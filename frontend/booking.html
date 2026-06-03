@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>預約免費試聽 | Mina 補習班</title>
+  <meta name="description" content="預約卓越補習班免費試聽，徐薇英文UP學、偉智數學WISE，不強迫報名。">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    .booking-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+    @media(min-width:1024px) {
+      .booking-layout { grid-template-columns: 1fr 400px; }
+    }
+    .booking-sidebar {
+      background: var(--bg-2);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+    }
+    .booking-sidebar h3 { margin-bottom: 20px; }
+    .booking-promise-list { display: flex; flex-direction: column; gap: 16px; }
+    .booking-promise-item { display: flex; gap: 12px; align-items: flex-start; }
+    .booking-promise-item .ico { font-size: 20px; flex-shrink: 0; }
+    .booking-promise-item strong { display: block; font-size: var(--fs-sm); margin-bottom: 2px; }
+    .booking-promise-item p { font-size: var(--fs-xs); color: var(--ink-3); margin: 0; }
+
+    .form-card {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      padding: 40px 32px;
+      box-shadow: var(--shadow-md);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media(max-width:639px) { .form-row { grid-template-columns: 1fr; } }
+
+    .submit-note { font-size: var(--fs-xs); color: var(--ink-3); margin-top: 12px; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" role="navigation" aria-label="主導覽">
+    <div class="wrap">
+      <a class="nav-logo" href="index.html">
+        <img src="https://placehold.co/120x36/B8005F/ffffff?text=Mina" alt="Mina 補習班" width="120" height="36">
+      </a>
+      <div class="nav-links">
+        <a href="index.html">首頁</a>
+        <a href="about.html">關於我們</a>
+        <a href="courses.html">課程介紹</a>
+        <a href="faq.html">常見問題</a>
+        <a href="booking.html" class="nav-cta">預約試聽</a>
+      </div>
+      <button class="nav-hamburger" aria-label="開啟選單" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" role="navigation" aria-label="行動裝置選單">
+    <a href="index.html">首頁</a>
+    <a href="about.html">關於我們</a>
+    <a href="courses.html">課程介紹</a>
+    <a href="faq.html">常見問題</a>
+    <a href="booking.html" class="mobile-cta">預約免費試聽</a>
+  </div>
+  <div class="nav-spacer"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="wrap">
+        <span class="kicker">FREE TRIAL</span>
+        <h1>預約免費試聽</h1>
+        <p>第一堂課完全免費，試聽後再決定是否報名</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="booking-layout">
+
+          <!-- Form -->
+          <div class="form-card reveal">
+            <h2 style="margin-bottom:8px;">填寫預約資料</h2>
+            <p style="color:var(--ink-3);font-size:var(--fs-sm);margin-bottom:32px;">老師將在 1–2 個工作天內與您聯繫確認。</p>
+
+            <form class="booking-form" id="booking-form" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="parent-name">家長姓名 <span class="required">*</span></label>
+                  <input type="text" id="parent-name" name="parentName" class="form-input"
+                    placeholder="王小明" autocomplete="name" required>
+                  <p class="form-error" id="err-parent-name">請輸入家長姓名</p>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="phone">聯絡電話 <span class="required">*</span></label>
+                  <input type="tel" id="phone" name="phone" class="form-input"
+                    placeholder="0912-345-678" autocomplete="tel" required>
+                  <p class="form-error" id="err-phone">請輸入有效的電話號碼</p>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="student-name">學生姓名 <span class="required">*</span></label>
+                  <input type="text" id="student-name" name="studentName" class="form-input"
+                    placeholder="王小華" required>
+                  <p class="form-error" id="err-student-name">請輸入學生姓名</p>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="grade">就讀年級 <span class="required">*</span></label>
+                  <select id="grade" name="grade" class="form-select" required>
+                    <option value="">請選擇年級</option>
+                    <option value="G1">國小一年級</option>
+                    <option value="G2">國小二年級</option>
+                    <option value="G3">國小三年級</option>
+                    <option value="G4">國小四年級</option>
+                    <option value="G5">國小五年級</option>
+                    <option value="G6">國小六年級</option>
+                  </select>
+                  <p class="form-error" id="err-grade">請選擇就讀年級</p>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">有興趣的課程 <span class="required">*</span></label>
+                <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;">
+                  <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:var(--fs-sm);">
+                    <input type="checkbox" name="courses" value="英文" style="accent-color:var(--pink);width:18px;height:18px;">
+                    <span>英文 UP學</span>
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:var(--fs-sm);">
+                    <input type="checkbox" name="courses" value="數學" style="accent-color:var(--orange);width:18px;height:18px;">
+                    <span>數學 WISE</span>
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:var(--fs-sm);">
+                    <input type="checkbox" name="courses" value="安親" style="accent-color:var(--green);width:18px;height:18px;">
+                    <span>課後安親</span>
+                  </label>
+                </div>
+                <p class="form-error" id="err-courses">請至少選擇一個課程</p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="preferred-time">希望試聽時段</label>
+                <select id="preferred-time" name="preferredTime" class="form-select">
+                  <option value="">不限（由老師安排）</option>
+                  <option value="weekday-afternoon">平日下午（14:00–16:00）</option>
+                  <option value="weekday-evening">平日傍晚（16:00–18:00）</option>
+                  <option value="weekday-night">平日晚間（18:00–20:00）</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="note">備注 / 孩子學習狀況</label>
+                <textarea id="note" name="note" class="form-textarea"
+                  placeholder="例如：孩子對英文比較沒有興趣，希望先了解課程內容…"></textarea>
+                <p class="form-hint">填寫越詳細，老師越能為您安排最合適的試聽課程。</p>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;" id="submit-btn">
+                送出預約申請 →
+              </button>
+              <p class="submit-note">送出後，老師將在 1–2 個工作天內電話確認。試聽完全免費、不強迫報名。</p>
+            </form>
+          </div>
+
+          <!-- Sidebar -->
+          <div>
+            <div class="booking-sidebar reveal">
+              <h3>✨ 試聽承諾</h3>
+              <div class="booking-promise-list">
+                <div class="booking-promise-item">
+                  <span class="ico">🆓</span>
+                  <div>
+                    <strong>完全免費</strong>
+                    <p>試聽一堂課，零費用、零負擔。</p>
+                  </div>
+                </div>
+                <div class="booking-promise-item">
+                  <span class="ico">🤝</span>
+                  <div>
+                    <strong>不強迫報名</strong>
+                    <p>試聽後如果不適合，完全不需要任何解釋，我們尊重您的選擇。</p>
+                  </div>
+                </div>
+                <div class="booking-promise-item">
+                  <span class="ico">📞</span>
+                  <div>
+                    <strong>老師親自聯繫</strong>
+                    <p>1–2 個工作天內電話確認時間，安排最合適的班級試聽。</p>
+                  </div>
+                </div>
+                <div class="booking-promise-item">
+                  <span class="ico">🎯</span>
+                  <div>
+                    <strong>程度評估</strong>
+                    <p>試聽同時了解孩子的程度，給予個人化的學習建議。</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:20px;padding:24px;background:var(--bg-2);border-radius:var(--radius-lg);" class="reveal">
+              <h4 style="margin-bottom:12px;">直接聯繫我們</h4>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <a href="tel:0423366868" style="display:flex;align-items:center;gap:8px;font-size:var(--fs-sm);color:var(--pink);font-weight:700;">
+                  <span>📞</span><span>04-2336-6868</span>
+                </a>
+                <div style="display:flex;align-items:flex-start;gap:8px;font-size:var(--fs-sm);color:var(--ink-2);">
+                  <span>📍</span><span>台中市烏日區健行北路96號</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:var(--fs-sm);color:var(--ink-2);">
+                  <span>🕐</span><span>週一至週五 13:30–20:00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <img src="https://placehold.co/120x36/ffffff/B8005F?text=Mina" alt="Mina 補習班" width="120" height="36">
+          </a>
+          <p class="footer-desc">台中市私立卓越國際文理短期補習班，提供英文、數學、安親小班教學。</p>
+          <div class="footer-contact">
+            <div class="footer-contact-item"><span class="ico">📞</span><span>04-2336-6868</span></div>
+            <div class="footer-contact-item"><span class="ico">📍</span><span>台中市烏日區健行北路96號</span></div>
+            <div class="footer-contact-item"><span class="ico">🕐</span><span>週一至週五 13:30–20:00</span></div>
+          </div>
+        </div>
+        <div>
+          <p class="footer-nav-title">課程</p>
+          <div class="footer-nav-links">
+            <a href="courses.html#english">徐薇英文 UP學</a>
+            <a href="courses.html#math">偉智數學 WISE</a>
+          </div>
+        </div>
+        <div>
+          <p class="footer-nav-title">關於</p>
+          <div class="footer-nav-links">
+            <a href="about.html">關於我們</a>
+            <a href="faq.html">常見問題</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 臺中市私立卓越國際文理短期補習班 版權所有</p>
+      </div>
+    </div>
+  </footer>
+
+  <button class="mina-widget-trigger" id="mina-trigger" aria-label="開啟 Mina 小幫手">
+    <span class="mina-avatar">🤖</span><span>Mina 小幫手</span>
+  </button>
+  <div class="mina-chat-panel" id="mina-panel" role="dialog" aria-label="Mina 小幫手對話" aria-hidden="true">
+    <div class="mina-chat-header">
+      <span style="width:32px;height:32px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">🤖</span>
+      <div><p class="mina-name">Mina 小幫手</p><p class="mina-status">線上中</p></div>
+      <button class="mina-close" id="mina-close" aria-label="關閉">✕</button>
+    </div>
+    <div class="mina-chat-body" id="mina-body"></div>
+  </div>
+
+  <script src="site.js"></script>
+  <script src="booking.js"></script>
+  <script src="faq.js"></script>
+</body>
+</html>
