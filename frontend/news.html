@@ -1,143 +1,325 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>最新消息 | Mina 補習班</title>
-  <meta name="description" content="卓越補習班最新消息、活動公告、課程資訊。">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>最新消息｜臺中市私立卓越國際文理短期補習班</title>
+<meta name="description" content="卓越國際文理最新公告、活動、特別課程與學習文章。台中烏日旭光國小旁的英數學院。"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
 </head>
-<body class="page-news-list">
+<body data-screen-label="最新消息">
 
-  <nav class="site-nav" role="navigation" aria-label="主導覽">
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="index.html">
+      <img src="assets/logo/zhuoyue-logo.svg" alt="卓越國際文理"/>
+      <span class="bt"><b>徐薇英文 × 偉智數學</b><span>RUBY × WISE</span></span>
+    </a>
+    <nav class="nav-links">
+      <a href="about.html">關於我們</a>
+      <a href="courses.html">課程介紹</a>
+      <a href="news.html" class="active">最新消息</a>
+      <a href="practice.html">題庫練習</a>
+      <a href="faq.html">常見問題</a>
+    </nav>
+    <a class="nav-cta" href="booking.html">預約免費試聽</a>
+    <button class="burger" id="burger" aria-label="選單"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="mm-backdrop" id="mmBackdrop"></div>
+<nav class="mobile-menu" id="mobileMenu">
+  <a href="about.html">關於我們</a>
+  <a href="courses.html">課程介紹</a>
+  <a href="news.html" class="active">最新消息</a>
+  <a href="practice.html">題庫練習</a>
+  <a href="faq.html">常見問題</a>
+  <a class="btn-primary" href="booking.html">預約一堂免費試聽 →</a>
+</nav>
+
+<main>
+  <!-- PAGE HERO -->
+  <section class="page-hero">
+    <div class="blob" style="width:200px;height:200px;background:var(--yellow);top:24px;left:8%;"></div>
+    <div class="blob" style="width:130px;height:130px;background:var(--orange-soft);bottom:6px;right:10%;"></div>
     <div class="wrap">
-      <a class="nav-logo" href="index.html">
-        <img src="https://placehold.co/120x36/B8005F/ffffff?text=Mina" alt="Mina 補習班" width="120" height="36">
-      </a>
-      <div class="nav-links">
-        <a href="index.html">首頁</a>
+      <div class="breadcrumb"><a href="index.html">首頁</a><span>›</span>最新消息</div>
+      <h1>最新<span class="hl">消息</span></h1>
+      <p class="ph-sub">公告、活動、特別課程與學習文章，<br class="br-soft">補習班的大小事，都在這裡<em>第一手</em>更新。</p>
+    </div>
+  </section>
+
+  <!-- NEWS LIST -->
+  <section class="sec-pad">
+    <div class="wrap">
+      <div class="news-filter reveal" id="newsFilter">
+        <button class="nfilter active" data-cat="all">全部</button>
+        <button class="nfilter" data-cat="notice">公告</button>
+        <button class="nfilter" data-cat="event">活動</button>
+        <button class="nfilter" data-cat="course">特別課程</button>
+        <button class="nfilter" data-cat="article">文章</button>
+      </div>
+
+      <div class="news-grid" id="newsGrid">
+        <!-- 活動 -->
+        <a class="ncard reveal" href="news-single.html" data-cat="event" data-date="2026-05-28">
+          <div class="nc-cover c-event"><span class="nc-ico">☀️</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-event">活動</span><span class="nc-date">2026.05.28</span></div>
+            <h3>2026 卓越夏令營　開始報名囉！</h3>
+            <p class="nc-excerpt">今年夏令營分英數加強與主題探索兩大路線，邊玩邊學、假期不退步。名額有限，趁早來幫孩子卡位。</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+        <!-- 公告 -->
+        <a class="ncard reveal" href="news-single.html" data-cat="notice" data-date="2026-05-20">
+          <div class="nc-cover c-notice"><span class="nc-ico">📢</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-notice">公告</span><span class="nc-date">2026.05.20</span></div>
+            <h3>端午連假停課與補課時間通知</h3>
+            <p class="nc-excerpt">配合端午連假，6/19–6/21 暫停所有課程，補課時段已排定。請家長留意班導 LINE 的個別通知。</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+        <!-- 特別課程 -->
+        <a class="ncard reveal" href="news-single.html" data-cat="course" data-date="2026-05-12">
+          <div class="nc-cover c-course"><span class="nc-ico">🔤</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-course">特別課程</span><span class="nc-date">2026.05.12</span></div>
+            <h3>正音小班制新班開課，幼大也能上</h3>
+            <p class="nc-excerpt">從自然發音到拼讀規則，6 人小班讓老師顧得到每個孩子。週六上午班，現正接受試聽預約。</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+        <!-- 文章 -->
+        <a class="ncard reveal" href="news-single.html" data-cat="article" data-date="2026-05-06">
+          <div class="nc-cover c-article"><span class="nc-ico">📖</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-article">文章</span><span class="nc-date">2026.05.06</span></div>
+            <h3>英文單字背了就忘？三個記得住的方法</h3>
+            <p class="nc-excerpt">與其死背，不如把單字放進句子和情境裡。分享三個我們在課堂上實測有效的記憶小技巧。</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+        <!-- 文章 -->
+        <a class="ncard reveal" href="news-single.html" data-cat="article" data-date="2026-04-28">
+          <div class="nc-cover c-article"><span class="nc-ico">📐</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-article">文章</span><span class="nc-date">2026.04.28</span></div>
+            <h3>段考前兩週，數學這樣準備最有效</h3>
+            <p class="nc-excerpt">先整理錯題、再練題型，最後做一次模擬。一份給家長與孩子的段考前衝刺時間表。</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+        <!-- 活動 -->
+        <a class="ncard reveal" href="news-single.html" data-cat="event" data-date="2026-04-18">
+          <div class="nc-cover c-event"><span class="nc-ico">🎨</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-event">活動</span><span class="nc-date">2026.04.18</span></div>
+            <h3>親子英語闖關日　活動花絮分享</h3>
+            <p class="nc-excerpt">上週末的闖關活動，孩子們用英文完成一關又一關的任務，家長也一起加入。謝謝大家的參與！</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+        <!-- 公告 -->
+        <a class="ncard reveal" href="news-single.html" data-cat="notice" data-date="2026-04-10">
+          <div class="nc-cover c-notice"><span class="nc-ico">🗓️</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-notice">公告</span><span class="nc-date">2026.04.10</span></div>
+            <h3>暑期班課表公布，歡迎預約諮詢</h3>
+            <p class="nc-excerpt">英數暑期班與安親銜接課程的時段已經出爐。想了解適合孩子的班別，歡迎來電或預約現場諮詢。</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+        <!-- 特別課程 -->
+        <a class="ncard reveal" href="news-single.html" data-cat="course" data-date="2026-04-02">
+          <div class="nc-cover c-course"><span class="nc-ico">🧮</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-course">特別課程</span><span class="nc-date">2026.04.02</span></div>
+            <h3>數學觀念養成班，先懂再練不怕難</h3>
+            <p class="nc-excerpt">針對中年級設計的觀念養成課，用生活例子把抽象觀念講清楚，幫孩子建立穩固的數學底子。</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+        <!-- 文章 -->
+        <a class="ncard reveal" href="news-single.html" data-cat="article" data-date="2026-03-25">
+          <div class="nc-cover c-article"><span class="nc-ico">💡</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-article">文章</span><span class="nc-date">2026.03.25</span></div>
+            <h3>孩子不愛寫作業？先別急著生氣</h3>
+            <p class="nc-excerpt">抗拒寫作業，往往是因為「不會」而不是「不想」。分享幾個讓孩子重新願意動筆的陪伴方式。</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+        <!-- 活動 -->
+        <a class="ncard reveal" href="news-single.html" data-cat="event" data-date="2026-03-15">
+          <div class="nc-cover c-event"><span class="nc-ico">🏆</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-event">活動</span><span class="nc-date">2026.03.15</span></div>
+            <h3>單字王挑戰賽　得獎名單出爐</h3>
+            <p class="nc-excerpt">恭喜這學期單字王挑戰賽的小達人們！大家這幾週的努力，老師們都看在眼裡，繼續加油。</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+        <!-- 公告 -->
+        <a class="ncard reveal" href="news-single.html" data-cat="notice" data-date="2026-03-05">
+          <div class="nc-cover c-notice"><span class="nc-ico">🚪</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-notice">公告</span><span class="nc-date">2026.03.05</span></div>
+            <h3>接送動線調整，請家長配合</h3>
+            <p class="nc-excerpt">為了孩子的安全，放學接送動線將自三月起調整。新的等候與上下車位置說明，請參閱內文。</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+        <!-- 文章 -->
+        <a class="ncard reveal" href="news-single.html" data-cat="article" data-date="2026-02-26">
+          <div class="nc-cover c-article"><span class="nc-ico">🗣️</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-article">文章</span><span class="nc-date">2026.02.26</span></div>
+            <h3>讓孩子開口說英文的三個小遊戲</h3>
+            <p class="nc-excerpt">在家也能玩的英語小遊戲，不用準備教具，吃飯散步都能練。重點是讓孩子覺得說英文是件好玩的事。</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="news-empty" id="newsEmpty"><span class="ee">🔍</span>這個分類目前還沒有消息，換個分類看看吧！</div>
+
+      <div class="pager" id="pager"></div>
+    </div>
+  </section>
+
+  <!-- MINA CHAT CTA -->
+  <section class="sec-pad" style="background:var(--bg-2);">
+    <div class="wrap">
+      <div class="linecta reveal">
+        <div class="lc-left">
+          <span class="lc-badge"><span class="pulse"></span>Mina 小幫手 在線上回覆中</span>
+          <h3>想了解最新活動？<span class="wig">👋</span></h3>
+          <p>看到喜歡的活動或課程，想報名或問細節，都歡迎找 Mina 小幫手，<br class="br-soft">Mina 小幫手 解決不了的，<b>老師都會親自回覆</b>喔！</p>
+          <a class="btn-w" href="faq.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> 跟 Mina 小幫手 聊聊</a>
+        </div>
+        <div class="chat">
+          <div class="chat-top">
+            <div class="chat-av">M</div>
+            <div><b>Mina 小幫手</b><span>● 在線</span></div>
+          </div>
+          <div class="chat-body">
+            <div class="bub me b1">看到夏令營報名了，請問還有名額嗎？</div>
+            <div class="bub mina b2">還有喔～我幫您留意一下梯次，方便先預約試聽認識孩子嗎？😊</div>
+            <div class="bub me b3">好，那要怎麼報名？</div>
+            <div class="typing"><i></i><i></i><i></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="ft-grid">
+      <div class="ft-brand">
+        <img src="assets/logo/zhuoyue-logo.svg" alt="卓越國際文理補習班"/>
+        <div class="fb-name"><span class="reg">立案登記</span>臺中市私立卓越國際文理短期補習班</div>
+        <div class="fb-brands">徐薇英文 UP學<span class="x">×</span>偉智數學 WISE</div>
+        <div class="fb-loc">台中市烏日區・旭光國小旁</div>
+      </div>
+      <div class="ft-col">
+        <h4>網站導覽</h4>
         <a href="about.html">關於我們</a>
         <a href="courses.html">課程介紹</a>
+        <a href="news.html">最新消息</a>
+        <a href="practice.html">題庫練習</a>
         <a href="faq.html">常見問題</a>
-        <a href="booking.html" class="nav-cta">預約試聽</a>
       </div>
-      <button class="nav-hamburger" aria-label="開啟選單" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+      <div class="ft-col">
+        <h4>聯絡我們</h4>
+        <a href="tel:0423366868">電話：04-2336-6868</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=%E5%8F%B0%E4%B8%AD%E5%B8%82%E7%83%8F%E6%97%A5%E5%8D%80%E5%81%A5%E8%A1%8C%E5%8C%97%E8%B7%AF96%E8%99%9F" target="_blank" rel="noopener">地址：台中市烏日區健行北路96號</a>
+        <a href="booking.html">預約免費試聽</a>
+        <a href="booking.html">服務時間：週一至週五 13:30–20:00</a>
+      </div>
     </div>
-  </nav>
-  <div class="mobile-menu" role="navigation" aria-label="行動裝置選單">
-    <a href="index.html">首頁</a>
-    <a href="about.html">關於我們</a>
-    <a href="courses.html">課程介紹</a>
-    <a href="faq.html">常見問題</a>
-    <a href="booking.html" class="mobile-cta">預約免費試聽</a>
+    <div class="ft-bottom">
+      <span>© 2026 臺中市私立卓越國際文理短期補習班</span>
+      <span>本頁為設計示意，文案與數據為佔位內容</span>
+    </div>
   </div>
-  <div class="nav-spacer"></div>
+</footer>
 
-  <main>
-    <section class="page-hero">
-      <div class="wrap">
-        <span class="kicker">LATEST NEWS</span>
-        <h1>最新消息</h1>
-        <p>課程資訊、活動公告、成果分享</p>
-      </div>
-    </section>
+<script src="site.js"></script>
+<script>
+(function(){
+  var PER_PAGE=9;
+  var grid=document.getElementById('newsGrid');
+  var cards=Array.prototype.slice.call(grid.querySelectorAll('.ncard'));
+  var filters=document.querySelectorAll('.nfilter');
+  var pager=document.getElementById('pager');
+  var empty=document.getElementById('newsEmpty');
+  var cat='all', page=1;
 
-    <section>
-      <div class="wrap">
+  function filtered(){
+    if(cat!=='all')return cards.filter(function(c){return c.dataset.cat===cat;});
+    var latest={};
+    cards.forEach(function(c){
+      var k=c.dataset.cat,d=c.dataset.date;
+      if(!latest[k]||d>latest[k].dataset.date)latest[k]=c;
+    });
+    return Object.keys(latest).map(function(k){return latest[k];})
+      .sort(function(a,b){return b.dataset.date<a.dataset.date?-1:1;});
+  }
 
-        <!-- Filter Bar -->
-        <div class="filter-bar" id="news-filter" role="tablist" aria-label="消息分類">
-          <button class="filter-tab active" data-category="all" role="tab" aria-selected="true">全部</button>
-          <button class="filter-tab" data-category="公告" role="tab" aria-selected="false">公告</button>
-          <button class="filter-tab" data-category="活動" role="tab" aria-selected="false">活動</button>
-          <button class="filter-tab" data-category="特別課程" role="tab" aria-selected="false">特別課程</button>
-          <button class="filter-tab" data-category="文章" role="tab" aria-selected="false">文章</button>
-        </div>
+  function render(){
+    var list=filtered();
+    var pages=Math.max(1,Math.ceil(list.length/PER_PAGE));
+    if(page>pages)page=pages;
+    cards.forEach(function(c){c.classList.add('hide');c.classList.remove('feat-card');var f=c.querySelector('.feat-flag');if(f)f.remove();});
+    grid.classList.toggle('overview',cat==='all');
+    var start=(page-1)*PER_PAGE;
+    var shown=list.slice(start,start+PER_PAGE);
+    shown.forEach(function(c){c.classList.remove('hide');});
+    if(cat==='all'&&shown.length){
+      var feat=shown[0];
+      feat.classList.add('feat-card');
+      var body=feat.querySelector('.nc-body');
+      var flag=document.createElement('span');
+      flag.className='feat-flag';flag.textContent='最新消息';
+      body.insertBefore(flag,body.firstChild);
+    }
+    empty.classList.toggle('show',list.length===0);
+    buildPager(pages);
+  }
 
-        <!-- Article Grid -->
-        <div class="grid-3" id="news-grid" aria-live="polite">
-          <!-- 由 news.js 動態渲染 -->
-        </div>
+  function buildPager(pages){
+    pager.innerHTML='';
+    if(pages<=1)return;
+    var prev=mkBtn('‹','pg-arrow');prev.disabled=(page===1);
+    prev.addEventListener('click',function(){if(page>1){page--;render();scrollTop();}});
+    pager.appendChild(prev);
+    for(var i=1;i<=pages;i++){(function(n){
+      var b=mkBtn(n,n===page?'active':'');
+      b.addEventListener('click',function(){page=n;render();scrollTop();});
+      pager.appendChild(b);
+    })(i);}
+    var next=mkBtn('›','pg-arrow');next.disabled=(page===pages);
+    next.addEventListener('click',function(){if(page<pages){page++;render();scrollTop();}});
+    pager.appendChild(next);
+  }
 
-        <!-- Empty State -->
-        <div class="empty-state" id="news-empty" style="display:none;">
-          <span class="emoji">😊</span>
-          <p>目前沒有消息，請稍後再看</p>
-        </div>
+  function mkBtn(label,cls){var b=document.createElement('button');b.textContent=label;if(cls)b.className=cls;return b;}
+  function scrollTop(){window.scrollTo({top:grid.offsetTop-120,behavior:'smooth'});}
 
-        <!-- Load More -->
-        <div class="load-more-wrap" id="load-more-wrap" style="display:none;">
-          <button class="btn btn-line" id="load-more-btn">載入更多</button>
-        </div>
+  filters.forEach(function(f){f.addEventListener('click',function(){
+    filters.forEach(function(x){x.classList.remove('active');});
+    f.classList.add('active');cat=f.dataset.cat;page=1;render();
+  });});
 
-      </div>
-    </section>
-
-    <section class="mina-cta-block">
-      <div class="wrap">
-        <span class="kicker" style="color:rgba(255,255,255,0.7)">FREE TRIAL</span>
-        <h2>想了解更多？</h2>
-        <p>有任何問題，歡迎直接預約試聽，老師親自說明。</p>
-        <a href="booking.html" class="btn btn-w">預約免費試聽 →</a>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="wrap">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="footer-logo">
-            <img src="https://placehold.co/120x36/ffffff/B8005F?text=Mina" alt="Mina 補習班" width="120" height="36">
-          </a>
-          <p class="footer-desc">台中市私立卓越國際文理短期補習班，提供英文、數學、安親小班教學。</p>
-          <div class="footer-contact">
-            <div class="footer-contact-item"><span class="ico">📞</span><span>04-2336-6868</span></div>
-            <div class="footer-contact-item"><span class="ico">📍</span><span>台中市烏日區健行北路96號</span></div>
-            <div class="footer-contact-item"><span class="ico">🕐</span><span>週一至週五 13:30–20:00</span></div>
-          </div>
-        </div>
-        <div>
-          <p class="footer-nav-title">課程</p>
-          <div class="footer-nav-links">
-            <a href="courses.html#english">徐薇英文 UP學</a>
-            <a href="courses.html#math">偉智數學 WISE</a>
-            <a href="courses.html#afterschool">課後安親</a>
-          </div>
-        </div>
-        <div>
-          <p class="footer-nav-title">關於</p>
-          <div class="footer-nav-links">
-            <a href="about.html">關於我們</a>
-            <a href="faq.html">常見問題</a>
-            <a href="booking.html">預約試聽</a>
-          </div>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p class="footer-copy">© 2026 臺中市私立卓越國際文理短期補習班 版權所有</p>
-      </div>
-    </div>
-  </footer>
-
-  <button class="mina-widget-trigger" id="mina-trigger" aria-label="開啟 Mina 小幫手">
-    <span class="mina-avatar">🤖</span><span>Mina 小幫手</span>
-  </button>
-  <div class="mina-chat-panel" id="mina-panel" role="dialog" aria-label="Mina 小幫手對話" aria-hidden="true">
-    <div class="mina-chat-header">
-      <span style="width:32px;height:32px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">🤖</span>
-      <div><p class="mina-name">Mina 小幫手</p><p class="mina-status">線上中</p></div>
-      <button class="mina-close" id="mina-close" aria-label="關閉">✕</button>
-    </div>
-    <div class="mina-chat-body" id="mina-body"></div>
-  </div>
-
-  <script src="site.js"></script>
-  <script src="news.js"></script>
-  <script src="faq.js"></script>
+  render();
+})();
+</script>
 </body>
 </html>
