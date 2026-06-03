@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /booking-success.html
+
+Sitemap: https://mina-website.pages.dev/sitemap.xml
