@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>課程介紹 | Mina 補習班 — 徐薇英文 UP學 × 偉智數學 WISE</title>
+  <meta name="description" content="徐薇英文UP學、偉智數學WISE、課後安親班，國小一至六年級小班教學，免費試聽。">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    .course-detail-section { padding: 80px 0; }
+    .course-detail-section:nth-child(even) { background: var(--bg-2); }
+    .course-detail-inner { display:grid; gap:48px; grid-template-columns:1fr; align-items:center; }
+    @media(min-width:1024px) {
+      .course-detail-inner { grid-template-columns: 1fr 1fr; }
+      .course-detail-inner.reverse > :first-child { order: 2; }
+      .course-detail-inner.reverse > :last-child { order: 1; }
+    }
+    .course-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: var(--radius-pill);
+      font-size: var(--fs-xs);
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+    .course-feature-list { display:flex; flex-direction:column; gap:12px; margin: 20px 0; }
+    .course-feature-item { display:flex; align-items:flex-start; gap:12px; }
+    .course-feature-item .check {
+      flex-shrink:0; width:22px; height:22px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; margin-top:2px;
+    }
+    .check-pink   { background: var(--pink); }
+    .check-orange { background: var(--orange); }
+    .check-green  { background: var(--green); }
+    .course-feature-item p { font-size:var(--fs-sm); color:var(--ink-2); margin:0; }
+    .course-feature-item strong { display:block; font-size:var(--fs-base); color:var(--ink); margin-bottom:2px; }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" role="navigation" aria-label="主導覽">
+    <div class="wrap">
+      <a class="nav-logo" href="index.html">
+        <img src="https://placehold.co/120x36/B8005F/ffffff?text=Mina" alt="Mina 補習班" width="120" height="36">
+      </a>
+      <div class="nav-links">
+        <a href="index.html">首頁</a>
+        <a href="about.html">關於我們</a>
+        <a href="courses.html">課程介紹</a>
+        <a href="faq.html">常見問題</a>
+        <a href="booking.html" class="nav-cta">預約試聽</a>
+      </div>
+      <button class="nav-hamburger" aria-label="開啟選單" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" role="navigation" aria-label="行動裝置選單">
+    <a href="index.html">首頁</a>
+    <a href="about.html">關於我們</a>
+    <a href="courses.html">課程介紹</a>
+    <a href="faq.html">常見問題</a>
+    <a href="booking.html" class="mobile-cta">預約免費試聽</a>
+  </div>
+  <div class="nav-spacer"></div>
+
+  <main>
+
+    <!-- Page Hero -->
+    <section class="page-hero">
+      <div class="wrap">
+        <span class="kicker">COURSES</span>
+        <h1>課程介紹</h1>
+        <p>三大課程，全面培育，陪伴孩子每一步成長</p>
+      </div>
+    </section>
+
+    <!-- Quick Nav -->
+    <section style="padding:32px 0; background:var(--bg); border-bottom:1px solid var(--line-2);">
+      <div class="wrap">
+        <div class="filter-bar" style="justify-content:center;">
+          <a href="#english" class="filter-tab">📚 徐薇英文 UP學</a>
+          <a href="#math" class="filter-tab">🔢 偉智數學 WISE</a>
+          <a href="#afterschool" class="filter-tab">🏠 課後安親</a>
+          <a href="#schedule" class="filter-tab">🕐 課程時段</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- English -->
+    <section class="course-detail-section" id="english">
+      <div class="wrap">
+        <div class="course-detail-inner">
+          <div class="reveal">
+            <span class="course-badge" style="background:var(--pink-soft);color:var(--pink);">徐薇英文 UP學</span>
+            <h2>英文課程</h2>
+            <p style="color:var(--ink-3);margin:4px 0 20px;">適合國小一至六年級</p>
+            <p style="color:var(--ink-2);">徐薇老師精心設計的英文課程，從聽說讀寫全方位訓練，讓孩子在輕鬆愉快的氛圍中，真正建立英文能力，而不只是應付考試。</p>
+            <div class="course-feature-list">
+              <div class="course-feature-item">
+                <span class="check check-pink">✓</span>
+                <div><strong>自然發音系統</strong><p>從發音規則出發，讓孩子看到生字就會念，不再死背單字。</p></div>
+              </div>
+              <div class="course-feature-item">
+                <span class="check check-pink">✓</span>
+                <div><strong>聽說讀寫四技並重</strong><p>課堂互動豐富，不只是做題目，真正開口說、動手寫。</p></div>
+              </div>
+              <div class="course-feature-item">
+                <span class="check check-pink">✓</span>
+                <div><strong>文法輕鬆學</strong><p>生活化情境帶入文法，讓孩子理解規則，而不是死背規則。</p></div>
+              </div>
+              <div class="course-feature-item">
+                <span class="check check-pink">✓</span>
+                <div><strong>小班分組</strong><p>依程度分組，確保每個孩子都能跟上，也不讓學得快的孩子覺得無聊。</p></div>
+              </div>
+            </div>
+            <a href="booking.html" class="btn btn-primary">預約英文試聽 →</a>
+          </div>
+          <div class="reveal">
+            <img src="https://placehold.co/560x420/fff5f8/B8005F?text=英文課程" alt="英文課程" style="width:100%;border-radius:var(--radius-lg);">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Math -->
+    <section class="course-detail-section" id="math">
+      <div class="wrap">
+        <div class="course-detail-inner reverse">
+          <div class="reveal">
+            <span class="course-badge" style="background:#fff8f0;color:var(--orange);">偉智數學 WISE</span>
+            <h2>數學課程</h2>
+            <p style="color:var(--ink-3);margin:4px 0 20px;">適合國小一至六年級</p>
+            <p style="color:var(--ink-2);">偉智老師用「理解」取代「死記」，讓孩子真正搞懂數學背後的邏輯。小班制讓老師能掌握每個孩子的狀況，課後有問題也可以問老師。</p>
+            <div class="course-feature-list">
+              <div class="course-feature-item">
+                <span class="check check-orange">✓</span>
+                <div><strong>邏輯思維培養</strong><p>不只教計算，更教思考方式，建立解題能力。</p></div>
+              </div>
+              <div class="course-feature-item">
+                <span class="check check-orange">✓</span>
+                <div><strong>應用題解題策略</strong><p>系統化分析題目，讓孩子看到複雜題目也不慌張。</p></div>
+              </div>
+              <div class="course-feature-item">
+                <span class="check check-orange">✓</span>
+                <div><strong>概念深化不死記</strong><p>從生活情境理解數學，讓公式有意義，而不只是符號。</p></div>
+              </div>
+              <div class="course-feature-item">
+                <span class="check check-orange">✓</span>
+                <div><strong>銜接國中數學</strong><p>紮實的國小數學基礎，讓孩子進入國中後更有優勢。</p></div>
+              </div>
+            </div>
+            <a href="booking.html" class="btn btn-orange">預約數學試聽 →</a>
+          </div>
+          <div class="reveal">
+            <img src="https://placehold.co/560x420/fff8f0/F07800?text=數學課程" alt="數學課程" style="width:100%;border-radius:var(--radius-lg);">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- After School -->
+    <section class="course-detail-section" id="afterschool">
+      <div class="wrap">
+        <div class="course-detail-inner">
+          <div class="reveal">
+            <span class="course-badge" style="background:var(--green-soft);color:var(--green);">課後安親</span>
+            <h2>安親班</h2>
+            <p style="color:var(--ink-3);margin:4px 0 20px;">適合國小一至六年級</p>
+            <p style="color:var(--ink-2);">讓家長安心、讓孩子開心。安全舒適的環境，有老師陪伴完成作業，培養自主學習習慣，也照顧孩子的生活起居。</p>
+            <div class="course-feature-list">
+              <div class="course-feature-item">
+                <span class="check check-green">✓</span>
+                <div><strong>作業輔導</strong><p>老師協助完成學校作業，有疑問立即解答。</p></div>
+              </div>
+              <div class="course-feature-item">
+                <span class="check check-green">✓</span>
+                <div><strong>自主學習時間</strong><p>養成良好的學習習慣，為未來打好基礎。</p></div>
+              </div>
+              <div class="course-feature-item">
+                <span class="check check-green">✓</span>
+                <div><strong>晚餐點心</strong><p>貼心準備，讓孩子補充能量再出發。</p></div>
+              </div>
+              <div class="course-feature-item">
+                <span class="check check-green">✓</span>
+                <div><strong>品格教育</strong><p>生活教育、人際互動，培養全方位的好孩子。</p></div>
+              </div>
+            </div>
+            <a href="booking.html" class="btn" style="background:var(--green);border:2px solid var(--green);color:#fff;">預約安親試聽 →</a>
+          </div>
+          <div class="reveal">
+            <img src="https://placehold.co/560x420/eafaf1/3C7A4E?text=安親班" alt="安親班" style="width:100%;border-radius:var(--radius-lg);">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Schedule -->
+    <section style="background:var(--bg-2);" id="schedule">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="kicker">SCHEDULE</span>
+          <h2>課程時段</h2>
+          <p>依不同年級與班別安排上課時間</p>
+        </div>
+        <div class="reveal" style="overflow-x:auto;">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th>課程</th>
+                <th>年級</th>
+                <th>時段</th>
+                <th>週次</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="tag">英文 UP學</span></td>
+                <td>低年級（1–2年級）</td>
+                <td>14:00–15:30</td>
+                <td>週一 / 三 / 五</td>
+              </tr>
+              <tr>
+                <td><span class="tag">英文 UP學</span></td>
+                <td>中高年級（3–6年級）</td>
+                <td>16:00–17:30</td>
+                <td>週一 / 三 / 五</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-orange">數學 WISE</span></td>
+                <td>低年級（1–2年級）</td>
+                <td>14:00–15:30</td>
+                <td>週二 / 四</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-orange">數學 WISE</span></td>
+                <td>中高年級（3–6年級）</td>
+                <td>16:00–17:30</td>
+                <td>週二 / 四</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-green">課後安親</span></td>
+                <td>全年級</td>
+                <td>13:30–20:00</td>
+                <td>週一至週五</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="note schedule-note">以上為示意時段，實際開課時間以現場公告為準。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="mina-cta-block">
+      <div class="wrap">
+        <span class="kicker" style="color:rgba(255,255,255,0.7)">FREE TRIAL</span>
+        <h2>選好課程了嗎？</h2>
+        <p>第一堂課完全免費，帶孩子來體驗！</p>
+        <div class="gap-ctas">
+          <a href="booking.html" class="btn btn-w">預約免費試聽 →</a>
+          <a href="faq.html" class="btn" style="background:transparent;border:2px solid rgba(255,255,255,0.6);color:#fff;">常見問題</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <img src="https://placehold.co/120x36/ffffff/B8005F?text=Mina" alt="Mina 補習班" width="120" height="36">
+          </a>
+          <p class="footer-desc">台中市私立卓越國際文理短期補習班，提供英文、數學、安親小班教學。</p>
+          <div class="footer-contact">
+            <div class="footer-contact-item"><span class="ico">📞</span><span>04-2336-6868</span></div>
+            <div class="footer-contact-item"><span class="ico">📍</span><span>台中市烏日區健行北路96號</span></div>
+            <div class="footer-contact-item"><span class="ico">🕐</span><span>週一至週五 13:30–20:00</span></div>
+          </div>
+        </div>
+        <div>
+          <p class="footer-nav-title">課程</p>
+          <div class="footer-nav-links">
+            <a href="#english">徐薇英文 UP學</a>
+            <a href="#math">偉智數學 WISE</a>
+            <a href="#afterschool">課後安親</a>
+            <a href="#schedule">課程時段</a>
+          </div>
+        </div>
+        <div>
+          <p class="footer-nav-title">關於</p>
+          <div class="footer-nav-links">
+            <a href="about.html">關於我們</a>
+            <a href="faq.html">常見問題</a>
+            <a href="booking.html">預約試聽</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 臺中市私立卓越國際文理短期補習班 版權所有</p>
+      </div>
+    </div>
+  </footer>
+
+  <button class="mina-widget-trigger" id="mina-trigger" aria-label="開啟 Mina 小幫手">
+    <span class="mina-avatar">🤖</span><span>Mina 小幫手</span>
+  </button>
+  <div class="mina-chat-panel" id="mina-panel" role="dialog" aria-label="Mina 小幫手對話" aria-hidden="true">
+    <div class="mina-chat-header">
+      <span style="width:32px;height:32px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">🤖</span>
+      <div><p class="mina-name">Mina 小幫手</p><p class="mina-status">線上中</p></div>
+      <button class="mina-close" id="mina-close" aria-label="關閉">✕</button>
+    </div>
+    <div class="mina-chat-body" id="mina-body"></div>
+  </div>
+
+  <script src="site.js"></script>
+  <script src="faq.js"></script>
+</body>
+</html>
