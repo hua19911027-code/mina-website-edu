@@ -1,221 +1,245 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>最新消息 | Mina 補習班</title>
-  <meta name="description" content="">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <style>
-    .article-layout {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 48px 0 80px;
-    }
-    .article-header { margin-bottom: 32px; }
-    .article-header h1 { font-size: var(--fs-2xl); margin: 12px 0; }
-    .article-meta {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-      font-size: var(--fs-sm);
-      color: var(--ink-3);
-    }
-    .article-cover {
-      aspect-ratio: 16/9;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      margin-bottom: 32px;
-      background: var(--bg-3);
-    }
-    .article-cover img { width:100%; height:100%; object-fit:cover; }
-    .article-footer {
-      margin-top: 48px;
-      padding-top: 32px;
-      border-top: 1px solid var(--line-2);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    /* Skeleton */
-    .article-skeleton .skeleton-heading { height:36px; width:75%; margin-bottom:16px; }
-    .article-skeleton .skeleton-meta   { height:14px; width:40%; margin-bottom:32px; }
-    .article-skeleton .skeleton-cover  { aspect-ratio:16/9; border-radius:var(--radius-lg); margin-bottom:32px; }
-    .article-skeleton .skeleton-lines  { display:flex;flex-direction:column;gap:12px; }
-    .article-skeleton .skeleton-line   { height:14px; }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>2026 卓越夏令營開始報名｜最新消息｜卓越國際文理</title>
+<meta name="description" content="2026 卓越夏令營分英數加強與主題探索兩大路線，邊玩邊學、假期不退步。名額有限，歡迎預約諮詢。"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
 </head>
-<body class="page-news-single">
+<body data-screen-label="最新消息單篇">
 
-  <nav class="site-nav" role="navigation" aria-label="主導覽">
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="index.html">
+      <img src="assets/logo/zhuoyue-logo.svg" alt="卓越國際文理"/>
+      <span class="bt"><b>徐薇英文 × 偉智數學</b><span>RUBY × WISE</span></span>
+    </a>
+    <nav class="nav-links">
+      <a href="about.html">關於我們</a>
+      <a href="courses.html">課程介紹</a>
+      <a href="news.html" class="active">最新消息</a>
+      <a href="practice.html">題庫練習</a>
+      <a href="faq.html">常見問題</a>
+    </nav>
+    <a class="nav-cta" href="booking.html">預約免費試聽</a>
+    <button class="burger" id="burger" aria-label="選單"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="mm-backdrop" id="mmBackdrop"></div>
+<nav class="mobile-menu" id="mobileMenu">
+  <a href="about.html">關於我們</a>
+  <a href="courses.html">課程介紹</a>
+  <a href="news.html" class="active">最新消息</a>
+  <a href="practice.html">題庫練習</a>
+  <a href="faq.html">常見問題</a>
+  <a class="btn-primary" href="booking.html">預約一堂免費試聽 →</a>
+</nav>
+
+<main>
+  <!-- ARTICLE HERO -->
+  <section class="page-hero" style="padding-bottom:18px;">
+    <div class="blob" style="width:170px;height:170px;background:var(--orange-soft);top:26px;left:9%;"></div>
+    <div class="wrap" style="max-width:780px;">
+      <div class="breadcrumb"><a href="index.html">首頁</a><span>›</span><a href="news.html">最新消息</a><span>›</span>2026 卓越夏令營</div>
+      <h1 style="font-size:clamp(28px,4.2vw,46px);">2026 卓越夏令營<br>開始報名囉！</h1>
+    </div>
+  </section>
+
+  <section class="sec-pad" style="padding-top:30px;">
     <div class="wrap">
-      <a class="nav-logo" href="index.html">
-        <img src="https://placehold.co/120x36/B8005F/ffffff?text=Mina" alt="Mina 補習班" width="120" height="36">
-      </a>
-      <div class="nav-links">
-        <a href="index.html">首頁</a>
+      <article class="article reveal">
+        <div class="art-meta">
+          <span class="nc-cat c-event">活動</span>
+          <span class="nc-date">2026.05.28</span>
+        </div>
+
+        <div class="art-cover c-event"><span class="ac-ico">☀️</span></div>
+
+        <div class="photo-carousel" id="carousel" role="region" aria-label="活動照片">
+          <div class="carousel-track">
+            <div class="carousel-slide on"><div class="ph-slide"><span class="pi">📸</span>活動花絮照片 1</div></div>
+            <div class="carousel-slide"><div class="ph-slide"><span class="pi">🎒</span>活動花絮照片 2</div></div>
+            <div class="carousel-slide"><div class="ph-slide"><span class="pi">🙌</span>活動花絮照片 3</div></div>
+            <div class="carousel-slide"><div class="ph-slide"><span class="pi">🎉</span>活動花絮照片 4</div></div>
+            <div class="carousel-slide"><div class="ph-slide"><span class="pi">📝</span>活動花絮照片 5</div></div>
+          </div>
+          <button class="carousel-prev" aria-label="上一張">‹</button>
+          <button class="carousel-next" aria-label="下一張">›</button>
+          <div class="carousel-dots" aria-hidden="true"></div>
+          <div class="carousel-counter" aria-live="polite">1 / 5</div>
+        </div>
+
+        <div class="art-body">
+          <p>暑假是孩子最容易「鬆掉」的兩個月，也是把基礎補回來、甚至超前的好機會。今年的卓越夏令營，我們把課程分成兩大路線，讓不同需求的孩子都能找到適合的節奏。</p>
+
+          <h2>兩大路線，依需求選擇</h2>
+          <ul>
+            <li><strong>英數加強路線</strong>：針對上學期較吃力的單元做系統複習，並預習下學期重點，開學不慌張。</li>
+            <li><strong>主題探索路線</strong>：用專題式學習結合英語會話與邏輯思考，邊玩邊學，培養興趣與表達力。</li>
+          </ul>
+
+          <div class="art-callout">兩條路線都採小班制，老師顧得到每個孩子的進度，也會在課後跟家長回報學習狀況。</div>
+
+          <h2>營隊資訊</h2>
+          <ul>
+            <li>對象：國小 1–6 年級</li>
+            <li>梯次：7 月、8 月，各分上下半月（示意，實際梯次以現場公告為準）</li>
+            <li>地點：台中市烏日區健行北路96號（旭光國小旁）</li>
+          </ul>
+
+          <h3>名額有限，建議提早預約</h3>
+          <p>每個梯次的名額都不多，想了解適合孩子的路線與時段，歡迎直接來電 04-2336-6868，或在線上預約一堂免費試聽，讓我們先認識孩子，再幫他安排最合適的安排。</p>
+        </div>
+
+        <div class="art-foot">
+          <a class="art-back" href="news.html">← 返回最新消息</a>
+          <div class="art-share">
+            <span class="sh-label">分享：</span>
+            <button class="sh-btn line" id="shLine" aria-label="分享到 LINE">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 5.69 2 10.23c0 4.07 3.55 7.48 8.34 8.13.32.07.77.21.88.49.1.25.06.64.03.89l-.14.85c-.04.25-.2.99.87.54s5.77-3.4 7.87-5.82C21.39 13.65 22 12.01 22 10.23 22 5.69 17.52 2 12 2z"/></svg>
+            </button>
+            <button class="sh-btn fb" id="shFb" aria-label="分享到 Facebook">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg>
+            </button>
+            <button class="sh-btn copy" id="shCopy" aria-label="複製連結">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </button>
+            <span class="sh-toast" id="shToast">已複製連結！</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- RELATED -->
+  <section class="sec-pad" style="background:var(--bg-2);padding-top:56px;">
+    <div class="wrap">
+      <div class="sec-head reveal" style="margin-bottom:30px;">
+        <span class="kicker">✦ More News</span>
+        <h2 class="sec-h" style="font-size:clamp(24px,3.2vw,34px);">你可能也想看</h2>
+      </div>
+      <div class="related">
+        <a class="ncard reveal" href="news-single.html">
+          <div class="nc-cover c-course"><span class="nc-ico">🔤</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-course">特別課程</span><span class="nc-date">2026.05.12</span></div>
+            <h3>正音小班制新班開課，幼大也能上</h3>
+            <p class="nc-excerpt">從自然發音到拼讀規則，6 人小班讓老師顧得到每個孩子。週六上午班，現正接受試聽預約。</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+        <a class="ncard reveal" href="news-single.html">
+          <div class="nc-cover c-article"><span class="nc-ico">📐</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-article">文章</span><span class="nc-date">2026.04.28</span></div>
+            <h3>段考前兩週，數學這樣準備最有效</h3>
+            <p class="nc-excerpt">先整理錯題、再練題型，最後做一次模擬。一份給家長與孩子的段考前衝刺時間表。</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+        <a class="ncard reveal" href="news-single.html">
+          <div class="nc-cover c-event"><span class="nc-ico">🎨</span></div>
+          <div class="nc-body">
+            <div class="nc-meta"><span class="nc-cat c-event">活動</span><span class="nc-date">2026.04.18</span></div>
+            <h3>親子英語闖關日　活動花絮分享</h3>
+            <p class="nc-excerpt">上週末的闖關活動，孩子們用英文完成一關又一關的任務，家長也一起加入。謝謝大家的參與！</p>
+            <span class="nc-more">閱讀更多 →</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="ft-grid">
+      <div class="ft-brand">
+        <img src="assets/logo/zhuoyue-logo.svg" alt="卓越國際文理補習班"/>
+        <div class="fb-name"><span class="reg">立案登記</span>臺中市私立卓越國際文理短期補習班</div>
+        <div class="fb-brands">徐薇英文 UP學<span class="x">×</span>偉智數學 WISE</div>
+        <div class="fb-loc">台中市烏日區・旭光國小旁</div>
+      </div>
+      <div class="ft-col">
+        <h4>網站導覽</h4>
         <a href="about.html">關於我們</a>
         <a href="courses.html">課程介紹</a>
+        <a href="news.html">最新消息</a>
+        <a href="practice.html">題庫練習</a>
         <a href="faq.html">常見問題</a>
-        <a href="booking.html" class="nav-cta">預約試聽</a>
       </div>
-      <button class="nav-hamburger" aria-label="開啟選單" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+      <div class="ft-col">
+        <h4>聯絡我們</h4>
+        <a href="tel:0423366868">電話：04-2336-6868</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=%E5%8F%B0%E4%B8%AD%E5%B8%82%E7%83%8F%E6%97%A5%E5%8D%80%E5%81%A5%E8%A1%8C%E5%8C%97%E8%B7%AF96%E8%99%9F" target="_blank" rel="noopener">地址：台中市烏日區健行北路96號</a>
+        <a href="booking.html">預約免費試聽</a>
+        <a href="booking.html">服務時間：週一至週五 13:30–20:00</a>
+      </div>
     </div>
-  </nav>
-  <div class="mobile-menu" role="navigation" aria-label="行動裝置選單">
-    <a href="index.html">首頁</a>
-    <a href="about.html">關於我們</a>
-    <a href="courses.html">課程介紹</a>
-    <a href="faq.html">常見問題</a>
-    <a href="booking.html" class="mobile-cta">預約免費試聽</a>
+    <div class="ft-bottom">
+      <span>© 2026 臺中市私立卓越國際文理短期補習班</span>
+      <span>本頁為設計示意，文案與數據為佔位內容</span>
+    </div>
   </div>
-  <div class="nav-spacer"></div>
+</footer>
 
-  <main>
-    <div class="wrap">
-      <div class="article-layout">
+<script src="site.js"></script>
+<script>
+(function(){
+  var car=document.getElementById('carousel');
+  if(car){
+    var slides=Array.prototype.slice.call(car.querySelectorAll('.carousel-slide'));
+    var dotsWrap=car.querySelector('.carousel-dots');
+    var counter=car.querySelector('.carousel-counter');
+    var prev=car.querySelector('.carousel-prev');
+    var next=car.querySelector('.carousel-next');
+    var i=0,n=slides.length;
+    if(n<=1){prev.style.display=next.style.display=dotsWrap.style.display=counter.style.display='none';}
+    else if(n<=10){slides.forEach(function(s,idx){
+      var d=document.createElement('button');d.className='dot'+(idx===0?' on':'');
+      d.setAttribute('aria-label','第 '+(idx+1)+' 張');
+      d.addEventListener('click',function(){go(idx);});dotsWrap.appendChild(d);
+    });}
+    function go(k){
+      i=(k+n)%n;
+      slides.forEach(function(s,idx){s.classList.toggle('on',idx===i);});
+      var dots=dotsWrap.querySelectorAll('.dot');
+      dots.forEach(function(d,idx){d.classList.toggle('on',idx===i);});
+      counter.textContent=(i+1)+' / '+n;
+    }
+    prev.addEventListener('click',function(){go(i-1);});
+    next.addEventListener('click',function(){go(i+1);});
+    document.addEventListener('keydown',function(e){
+      if(e.key==='ArrowLeft')go(i-1);else if(e.key==='ArrowRight')go(i+1);
+    });
+    var x0=null;
+    car.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;},{passive:true});
+    car.addEventListener('touchend',function(e){
+      if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;
+      if(Math.abs(dx)>40)go(dx<0?i+1:i-1);x0=null;
+    },{passive:true});
+  }
 
-        <!-- Back link -->
-        <a href="news.html" class="back-link">← 返回最新消息</a>
-
-        <!-- Article content (rendered by news.js) -->
-        <article id="article-container">
-
-          <!-- Loading state -->
-          <div class="article-skeleton" id="article-skeleton">
-            <div class="skeleton skeleton-heading"></div>
-            <div class="skeleton skeleton-meta"></div>
-            <div class="skeleton skeleton-cover"></div>
-            <div class="skeleton-lines">
-              <div class="skeleton skeleton-line w-full"></div>
-              <div class="skeleton skeleton-line w-3q"></div>
-              <div class="skeleton skeleton-line w-full"></div>
-              <div class="skeleton skeleton-line w-half"></div>
-              <div class="skeleton skeleton-line w-full"></div>
-              <div class="skeleton skeleton-line w-3q"></div>
-            </div>
-          </div>
-
-          <!-- Article body (shown by JS) -->
-          <div id="article-body" style="display:none;">
-            <header class="article-header">
-              <div class="article-meta">
-                <span class="tag" id="article-category"></span>
-                <span id="article-date"></span>
-              </div>
-              <h1 id="article-title"></h1>
-            </header>
-
-            <!-- Cover Image -->
-            <div class="article-cover">
-              <img id="article-cover-img" src="" alt="" loading="eager"
-                onerror="this.src='https://placehold.co/800x450/f0ece8/B8005F?text=Mina'">
-            </div>
-
-            <!-- Photo Carousel (活動 category) -->
-            <div class="photo-carousel" id="photo-carousel">
-              <div class="carousel-track"></div>
-              <button class="carousel-prev" aria-label="上一張">‹</button>
-              <button class="carousel-next" aria-label="下一張">›</button>
-              <div class="carousel-counter" aria-live="polite"></div>
-              <div class="carousel-dots" role="tablist"></div>
-            </div>
-
-            <!-- Content -->
-            <div class="article-content" id="article-content"></div>
-
-            <!-- Footer -->
-            <footer class="article-footer">
-              <a href="news.html" class="back-link" style="margin:0;">← 返回最新消息</a>
-              <button class="btn btn-line btn-sm" id="copy-link-btn">🔗 複製連結</button>
-            </footer>
-          </div>
-
-          <!-- 404 state -->
-          <div id="article-404" style="display:none;" class="empty-state">
-            <span class="emoji">😢</span>
-            <p>找不到這篇文章</p>
-            <a href="news.html" class="btn btn-primary" style="margin-top:24px;display:inline-flex;">返回最新消息</a>
-          </div>
-
-        </article>
-      </div>
-    </div>
-
-    <!-- Mina CTA -->
-    <section class="mina-cta-block">
-      <div class="wrap">
-        <span class="kicker" style="color:rgba(255,255,255,0.7)">MINA ASSISTANT</span>
-        <h2>還有問題嗎？</h2>
-        <p>Mina 小幫手隨時為您解答。</p>
-        <div class="gap-ctas">
-          <a href="faq.html" class="btn btn-w">常見問題</a>
-          <a href="booking.html" class="btn" style="background:transparent;border:2px solid rgba(255,255,255,0.6);color:#fff;">預約試聽</a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="wrap">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="footer-logo">
-            <img src="https://placehold.co/120x36/ffffff/B8005F?text=Mina" alt="Mina 補習班" width="120" height="36">
-          </a>
-          <p class="footer-desc">台中市私立卓越國際文理短期補習班，提供英文、數學、安親小班教學。</p>
-          <div class="footer-contact">
-            <div class="footer-contact-item"><span class="ico">📞</span><span>04-2336-6868</span></div>
-            <div class="footer-contact-item"><span class="ico">📍</span><span>台中市烏日區健行北路96號</span></div>
-            <div class="footer-contact-item"><span class="ico">🕐</span><span>週一至週五 13:30–20:00</span></div>
-          </div>
-        </div>
-        <div>
-          <p class="footer-nav-title">課程</p>
-          <div class="footer-nav-links">
-            <a href="courses.html#english">徐薇英文 UP學</a>
-            <a href="courses.html#math">偉智數學 WISE</a>
-            <a href="courses.html#afterschool">課後安親</a>
-          </div>
-        </div>
-        <div>
-          <p class="footer-nav-title">關於</p>
-          <div class="footer-nav-links">
-            <a href="about.html">關於我們</a>
-            <a href="news.html">最新消息</a>
-            <a href="faq.html">常見問題</a>
-            <a href="booking.html">預約試聽</a>
-          </div>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p class="footer-copy">© 2026 臺中市私立卓越國際文理短期補習班 版權所有</p>
-      </div>
-    </div>
-  </footer>
-
-  <button class="mina-widget-trigger" id="mina-trigger" aria-label="開啟 Mina 小幫手">
-    <span class="mina-avatar">🤖</span><span>Mina 小幫手</span>
-  </button>
-  <div class="mina-chat-panel" id="mina-panel" role="dialog" aria-label="Mina 小幫手對話" aria-hidden="true">
-    <div class="mina-chat-header">
-      <span style="width:32px;height:32px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">🤖</span>
-      <div><p class="mina-name">Mina 小幫手</p><p class="mina-status">線上中</p></div>
-      <button class="mina-close" id="mina-close" aria-label="關閉">✕</button>
-    </div>
-    <div class="mina-chat-body" id="mina-body"></div>
-  </div>
-
-  <script src="site.js"></script>
-  <script src="news.js"></script>
-  <script src="faq.js"></script>
+  var url=location.href, title=document.title;
+  var line=document.getElementById('shLine'),fb=document.getElementById('shFb'),
+      copy=document.getElementById('shCopy'),toast=document.getElementById('shToast');
+  if(line)line.addEventListener('click',function(){
+    window.open('https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(url),'_blank','noopener,width=560,height=640');
+  });
+  if(fb)fb.addEventListener('click',function(){
+    window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url),'_blank','noopener,width=560,height=640');
+  });
+  if(copy)copy.addEventListener('click',function(){
+    var done=function(){toast.classList.add('show');setTimeout(function(){toast.classList.remove('show');},1800);};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done,done);}
+    else done();
+  });
+})();
+</script>
 </body>
 </html>
