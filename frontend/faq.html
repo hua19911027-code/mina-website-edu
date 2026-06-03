@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>常見問題 | Mina 補習班</title>
+  <meta name="description" content="卓越補習班常見問題，包括課程、費用、試聽、上課時間等說明。">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    .faq-category-title {
+      font-size: var(--fs-md);
+      font-weight: 700;
+      color: var(--pink);
+      margin: 40px 0 8px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--pink-soft);
+    }
+    .faq-category-title:first-of-type { margin-top: 0; }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" role="navigation" aria-label="主導覽">
+    <div class="wrap">
+      <a class="nav-logo" href="index.html">
+        <img src="https://placehold.co/120x36/B8005F/ffffff?text=Mina" alt="Mina 補習班" width="120" height="36">
+      </a>
+      <div class="nav-links">
+        <a href="index.html">首頁</a>
+        <a href="about.html">關於我們</a>
+        <a href="courses.html">課程介紹</a>
+        <a href="faq.html">常見問題</a>
+        <a href="booking.html" class="nav-cta">預約試聽</a>
+      </div>
+      <button class="nav-hamburger" aria-label="開啟選單" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" role="navigation" aria-label="行動裝置選單">
+    <a href="index.html">首頁</a>
+    <a href="about.html">關於我們</a>
+    <a href="courses.html">課程介紹</a>
+    <a href="faq.html">常見問題</a>
+    <a href="booking.html" class="mobile-cta">預約免費試聽</a>
+  </div>
+  <div class="nav-spacer"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="wrap">
+        <span class="kicker">FAQ</span>
+        <h1>常見問題</h1>
+        <p>找不到答案？讓 Mina 小幫手來回答你</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div style="display:grid; gap:48px; grid-template-columns:1fr;">
+          <div style="max-width:720px; margin:0 auto; width:100%;">
+
+            <!-- FAQ List (rendered by faq.js) -->
+            <div id="faq-list" aria-live="polite">
+              <!-- Loading skeleton -->
+              <div id="faq-skeleton">
+                <div class="skeleton" style="height:20px;width:30%;margin-bottom:12px;"></div>
+                <div style="border-bottom:1px solid var(--line-2);">
+                  <div class="skeleton" style="height:52px;margin:12px 0;border-radius:4px;"></div>
+                </div>
+                <div style="border-bottom:1px solid var(--line-2);">
+                  <div class="skeleton" style="height:52px;margin:12px 0;border-radius:4px;"></div>
+                </div>
+                <div class="skeleton" style="height:20px;width:25%;margin:28px 0 12px;"></div>
+                <div style="border-bottom:1px solid var(--line-2);">
+                  <div class="skeleton" style="height:52px;margin:12px 0;border-radius:4px;"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Contact section -->
+        <div style="max-width:720px;margin:64px auto 0; padding:40px; background:var(--bg-2); border-radius:var(--radius-lg); text-align:center;" class="reveal">
+          <h3 style="margin-bottom:12px;">還有其他問題？</h3>
+          <p style="color:var(--ink-3);font-size:var(--fs-sm);margin-bottom:24px;">以上沒有找到您的問題嗎？歡迎直接聯繫我們！</p>
+          <div class="gap-ctas">
+            <a href="tel:0423366868" class="btn btn-primary">📞 04-2336-6868</a>
+            <a href="#" data-todo="Replace with real LINE OA URL" class="btn btn-line">💬 LINE 詢問</a>
+            <a href="booking.html" class="btn btn-w">預約免費試聽</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mina-cta-block">
+      <div class="wrap">
+        <span class="kicker" style="color:rgba(255,255,255,0.7)">MINA ASSISTANT</span>
+        <h2>用 Mina 小幫手快速找答案</h2>
+        <p>點選下方按鈕，直接問 Mina 小幫手吧！</p>
+        <button class="btn btn-w" id="open-mina-btn">🤖 開啟 Mina 小幫手</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <img src="https://placehold.co/120x36/ffffff/B8005F?text=Mina" alt="Mina 補習班" width="120" height="36">
+          </a>
+          <p class="footer-desc">台中市私立卓越國際文理短期補習班，提供英文、數學、安親小班教學。</p>
+          <div class="footer-contact">
+            <div class="footer-contact-item"><span class="ico">📞</span><span>04-2336-6868</span></div>
+            <div class="footer-contact-item"><span class="ico">📍</span><span>台中市烏日區健行北路96號</span></div>
+            <div class="footer-contact-item"><span class="ico">🕐</span><span>週一至週五 13:30–20:00</span></div>
+          </div>
+        </div>
+        <div>
+          <p class="footer-nav-title">課程</p>
+          <div class="footer-nav-links">
+            <a href="courses.html#english">徐薇英文 UP學</a>
+            <a href="courses.html#math">偉智數學 WISE</a>
+            <a href="courses.html#afterschool">課後安親</a>
+          </div>
+        </div>
+        <div>
+          <p class="footer-nav-title">關於</p>
+          <div class="footer-nav-links">
+            <a href="about.html">關於我們</a>
+            <a href="faq.html">常見問題</a>
+            <a href="booking.html">預約試聽</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 臺中市私立卓越國際文理短期補習班 版權所有</p>
+      </div>
+    </div>
+  </footer>
+
+  <button class="mina-widget-trigger" id="mina-trigger" aria-label="開啟 Mina 小幫手">
+    <span class="mina-avatar">🤖</span><span>Mina 小幫手</span>
+  </button>
+  <div class="mina-chat-panel" id="mina-panel" role="dialog" aria-label="Mina 小幫手對話" aria-hidden="true">
+    <div class="mina-chat-header">
+      <span style="width:32px;height:32px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">🤖</span>
+      <div><p class="mina-name">Mina 小幫手</p><p class="mina-status">線上中</p></div>
+      <button class="mina-close" id="mina-close" aria-label="關閉">✕</button>
+    </div>
+    <div class="mina-chat-body" id="mina-body"></div>
+  </div>
+
+  <script src="site.js"></script>
+  <script src="faq.js"></script>
+  <script>
+    /* Open Mina from CTA block */
+    document.getElementById('open-mina-btn').addEventListener('click', function () {
+      var panel = document.getElementById('mina-panel');
+      if (panel) {
+        panel.classList.add('open');
+        panel.setAttribute('aria-hidden', 'false');
+      }
+    });
+  </script>
+</body>
+</html>
