@@ -1,366 +1,228 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mina 補習班 — 徐薇英文 UP學 × 偉智數學 WISE | 台中烏日</title>
-  <meta name="description" content="台中市烏日區卓越補習班，提供徐薇英文UP學與偉智數學WISE小班教學。免費試聽，名師授課，在旭光國小旁。">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>臺中市私立卓越國際文理短期補習班｜徐薇英文 × 偉智數學</title>
+<meta name="description" content="台中烏日旭光國小旁的英數學院。徐薇英文 UP學 × 偉智數學 WISE，用對方法，孩子自己會想學。預約一堂免費試聽。"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
 </head>
-<body>
+<body data-screen-label="首頁">
 
-  <!-- Navigation -->
-  <nav class="site-nav" role="navigation" aria-label="主導覽">
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="index.html">
+      <img src="assets/logo/zhuoyue-logo.svg" alt="卓越國際文理"/>
+      <span class="bt"><b>徐薇英文 × 偉智數學</b><span>RUBY × WISE</span></span>
+    </a>
+    <nav class="nav-links">
+      <a href="about.html">關於我們</a>
+      <a href="courses.html">課程介紹</a>
+      <a href="news.html">最新消息</a>
+      <a href="practice.html">題庫練習</a>
+      <a href="faq.html">常見問題</a>
+    </nav>
+    <a class="nav-cta" href="booking.html">預約免費試聽</a>
+    <button class="burger" id="burger" aria-label="選單"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="mm-backdrop" id="mmBackdrop"></div>
+<nav class="mobile-menu" id="mobileMenu">
+  <a href="about.html">關於我們</a>
+  <a href="courses.html">課程介紹</a>
+  <a href="news.html">最新消息</a>
+  <a href="practice.html">題庫練習</a>
+  <a href="faq.html">常見問題</a>
+  <a class="btn-primary" href="booking.html">預約一堂免費試聽 →</a>
+</nav>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="blob" style="width:200px;height:200px;background:var(--yellow);top:60px;left:6%;opacity:.5;"></div>
+    <div class="blob" style="width:150px;height:150px;background:var(--orange-soft);bottom:40px;right:8%;"></div>
+    <div class="sparkle" style="top:80px;right:14%;animation-delay:.4s;"><svg width="38" height="38" viewBox="0 0 24 24" fill="#B8005F"><path d="M12 0l2.6 8.4L24 12l-9.4 3.6L12 24l-2.6-8.4L0 12l9.4-3.6z"/></svg></div>
+    <div class="sparkle" style="bottom:120px;left:12%;animation-delay:1.2s;"><svg width="26" height="26" viewBox="0 0 24 24" fill="#F07800"><path d="M12 0l2.6 8.4L24 12l-9.4 3.6L12 24l-2.6-8.4L0 12l9.4-3.6z"/></svg></div>
+    <div class="sparkle" style="top:200px;left:24%;animation-delay:2s;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 0l2.6 8.4L24 12l-9.4 3.6L12 24l-2.6-8.4L0 12l9.4-3.6z"/></svg></div>
+    <div class="wrap hero-in">
+      <img class="hero-logo" src="assets/logo/zhuoyue-logo.svg" alt="卓越國際文理補習班"/>
+      <span class="badge"><span class="star">✦</span>台中烏日 · 旭光國小旁的英數學院</span>
+      <h1 class="hero-h">讓孩子<span class="pop">愛上</span>學習<br>的 <span class="hl">那一間</span> 補習班</h1>
+      <p class="hero-sub"><b class="lead-brand">徐薇英文 UP學 × 偉智數學 WISE</b>用對方法，把英文與數學變得<em>有趣又聽得懂</em>，孩子自己會想學！</p>
+      <div class="hero-cta">
+        <a class="btn-primary" href="booking.html">預約一堂免費試聽 →</a>
+        <a class="btn-line" href="faq.html"><span class="lc">?</span> 常見問題</a>
+      </div>
+      <div class="hero-strip">
+        <span class="pill"><span class="d" style="background:var(--pink)"></span>英文 UP學</span>
+        <span class="pill"><span class="d" style="background:var(--orange)"></span>數學 WISE</span>
+        <span class="pill"><span class="d" style="background:var(--yellow)"></span>課後安親</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <section class="trust sec-pad" id="about">
     <div class="wrap">
-      <a class="nav-logo" href="index.html">
-        <img src="https://placehold.co/120x36/B8005F/ffffff?text=Mina" alt="Mina 補習班" width="120" height="36">
-      </a>
-      <div class="nav-links">
-        <a href="index.html">首頁</a>
+      <div class="trust-grid reveal">
+        <div class="tstat"><div class="n" data-to="10"><span class="cnum">0</span><span class="u">年+</span></div><div class="l">在地教學經驗</div></div>
+        <div class="tstat"><div class="n" data-to="320"><span class="cnum">0</span><span class="u">+</span></div><div class="l">學生與家長信任</div></div>
+        <div class="tstat"><div class="n"><span class="cnum">4.8</span><span class="u">★</span></div><div class="l">家長平均評價</div></div>
+        <div class="tstat"><div class="n" data-to="95"><span class="cnum">0</span><span class="u">%</span></div><div class="l">學期續班率</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COURSES -->
+  <section class="sec-pad" id="courses">
+    <div class="wrap">
+      <div class="sec-head center reveal">
+        <span class="kicker">✦ Our Courses</span>
+        <h2 class="sec-h">英文、數學、安親<br>一間就能照顧好！</h2>
+        <p class="sec-lead">依年級節點與段考時程，安排剛剛好的學習，不把孩子塞滿課。</p>
+      </div>
+      <div class="course-grid">
+        <div class="course en reveal">
+          <img class="ruby-logo" src="assets/logo/ruby-wordmark-t.png" alt="徐薇英文"/>
+          <h3>英文課程</h3>
+          <div class="sub-en">徐薇英文 UP學 · 國小 1–6 年級</div>
+          <p>從自然發音到文法句型，搭配徐薇英文教材，把底子打穩。</p>
+          <ul><li>自然發音與字彙累積</li><li>文法句型系統化拆解</li><li>會話、閱讀與寫作整合</li></ul>
+          <a class="clink" href="courses.html">看課程安排 →</a>
+        </div>
+        <div class="course ma reveal">
+          <img class="wise-logo" src="assets/logo/wise-math-t.png" alt="WISE math 偉智數學"/>
+          <h3>數學課程</h3>
+          <div class="sub-en">偉智數學 WISE · 國小 1–6 年級</div>
+          <p>先把觀念講到懂，再用解題策略提升段考表現，不只背公式。</p>
+          <ul><li>觀念建立，不只背公式</li><li>錯題診斷與解題策略</li><li>段考衝刺與題型整理</li></ul>
+          <a class="clink" href="courses.html">看課程安排 →</a>
+        </div>
+        <div class="course af reveal">
+          <img class="zy-logo" src="assets/logo/zhuoyue-logo.svg" alt="卓越國際文理"/>
+          <h3>安親課程</h3>
+          <div class="sub-en">After School Care</div>
+          <p>放學後的安心選擇，作業督導加上生活照顧，銜接英數課程。</p>
+          <ul><li>作業督導與訂正</li><li>用餐與生活照顧</li><li>無縫銜接英數課程</li></ul>
+          <a class="clink" href="courses.html">看課程安排 →</a>
+        </div>
+      </div>
+      <div class="minicards reveal">
+        <div class="mini"><span class="em">☀️</span><h4>夏令營</h4><p>暑期密集營隊，邊玩邊學，假期不退步。</p></div>
+        <div class="mini"><span class="em">⛄</span><h4>冬令營</h4><p>寒假銜接課程，贏在下學期的起跑點。</p></div>
+        <div class="mini"><span class="em">🔤</span><h4>正音課程</h4><p>自然發音打底，開口不再怕念錯單字。</p></div>
+        <div class="mini"><span class="em">🎨</span><h4>多元課程</h4><p>美語、邏輯與才藝，多元探索找興趣。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRACTICE -->
+  <section class="practice sec-pad" id="practice">
+    <div class="wrap">
+      <div class="sec-head center reveal">
+        <span class="kicker">✦ Free Practice</span>
+        <h2 class="sec-h">考前題庫，免費玩中學</h2>
+        <p class="sec-lead">挑科目、選題型，把最常錯的觀念一次弄懂，考前兩週最有感！</p>
+      </div>
+      <div class="reveal">
+        <div class="tabs" id="tabs">
+          <button class="tab active" data-subj="en">英文</button>
+          <button class="tab" data-subj="ma">數學</button>
+        </div>
+        <div class="chips" id="chips">
+          <span class="chip active" data-chip="觀念拆解">觀念拆解</span>
+          <span class="chip" data-chip="錯題診斷">錯題診斷</span>
+          <span class="chip" data-chip="考前清單">考前清單</span>
+          <span class="chip" data-chip="資源整理">資源整理</span>
+        </div>
+        <div class="qcards" id="qcards"></div>
+        <p class="practice-note">這只是示意題庫。看更多請到 <b><a href="practice.html" style="color:var(--pink);border-bottom:2px solid var(--pink);">完整題庫練習 →</a></b></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MINA CHAT CTA -->
+  <section class="sec-pad" id="faq">
+    <div class="wrap">
+      <div class="linecta reveal">
+        <div class="lc-left">
+          <span class="lc-badge"><span class="pulse"></span>Mina 小幫手 在線上回覆中</span>
+          <h3>有問題嗎？<span class="wig">👋</span></h3>
+          <p>問班、試聽流程，任何問題都歡迎找 Mina 小幫手，<br class="br-soft">Mina 小幫手 解決不了的，<b>老師都會親自回覆</b>喔！</p>
+          <a class="btn-w" href="faq.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> 跟 Mina 小幫手 聊聊</a>
+        </div>
+        <div class="chat">
+          <div class="chat-top">
+            <div class="chat-av">M</div>
+            <div><b>Mina 小幫手</b><span>● 在線</span></div>
+          </div>
+          <div class="chat-body">
+            <div class="bub me b1">請問三年級有英文班嗎？可以試聽嗎？</div>
+            <div class="bub mina b2">當然可以～我幫您安排一堂免費試聽，這週五下午方便嗎？😊</div>
+            <div class="bub me b3">太好了！那費用怎麼算？</div>
+            <div class="typing"><i></i><i></i><i></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL / CONTACT -->
+  <section class="social sec-pad" id="contact" style="padding-top:0;">
+    <div class="wrap">
+      <span class="kicker">✦ Find Us</span>
+      <h2 class="sec-h">在這些地方找到我們</h2>
+      <div class="contact-info">
+        <a class="ci" href="tel:0423366868"><span class="ci-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B8005F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><div><b>04-2336-6868</b><span>點此直接來電洽詢</span></div></a>
+        <a class="ci" href="https://www.google.com/maps/search/?api=1&query=%E5%8F%B0%E4%B8%AD%E5%B8%82%E7%83%8F%E6%97%A5%E5%8D%80%E5%81%A5%E8%A1%8C%E5%8C%97%E8%B7%AF96%E8%99%9F" target="_blank" rel="noopener"><span class="ci-ic map"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#EA4335"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg></span><div><b>台中市烏日區健行北路96號</b><span>開啟 Google 地圖導航 →</span></div></a>
+      </div>
+      <div class="social-row">
+        <a class="soc" href="#">LINE</a>
+        <a class="soc" href="#">FB</a>
+        <a class="soc" href="#">IG</a>
+        <a class="soc" href="#">Threads</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="ft-grid">
+      <div class="ft-brand">
+        <img src="assets/logo/zhuoyue-logo.svg" alt="卓越國際文理補習班"/>
+        <div class="fb-name"><span class="reg">立案登記</span>臺中市私立卓越國際文理短期補習班</div>
+        <div class="fb-brands">徐薇英文 UP學<span class="x">×</span>偉智數學 WISE</div>
+        <div class="fb-loc">台中市烏日區・旭光國小旁</div>
+      </div>
+      <div class="ft-col">
+        <h4>網站導覽</h4>
         <a href="about.html">關於我們</a>
         <a href="courses.html">課程介紹</a>
+        <a href="news.html">最新消息</a>
+        <a href="practice.html">題庫練習</a>
         <a href="faq.html">常見問題</a>
-        <a href="booking.html" class="nav-cta">預約試聽</a>
       </div>
-      <button class="nav-hamburger" aria-label="開啟選單" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+      <div class="ft-col">
+        <h4>聯絡我們</h4>
+        <a href="tel:0423366868">電話：04-2336-6868</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=%E5%8F%B0%E4%B8%AD%E5%B8%82%E7%83%8F%E6%97%A5%E5%8D%80%E5%81%A5%E8%A1%8C%E5%8C%97%E8%B7%AF96%E8%99%9F" target="_blank" rel="noopener">地址：台中市烏日區健行北路96號</a>
+        <a href="booking.html">預約免費試聽</a>
+        <a href="booking.html">服務時間：週一至週五 13:30–20:00</a>
+      </div>
     </div>
-  </nav>
-
-  <!-- Mobile Menu -->
-  <div class="mobile-menu" role="navigation" aria-label="行動裝置選單">
-    <a href="index.html">首頁</a>
-    <a href="about.html">關於我們</a>
-    <a href="courses.html">課程介紹</a>
-    <a href="faq.html">常見問題</a>
-    <a href="booking.html" class="mobile-cta">預約免費試聽</a>
+    <div class="ft-bottom">
+      <span>© 2026 臺中市私立卓越國際文理短期補習班</span>
+      <span>本頁為設計示意，文案與數據為佔位內容</span>
+    </div>
   </div>
+</footer>
 
-  <div class="nav-spacer"></div>
-  <main>
-
-    <!-- Hero -->
-    <section class="hero" aria-label="歡迎區塊">
-      <div class="blob blob-1"></div>
-      <div class="blob blob-2"></div>
-      <span class="sparkle sparkle-1" aria-hidden="true"></span>
-      <span class="sparkle sparkle-2" aria-hidden="true"></span>
-      <span class="sparkle sparkle-3" aria-hidden="true"></span>
-      <div class="wrap">
-        <div class="hero-inner">
-          <span class="kicker">台中 烏日・旭光國小旁</span>
-          <h1>讓孩子真的<br>愛上學習</h1>
-          <p class="sub">卓越補習班，專業小班教學，徐薇英文 UP學 × 偉智數學 WISE，<br>陪伴每一位孩子建立自信、打好基礎。</p>
-          <div class="hero-pills">
-            <span class="hero-pill"><span class="dot dot-pink"></span>英文 UP學</span>
-            <span class="hero-pill"><span class="dot dot-orange"></span>數學 WISE</span>
-            <span class="hero-pill"><span class="dot dot-yellow"></span>課後安親</span>
-          </div>
-          <div class="hero-ctas">
-            <a href="booking.html" class="btn btn-primary btn-lg">預約一堂免費試聽 →</a>
-            <a href="faq.html" class="btn btn-line btn-lg">? 常見問題</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Stats -->
-    <section style="background: var(--bg); padding: 48px 0;" aria-label="信任指標">
-      <div class="wrap">
-        <div class="stats reveal">
-          <div class="stat-item">
-            <span class="stat-num" data-target="10" data-suffix="+ 年">10+ 年</span>
-            <span class="stat-label">教學經驗</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-num" data-target="300" data-suffix="+">300+</span>
-            <span class="stat-label">學生人數</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-num" data-target="4" data-suffix=".8★">4.8★</span>
-            <span class="stat-label">Google 評分</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-num" data-target="90" data-suffix="%">90%</span>
-            <span class="stat-label">學生成績進步</span>
-          </div>
-        </div>
-        <p class="note text-center" style="margin-top:12px;" data-placeholder="true">以上為示意數據，實際數據以補習班公告為準。</p>
-      </div>
-    </section>
-
-    <!-- Why Us -->
-    <section style="background: var(--bg-2);" aria-label="為什麼選擇我們">
-      <div class="wrap">
-        <div class="sec-head reveal">
-          <span class="kicker">WHY MINA</span>
-          <h2>讓孩子真正學會，不只是上課</h2>
-          <p>我們相信每個孩子都有潛力，關鍵在於找到對的方法。</p>
-        </div>
-        <div class="grid-3">
-          <div class="feature-card reveal">
-            <div class="feature-icon">👥</div>
-            <h3>小班教學</h3>
-            <p>每班人數嚴格控制，老師能真正照顧到每一位學生。</p>
-          </div>
-          <div class="feature-card reveal">
-            <div class="feature-icon">🎯</div>
-            <h3>因材施教</h3>
-            <p>依學生程度分組，不讓任何孩子跟不上，也不讓優秀孩子被拖慢。</p>
-          </div>
-          <div class="feature-card reveal">
-            <div class="feature-icon">❤️</div>
-            <h3>用心陪伴</h3>
-            <p>老師不只教課，還關心孩子的學習狀況，主動與家長溝通。</p>
-          </div>
-          <div class="feature-card reveal">
-            <div class="feature-icon">📈</div>
-            <h3>看得見的進步</h3>
-            <p>定期評量、學習回報，讓家長清楚掌握孩子的成長。</p>
-          </div>
-          <div class="feature-card reveal">
-            <div class="feature-icon">🆓</div>
-            <h3>免費試聽</h3>
-            <p>第一堂課完全免費，試聽後沒有任何壓力，合適再報名。</p>
-          </div>
-          <div class="feature-card reveal">
-            <div class="feature-icon">📍</div>
-            <h3>交通方便</h3>
-            <p>旭光國小旁，附近有停車位，方便家長接送。</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Courses Preview -->
-    <section aria-label="課程介紹">
-      <div class="wrap">
-        <div class="sec-head reveal">
-          <span class="kicker">COURSES</span>
-          <h2>三大課程，全面培育</h2>
-          <p>英文、數學、安親，從學科到品格，全方位陪伴孩子成長。</p>
-        </div>
-        <div class="grid-3">
-          <div class="course-card reveal">
-            <div class="course-card-header pink">
-              <span class="course-brand">徐薇英文 UP學</span>
-              <h3>英文課程</h3>
-              <p class="sub">國小一至六年級・小班制</p>
-            </div>
-            <div class="course-card-body">
-              <ul>
-                <li>聽說讀寫全方位訓練</li>
-                <li>自然發音 + 文法同步建立</li>
-                <li>讓孩子真正愛上英文</li>
-                <li>依程度分班，不落後不無聊</li>
-              </ul>
-              <a href="courses.html#english" class="btn btn-w btn-sm">了解更多</a>
-            </div>
-          </div>
-          <div class="course-card reveal">
-            <div class="course-card-header orange">
-              <span class="course-brand">偉智數學 WISE</span>
-              <h3>數學課程</h3>
-              <p class="sub">國小一至六年級・小班制</p>
-            </div>
-            <div class="course-card-body">
-              <ul>
-                <li>理解優先，拒絕死記</li>
-                <li>邏輯思維系統培養</li>
-                <li>應用題解題策略</li>
-                <li>奠定中學數學基礎</li>
-              </ul>
-              <a href="courses.html#math" class="btn btn-orange btn-sm" style="background:var(--orange);border-color:var(--orange);color:#fff;">了解更多</a>
-            </div>
-          </div>
-          <div class="course-card reveal">
-            <div class="course-card-header green">
-              <span class="course-brand">課後安親</span>
-              <h3>安親班</h3>
-              <p class="sub">國小一至六年級</p>
-            </div>
-            <div class="course-card-body">
-              <ul>
-                <li>安全舒適的學習環境</li>
-                <li>作業輔導與自主學習</li>
-                <li>品格教育與生活照顧</li>
-                <li>晚餐點心貼心準備</li>
-              </ul>
-              <a href="courses.html#afterschool" class="btn btn-w btn-sm" style="color:var(--green);border-color:var(--green);">了解更多</a>
-            </div>
-          </div>
-        </div>
-        <div class="text-center mt-8">
-          <a href="courses.html" class="btn btn-primary">查看所有課程</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- News Preview -->
-    <section style="background: var(--bg-2);" aria-label="最新消息">
-      <div class="wrap">
-        <div class="sec-head reveal">
-          <span class="kicker">LATEST NEWS</span>
-          <h2>最新消息</h2>
-          <p>課程資訊、活動公告、學習資源</p>
-        </div>
-        <div class="grid-3" id="news-preview">
-          <!-- 由 JS 動態載入 -->
-          <div class="skeleton-card reveal">
-            <div class="skeleton skeleton-img"></div>
-            <div class="skeleton-body">
-              <div class="skeleton skeleton-line w-half"></div>
-              <div class="skeleton skeleton-line w-full"></div>
-              <div class="skeleton skeleton-line w-3q"></div>
-            </div>
-          </div>
-          <div class="skeleton-card reveal">
-            <div class="skeleton skeleton-img"></div>
-            <div class="skeleton-body">
-              <div class="skeleton skeleton-line w-half"></div>
-              <div class="skeleton skeleton-line w-full"></div>
-              <div class="skeleton skeleton-line w-3q"></div>
-            </div>
-          </div>
-          <div class="skeleton-card reveal">
-            <div class="skeleton skeleton-img"></div>
-            <div class="skeleton-body">
-              <div class="skeleton skeleton-line w-half"></div>
-              <div class="skeleton skeleton-line w-full"></div>
-              <div class="skeleton skeleton-line w-3q"></div>
-            </div>
-          </div>
-        </div>
-        <div class="text-center mt-8">
-          <a href="news.html" class="btn btn-line">查看所有消息</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Practice CTA -->
-    <section aria-label="題庫練習">
-      <div class="wrap">
-        <div style="background: linear-gradient(135deg, var(--bg-2) 0%, var(--pink-soft) 100%); border-radius: var(--radius-lg); padding: 48px 40px; display:flex; flex-wrap:wrap; gap:32px; align-items:center; justify-content:space-between;">
-          <div class="reveal">
-            <span class="kicker">PRACTICE</span>
-            <h2>免費題庫練習</h2>
-            <p style="color:var(--ink-2); margin-top:8px;">英文、數學各年級題目，在家也能輕鬆練習，即時解析幫助理解。</p>
-          </div>
-          <a href="practice.html" class="btn btn-primary reveal">立即開始練習 →</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Mina CTA -->
-    <section class="mina-cta-block" aria-label="Mina 小幫手">
-      <div class="wrap">
-        <span class="kicker" style="color:rgba(255,255,255,0.7)">MINA ASSISTANT</span>
-        <h2>有問題？問 Mina 小幫手</h2>
-        <p>課程、費用、上課時間，24 小時都可以問。</p>
-        <div class="gap-ctas">
-          <a href="faq.html" class="btn btn-w">? 查看常見問題</a>
-          <a href="booking.html" class="btn" style="background:transparent;border:2px solid rgba(255,255,255,0.6);color:#fff;">預約免費試聽</a>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Footer -->
-  <footer class="site-footer" aria-label="頁尾">
-    <div class="wrap">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="index.html" class="footer-logo">
-            <img src="https://placehold.co/120x36/ffffff/B8005F?text=Mina" alt="Mina 補習班" width="120" height="36">
-          </a>
-          <p class="footer-desc">台中市私立卓越國際文理短期補習班，提供英文、數學、安親小班教學。</p>
-          <div class="footer-contact">
-            <div class="footer-contact-item"><span class="ico">📞</span><span>04-2336-6868</span></div>
-            <div class="footer-contact-item"><span class="ico">📍</span><span>台中市烏日區健行北路96號（旭光國小旁）</span></div>
-            <div class="footer-contact-item"><span class="ico">🕐</span><span>週一至週五 13:30–20:00</span></div>
-          </div>
-        </div>
-        <div>
-          <p class="footer-nav-title">課程</p>
-          <div class="footer-nav-links">
-            <a href="courses.html#english">徐薇英文 UP學</a>
-            <a href="courses.html#math">偉智數學 WISE</a>
-            <a href="courses.html#afterschool">課後安親</a>
-            <a href="courses.html#schedule">課程時段</a>
-          </div>
-        </div>
-        <div>
-          <p class="footer-nav-title">關於</p>
-          <div class="footer-nav-links">
-            <a href="about.html">關於我們</a>
-            <a href="news.html">最新消息</a>
-            <a href="practice.html">題庫練習</a>
-            <a href="faq.html">常見問題</a>
-            <a href="booking.html">預約試聽</a>
-          </div>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p class="footer-copy">© 2026 臺中市私立卓越國際文理短期補習班 版權所有</p>
-        <a href="#" data-todo="Replace with real LINE OA URL" class="btn btn-sm" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.2);">LINE 官方帳號</a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Mina Widget Trigger -->
-  <button class="mina-widget-trigger" id="mina-trigger" aria-label="開啟 Mina 小幫手">
-    <span class="mina-avatar">🤖</span>
-    <span>Mina 小幫手</span>
-  </button>
-
-  <!-- Mina Chat Panel -->
-  <div class="mina-chat-panel" id="mina-panel" role="dialog" aria-label="Mina 小幫手對話" aria-hidden="true">
-    <div class="mina-chat-header">
-      <span class="mina-avatar" style="width:32px;height:32px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">🤖</span>
-      <div>
-        <p class="mina-name">Mina 小幫手</p>
-        <p class="mina-status">線上中</p>
-      </div>
-      <button class="mina-close" id="mina-close" aria-label="關閉">✕</button>
-    </div>
-    <div class="mina-chat-body" id="mina-body"></div>
-  </div>
-
-  <script src="site.js"></script>
-  <script>
-    /* 首頁 News Preview */
-    (function () {
-      fetch('/api/v1/news?limit=3')
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          var articles = (data.data && data.data.articles) || [];
-          if (!articles.length) return;
-          var container = document.getElementById('news-preview');
-          container.innerHTML = '';
-          articles.forEach(function (a) {
-            var date = a.publishedAt
-              ? new Date(a.publishedAt).toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '.')
-              : '';
-            var card = document.createElement('a');
-            card.href = 'news-single.html?slug=' + encodeURIComponent(a.slug);
-            card.className = 'news-card reveal';
-            card.innerHTML =
-              '<div class="news-card-img"><img src="' + (a.coverImage || 'https://placehold.co/800x450/f0ece8/B8005F?text=Mina') + '" alt="' + a.title + '" loading="lazy" onerror="this.src=\'https://placehold.co/800x450/f0ece8/B8005F?text=Mina\'"></div>' +
-              '<div class="news-card-body">' +
-              '<div class="news-card-meta"><span class="tag">' + a.category + '</span><span class="news-card-date">' + date + '</span></div>' +
-              '<h3 class="news-card-title">' + a.title + '</h3>' +
-              '<p class="news-card-excerpt">' + (a.excerpt || '') + '</p>' +
-              '</div>';
-            container.appendChild(card);
-          });
-        })
-        .catch(function () { /* 靜默失敗，skeleton 保持顯示 */ });
-    }());
-  </script>
-  <script src="faq.js"></script>
+<script src="practice.js"></script>
+<script src="site.js"></script>
 </body>
 </html>
