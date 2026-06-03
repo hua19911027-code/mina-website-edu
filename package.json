@@ -1,0 +1,11 @@
+{
+  "name": "mina-website",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:workers": "cd workers && npm run dev",
+    "deploy:workers": "cd workers && npm run deploy",
+    "install:workers": "cd workers && npm install",
+    "type-check": "cd workers && npm run type-check"
+  }
+}

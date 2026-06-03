@@ -1,0 +1,31 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+workers/node_modules/
+
+# Build
+dist/
+.wrangler/
+workers/.wrangler/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Zone identifier files (Windows WSL)
+*.Zone.Identifier
+*:Zone.Identifier

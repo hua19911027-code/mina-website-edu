@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "include": ["/api/*"],
+  "exclude": [
+    "/",
+    "/index.html",
+    "/about.html",
+    "/courses.html",
+    "/news.html",
+    "/news-single.html",
+    "/practice.html",
+    "/faq.html",
+    "/booking.html",
+    "/booking-success.html",
+    "/styles.css",
+    "/site.js",
+    "/news.js",
+    "/practice.js",
+    "/faq.js",
+    "/booking.js",
+    "/assets/*",
+    "/sitemap.xml",
+    "/robots.txt"
+  ]
+}
