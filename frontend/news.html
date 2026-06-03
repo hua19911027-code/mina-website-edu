@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>最新消息 | Mina 補習班</title>
+  <meta name="description" content="卓越補習班最新消息、活動公告、課程資訊。">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="page-news-list">
+
+  <nav class="site-nav" role="navigation" aria-label="主導覽">
+    <div class="wrap">
+      <a class="nav-logo" href="index.html">
+        <img src="https://placehold.co/120x36/B8005F/ffffff?text=Mina" alt="Mina 補習班" width="120" height="36">
+      </a>
+      <div class="nav-links">
+        <a href="index.html">首頁</a>
+        <a href="about.html">關於我們</a>
+        <a href="courses.html">課程介紹</a>
+        <a href="faq.html">常見問題</a>
+        <a href="booking.html" class="nav-cta">預約試聽</a>
+      </div>
+      <button class="nav-hamburger" aria-label="開啟選單" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" role="navigation" aria-label="行動裝置選單">
+    <a href="index.html">首頁</a>
+    <a href="about.html">關於我們</a>
+    <a href="courses.html">課程介紹</a>
+    <a href="faq.html">常見問題</a>
+    <a href="booking.html" class="mobile-cta">預約免費試聽</a>
+  </div>
+  <div class="nav-spacer"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="wrap">
+        <span class="kicker">LATEST NEWS</span>
+        <h1>最新消息</h1>
+        <p>課程資訊、活動公告、成果分享</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+
+        <!-- Filter Bar -->
+        <div class="filter-bar" id="news-filter" role="tablist" aria-label="消息分類">
+          <button class="filter-tab active" data-category="all" role="tab" aria-selected="true">全部</button>
+          <button class="filter-tab" data-category="公告" role="tab" aria-selected="false">公告</button>
+          <button class="filter-tab" data-category="活動" role="tab" aria-selected="false">活動</button>
+          <button class="filter-tab" data-category="特別課程" role="tab" aria-selected="false">特別課程</button>
+          <button class="filter-tab" data-category="文章" role="tab" aria-selected="false">文章</button>
+        </div>
+
+        <!-- Article Grid -->
+        <div class="grid-3" id="news-grid" aria-live="polite">
+          <!-- 由 news.js 動態渲染 -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="news-empty" style="display:none;">
+          <span class="emoji">😊</span>
+          <p>目前沒有消息，請稍後再看</p>
+        </div>
+
+        <!-- Load More -->
+        <div class="load-more-wrap" id="load-more-wrap" style="display:none;">
+          <button class="btn btn-line" id="load-more-btn">載入更多</button>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="mina-cta-block">
+      <div class="wrap">
+        <span class="kicker" style="color:rgba(255,255,255,0.7)">FREE TRIAL</span>
+        <h2>想了解更多？</h2>
+        <p>有任何問題，歡迎直接預約試聽，老師親自說明。</p>
+        <a href="booking.html" class="btn btn-w">預約免費試聽 →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <img src="https://placehold.co/120x36/ffffff/B8005F?text=Mina" alt="Mina 補習班" width="120" height="36">
+          </a>
+          <p class="footer-desc">台中市私立卓越國際文理短期補習班，提供英文、數學、安親小班教學。</p>
+          <div class="footer-contact">
+            <div class="footer-contact-item"><span class="ico">📞</span><span>04-2336-6868</span></div>
+            <div class="footer-contact-item"><span class="ico">📍</span><span>台中市烏日區健行北路96號</span></div>
+            <div class="footer-contact-item"><span class="ico">🕐</span><span>週一至週五 13:30–20:00</span></div>
+          </div>
+        </div>
+        <div>
+          <p class="footer-nav-title">課程</p>
+          <div class="footer-nav-links">
+            <a href="courses.html#english">徐薇英文 UP學</a>
+            <a href="courses.html#math">偉智數學 WISE</a>
+            <a href="courses.html#afterschool">課後安親</a>
+          </div>
+        </div>
+        <div>
+          <p class="footer-nav-title">關於</p>
+          <div class="footer-nav-links">
+            <a href="about.html">關於我們</a>
+            <a href="faq.html">常見問題</a>
+            <a href="booking.html">預約試聽</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 臺中市私立卓越國際文理短期補習班 版權所有</p>
+      </div>
+    </div>
+  </footer>
+
+  <button class="mina-widget-trigger" id="mina-trigger" aria-label="開啟 Mina 小幫手">
+    <span class="mina-avatar">🤖</span><span>Mina 小幫手</span>
+  </button>
+  <div class="mina-chat-panel" id="mina-panel" role="dialog" aria-label="Mina 小幫手對話" aria-hidden="true">
+    <div class="mina-chat-header">
+      <span style="width:32px;height:32px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">🤖</span>
+      <div><p class="mina-name">Mina 小幫手</p><p class="mina-status">線上中</p></div>
+      <button class="mina-close" id="mina-close" aria-label="關閉">✕</button>
+    </div>
+    <div class="mina-chat-body" id="mina-body"></div>
+  </div>
+
+  <script src="site.js"></script>
+  <script src="news.js"></script>
+  <script src="faq.js"></script>
+</body>
+</html>
