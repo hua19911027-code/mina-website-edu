@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>最新消息 | Mina 補習班</title>
+  <meta name="description" content="">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    .article-layout {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 0 80px;
+    }
+    .article-header { margin-bottom: 32px; }
+    .article-header h1 { font-size: var(--fs-2xl); margin: 12px 0; }
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      font-size: var(--fs-sm);
+      color: var(--ink-3);
+    }
+    .article-cover {
+      aspect-ratio: 16/9;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 32px;
+      background: var(--bg-3);
+    }
+    .article-cover img { width:100%; height:100%; object-fit:cover; }
+    .article-footer {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid var(--line-2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    /* Skeleton */
+    .article-skeleton .skeleton-heading { height:36px; width:75%; margin-bottom:16px; }
+    .article-skeleton .skeleton-meta   { height:14px; width:40%; margin-bottom:32px; }
+    .article-skeleton .skeleton-cover  { aspect-ratio:16/9; border-radius:var(--radius-lg); margin-bottom:32px; }
+    .article-skeleton .skeleton-lines  { display:flex;flex-direction:column;gap:12px; }
+    .article-skeleton .skeleton-line   { height:14px; }
+  </style>
+</head>
+<body class="page-news-single">
+
+  <nav class="site-nav" role="navigation" aria-label="主導覽">
+    <div class="wrap">
+      <a class="nav-logo" href="index.html">
+        <img src="https://placehold.co/120x36/B8005F/ffffff?text=Mina" alt="Mina 補習班" width="120" height="36">
+      </a>
+      <div class="nav-links">
+        <a href="index.html">首頁</a>
+        <a href="about.html">關於我們</a>
+        <a href="courses.html">課程介紹</a>
+        <a href="faq.html">常見問題</a>
+        <a href="booking.html" class="nav-cta">預約試聽</a>
+      </div>
+      <button class="nav-hamburger" aria-label="開啟選單" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" role="navigation" aria-label="行動裝置選單">
+    <a href="index.html">首頁</a>
+    <a href="about.html">關於我們</a>
+    <a href="courses.html">課程介紹</a>
+    <a href="faq.html">常見問題</a>
+    <a href="booking.html" class="mobile-cta">預約免費試聽</a>
+  </div>
+  <div class="nav-spacer"></div>
+
+  <main>
+    <div class="wrap">
+      <div class="article-layout">
+
+        <!-- Back link -->
+        <a href="news.html" class="back-link">← 返回最新消息</a>
+
+        <!-- Article content (rendered by news.js) -->
+        <article id="article-container">
+
+          <!-- Loading state -->
+          <div class="article-skeleton" id="article-skeleton">
+            <div class="skeleton skeleton-heading"></div>
+            <div class="skeleton skeleton-meta"></div>
+            <div class="skeleton skeleton-cover"></div>
+            <div class="skeleton-lines">
+              <div class="skeleton skeleton-line w-full"></div>
+              <div class="skeleton skeleton-line w-3q"></div>
+              <div class="skeleton skeleton-line w-full"></div>
+              <div class="skeleton skeleton-line w-half"></div>
+              <div class="skeleton skeleton-line w-full"></div>
+              <div class="skeleton skeleton-line w-3q"></div>
+            </div>
+          </div>
+
+          <!-- Article body (shown by JS) -->
+          <div id="article-body" style="display:none;">
+            <header class="article-header">
+              <div class="article-meta">
+                <span class="tag" id="article-category"></span>
+                <span id="article-date"></span>
+              </div>
+              <h1 id="article-title"></h1>
+            </header>
+
+            <!-- Cover Image -->
+            <div class="article-cover">
+              <img id="article-cover-img" src="" alt="" loading="eager"
+                onerror="this.src='https://placehold.co/800x450/f0ece8/B8005F?text=Mina'">
+            </div>
+
+            <!-- Photo Carousel (活動 category) -->
+            <div class="photo-carousel" id="photo-carousel">
+              <div class="carousel-track"></div>
+              <button class="carousel-prev" aria-label="上一張">‹</button>
+              <button class="carousel-next" aria-label="下一張">›</button>
+              <div class="carousel-counter" aria-live="polite"></div>
+              <div class="carousel-dots" role="tablist"></div>
+            </div>
+
+            <!-- Content -->
+            <div class="article-content" id="article-content"></div>
+
+            <!-- Footer -->
+            <footer class="article-footer">
+              <a href="news.html" class="back-link" style="margin:0;">← 返回最新消息</a>
+              <button class="btn btn-line btn-sm" id="copy-link-btn">🔗 複製連結</button>
+            </footer>
+          </div>
+
+          <!-- 404 state -->
+          <div id="article-404" style="display:none;" class="empty-state">
+            <span class="emoji">😢</span>
+            <p>找不到這篇文章</p>
+            <a href="news.html" class="btn btn-primary" style="margin-top:24px;display:inline-flex;">返回最新消息</a>
+          </div>
+
+        </article>
+      </div>
+    </div>
+
+    <!-- Mina CTA -->
+    <section class="mina-cta-block">
+      <div class="wrap">
+        <span class="kicker" style="color:rgba(255,255,255,0.7)">MINA ASSISTANT</span>
+        <h2>還有問題嗎？</h2>
+        <p>Mina 小幫手隨時為您解答。</p>
+        <div class="gap-ctas">
+          <a href="faq.html" class="btn btn-w">常見問題</a>
+          <a href="booking.html" class="btn" style="background:transparent;border:2px solid rgba(255,255,255,0.6);color:#fff;">預約試聽</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <img src="https://placehold.co/120x36/ffffff/B8005F?text=Mina" alt="Mina 補習班" width="120" height="36">
+          </a>
+          <p class="footer-desc">台中市私立卓越國際文理短期補習班，提供英文、數學、安親小班教學。</p>
+          <div class="footer-contact">
+            <div class="footer-contact-item"><span class="ico">📞</span><span>04-2336-6868</span></div>
+            <div class="footer-contact-item"><span class="ico">📍</span><span>台中市烏日區健行北路96號</span></div>
+            <div class="footer-contact-item"><span class="ico">🕐</span><span>週一至週五 13:30–20:00</span></div>
+          </div>
+        </div>
+        <div>
+          <p class="footer-nav-title">課程</p>
+          <div class="footer-nav-links">
+            <a href="courses.html#english">徐薇英文 UP學</a>
+            <a href="courses.html#math">偉智數學 WISE</a>
+            <a href="courses.html#afterschool">課後安親</a>
+          </div>
+        </div>
+        <div>
+          <p class="footer-nav-title">關於</p>
+          <div class="footer-nav-links">
+            <a href="about.html">關於我們</a>
+            <a href="news.html">最新消息</a>
+            <a href="faq.html">常見問題</a>
+            <a href="booking.html">預約試聽</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 臺中市私立卓越國際文理短期補習班 版權所有</p>
+      </div>
+    </div>
+  </footer>
+
+  <button class="mina-widget-trigger" id="mina-trigger" aria-label="開啟 Mina 小幫手">
+    <span class="mina-avatar">🤖</span><span>Mina 小幫手</span>
+  </button>
+  <div class="mina-chat-panel" id="mina-panel" role="dialog" aria-label="Mina 小幫手對話" aria-hidden="true">
+    <div class="mina-chat-header">
+      <span style="width:32px;height:32px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">🤖</span>
+      <div><p class="mina-name">Mina 小幫手</p><p class="mina-status">線上中</p></div>
+      <button class="mina-close" id="mina-close" aria-label="關閉">✕</button>
+    </div>
+    <div class="mina-chat-body" id="mina-body"></div>
+  </div>
+
+  <script src="site.js"></script>
+  <script src="news.js"></script>
+  <script src="faq.js"></script>
+</body>
+</html>
