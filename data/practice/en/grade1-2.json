@@ -1,0 +1,58 @@
+{
+  "subject": "en",
+  "grade": "1-2",
+  "gradeLabel": "國小低年級（1–2年級）",
+  "updatedAt": "2026-01-01",
+  "questions": [
+    {
+      "id": "en-12-001",
+      "type": "multiple_choice",
+      "chapter": "顏色與形狀",
+      "question": "看圖選出正確的英文單字：🔴",
+      "options": ["Blue", "Red", "Green", "Yellow"],
+      "answer": "Red",
+      "explanation": "紅色的英文是 Red。Blue 是藍色，Green 是綠色，Yellow 是黃色。",
+      "difficulty": 1
+    },
+    {
+      "id": "en-12-002",
+      "type": "multiple_choice",
+      "chapter": "數字",
+      "question": "「五」的英文怎麼說？",
+      "options": ["Three", "Four", "Five", "Six"],
+      "answer": "Five",
+      "explanation": "Five 是 5 的英文。Three=3，Four=4，Six=6。",
+      "difficulty": 1
+    },
+    {
+      "id": "en-12-003",
+      "type": "multiple_choice",
+      "chapter": "身體部位",
+      "question": "「眼睛」的英文是什麼？",
+      "options": ["Ear", "Nose", "Eye", "Mouth"],
+      "answer": "Eye",
+      "explanation": "Eye 是眼睛。Ear=耳朵，Nose=鼻子，Mouth=嘴巴。",
+      "difficulty": 1
+    },
+    {
+      "id": "en-12-004",
+      "type": "multiple_choice",
+      "chapter": "動物",
+      "question": "「貓」的英文是什麼？",
+      "options": ["Dog", "Cat", "Bird", "Fish"],
+      "answer": "Cat",
+      "explanation": "Cat 是貓。Dog=狗，Bird=鳥，Fish=魚。",
+      "difficulty": 1
+    },
+    {
+      "id": "en-12-005",
+      "type": "multiple_choice",
+      "chapter": "問候語",
+      "question": "早上見到朋友應該說什麼？",
+      "options": ["Good night!", "Good afternoon!", "Good morning!", "Goodbye!"],
+      "answer": "Good morning!",
+      "explanation": "早上打招呼說 Good morning！下午說 Good afternoon，晚上說 Good night，離開說 Goodbye。",
+      "difficulty": 1
+    }
+  ]
+}

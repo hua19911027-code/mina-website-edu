@@ -1,0 +1,63 @@
+{
+  "subject": "en",
+  "grade": "5-6",
+  "gradeLabel": "國小高年級（5–6年級）",
+  "updatedAt": "2026-01-01",
+  "questions": [
+    {
+      "id": "en-56-001",
+      "type": "multiple_choice",
+      "chapter": "過去式",
+      "question": "Yesterday, I ___ my homework before dinner.",
+      "options": ["finish", "finishes", "finished", "finishing"],
+      "answer": "finished",
+      "explanation": "Yesterday 表示過去，動詞要用過去式。finish → finished（規則動詞加 -ed）。",
+      "difficulty": 3
+    },
+    {
+      "id": "en-56-002",
+      "type": "multiple_choice",
+      "chapter": "比較級",
+      "question": "Tom is ___ than his brother.",
+      "options": ["tall", "taller", "tallest", "more tall"],
+      "answer": "taller",
+      "explanation": "兩者比較用比較級。tall 是一個音節的形容詞，比較級加 -er → taller。",
+      "difficulty": 3
+    },
+    {
+      "id": "en-56-003",
+      "type": "multiple_choice",
+      "chapter": "被動語態",
+      "question": "The letter ___ by Mary yesterday.",
+      "options": ["writes", "wrote", "was written", "is writing"],
+      "answer": "was written",
+      "explanation": "被動語態結構：be + 過去分詞。yesterday 表過去，所以用 was + written。",
+      "difficulty": 3
+    },
+    {
+      "id": "en-56-004",
+      "type": "multiple_choice",
+      "chapter": "連接詞",
+      "question": "___ it was raining, we went out.",
+      "options": ["Because", "Although", "If", "When"],
+      "answer": "Although",
+      "explanation": "雖然下雨，我們還是出去了。表示讓步用 Although（雖然）。Because=因為，If=如果，When=當…時候。",
+      "difficulty": 3
+    },
+    {
+      "id": "en-56-005",
+      "type": "multiple_choice",
+      "chapter": "閱讀理解",
+      "question": "Which sentence is correct?",
+      "options": [
+        "She don't like apples.",
+        "She doesn't likes apples.",
+        "She doesn't like apples.",
+        "She not like apples."
+      ],
+      "answer": "She doesn't like apples.",
+      "explanation": "第三人稱單數否定用 doesn't + 原形動詞。不能說 don't 或 doesn't likes。",
+      "difficulty": 3
+    }
+  ]
+}

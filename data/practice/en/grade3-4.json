@@ -1,0 +1,58 @@
+{
+  "subject": "en",
+  "grade": "3-4",
+  "gradeLabel": "國小中年級（3–4年級）",
+  "updatedAt": "2026-01-01",
+  "questions": [
+    {
+      "id": "en-34-001",
+      "type": "multiple_choice",
+      "chapter": "現在式",
+      "question": "She ___ to school every day.",
+      "options": ["go", "goes", "going", "gone"],
+      "answer": "goes",
+      "explanation": "主詞是第三人稱單數（She），動詞要加 -s 或 -es。go → goes。",
+      "difficulty": 2
+    },
+    {
+      "id": "en-34-002",
+      "type": "multiple_choice",
+      "chapter": "職業",
+      "question": "A person who teaches students is called a ___.",
+      "options": ["doctor", "teacher", "driver", "farmer"],
+      "answer": "teacher",
+      "explanation": "教導學生的人叫 teacher（老師）。doctor=醫生，driver=司機，farmer=農夫。",
+      "difficulty": 2
+    },
+    {
+      "id": "en-34-003",
+      "type": "multiple_choice",
+      "chapter": "介係詞",
+      "question": "The book is ___ the table.",
+      "options": ["in", "on", "at", "under"],
+      "answer": "on",
+      "explanation": "東西放在桌子上面用 on。in=在裡面，at=在某地，under=在下面。",
+      "difficulty": 2
+    },
+    {
+      "id": "en-34-004",
+      "type": "multiple_choice",
+      "chapter": "形容詞",
+      "question": "Which word means the opposite of 'hot'?",
+      "options": ["warm", "cold", "cool", "mild"],
+      "answer": "cold",
+      "explanation": "hot（熱的）的反義詞是 cold（冷的）。warm=溫暖，cool=涼爽，mild=溫和。",
+      "difficulty": 2
+    },
+    {
+      "id": "en-34-005",
+      "type": "multiple_choice",
+      "chapter": "時間",
+      "question": "What time is it? It's ___ o'clock.",
+      "options": ["three", "third", "threes", "thirdy"],
+      "answer": "three",
+      "explanation": "說幾點時用基數詞（one, two, three...），不用序數詞（first, second, third）。",
+      "difficulty": 2
+    }
+  ]
+}

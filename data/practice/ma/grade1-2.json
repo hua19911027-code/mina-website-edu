@@ -1,0 +1,58 @@
+{
+  "subject": "ma",
+  "grade": "1-2",
+  "gradeLabel": "國小低年級（1–2年級）",
+  "updatedAt": "2026-01-01",
+  "questions": [
+    {
+      "id": "ma-12-001",
+      "type": "multiple_choice",
+      "chapter": "加法",
+      "question": "5 + 3 = ?",
+      "options": ["6", "7", "8", "9"],
+      "answer": "8",
+      "explanation": "5 加 3 等於 8。用手指頭數：5 之後再數 3 個就是 6、7、8。",
+      "difficulty": 1
+    },
+    {
+      "id": "ma-12-002",
+      "type": "multiple_choice",
+      "chapter": "減法",
+      "question": "10 - 4 = ?",
+      "options": ["4", "5", "6", "7"],
+      "answer": "6",
+      "explanation": "10 減掉 4 剩下 6。10 往回數 4 個：9、8、7、6。",
+      "difficulty": 1
+    },
+    {
+      "id": "ma-12-003",
+      "type": "multiple_choice",
+      "chapter": "比大小",
+      "question": "下列哪個數字最大？",
+      "options": ["15", "21", "9", "18"],
+      "answer": "21",
+      "explanation": "比較大小時，先比十位數：21 的十位是 2，其他都是 1 或 0，所以 21 最大。",
+      "difficulty": 1
+    },
+    {
+      "id": "ma-12-004",
+      "type": "multiple_choice",
+      "chapter": "形狀",
+      "question": "正方形有幾個角？",
+      "options": ["3", "4", "5", "6"],
+      "answer": "4",
+      "explanation": "正方形有 4 個角、4 條邊，而且每條邊一樣長。",
+      "difficulty": 1
+    },
+    {
+      "id": "ma-12-005",
+      "type": "multiple_choice",
+      "chapter": "時間",
+      "question": "一小時等於幾分鐘？",
+      "options": ["30分鐘", "60分鐘", "100分鐘", "24分鐘"],
+      "answer": "60分鐘",
+      "explanation": "1 小時 = 60 分鐘。記憶方法：時鐘的長針走一圈就是 60 分鐘，也就是 1 小時。",
+      "difficulty": 1
+    }
+  ]
+}

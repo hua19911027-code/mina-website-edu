@@ -1,0 +1,58 @@
+{
+  "subject": "ma",
+  "grade": "5-6",
+  "gradeLabel": "國小高年級（5–6年級）",
+  "updatedAt": "2026-01-01",
+  "questions": [
+    {
+      "id": "ma-56-001",
+      "type": "multiple_choice",
+      "chapter": "百分比",
+      "question": "200 的 30% 是多少？",
+      "options": ["40", "60", "80", "90"],
+      "answer": "60",
+      "explanation": "200 × 30% = 200 × 0.3 = 60。百分比轉小數：30% = 0.3。",
+      "difficulty": 3
+    },
+    {
+      "id": "ma-56-002",
+      "type": "multiple_choice",
+      "chapter": "比例",
+      "question": "3:5 = 12:?",
+      "options": ["15", "18", "20", "25"],
+      "answer": "20",
+      "explanation": "比例相等：3/5 = 12/x，所以 x = 12 × 5 ÷ 3 = 20。",
+      "difficulty": 3
+    },
+    {
+      "id": "ma-56-003",
+      "type": "multiple_choice",
+      "chapter": "圓形",
+      "question": "半徑為 7 公分的圓，其周長約為多少公分？（π ≈ 3.14）",
+      "options": ["21.98", "43.96", "153.86", "87.92"],
+      "answer": "43.96",
+      "explanation": "圓周長 = 2πr = 2 × 3.14 × 7 = 43.96 公分。注意是半徑不是直徑。",
+      "difficulty": 3
+    },
+    {
+      "id": "ma-56-004",
+      "type": "multiple_choice",
+      "chapter": "應用題",
+      "question": "一件衣服原價 800 元，打八折後售價是多少？",
+      "options": ["640", "680", "720", "760"],
+      "answer": "640",
+      "explanation": "打八折 = 乘以 0.8。800 × 0.8 = 640 元。",
+      "difficulty": 3
+    },
+    {
+      "id": "ma-56-005",
+      "type": "multiple_choice",
+      "chapter": "統計",
+      "question": "數列 2, 4, 6, 8, 10 的平均數是？",
+      "options": ["4", "5", "6", "7"],
+      "answer": "6",
+      "explanation": "平均數 = 總和 ÷ 個數 = (2+4+6+8+10) ÷ 5 = 30 ÷ 5 = 6。",
+      "difficulty": 3
+    }
+  ]
+}

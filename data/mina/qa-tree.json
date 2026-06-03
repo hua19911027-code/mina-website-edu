@@ -1,0 +1,123 @@
+{
+  "version": "1.0",
+  "updatedAt": "2026-01-01",
+  "welcome": "你好！我是 Mina 小幫手 👋\n請問你想了解什麼呢？",
+  "handoffMessage": "這個問題讓老師來親自回答更好喔 😊",
+  "handoffCta": { "label": "加 LINE 詢問老師", "url": "#TODO_LINE_URL" },
+  "nodes": {
+    "root": {
+      "id": "root",
+      "type": "options",
+      "text": null,
+      "options": [
+        { "label": "📚 課程相關", "nodeId": "courses" },
+        { "label": "💰 費用相關", "nodeId": "pricing" },
+        { "label": "🕐 上課時間", "nodeId": "schedule" },
+        { "label": "📍 地點交通", "nodeId": "location" },
+        { "label": "🎯 預約試聽", "nodeId": "booking" },
+        { "label": "❓ 其他問題", "nodeId": "other" }
+      ]
+    },
+    "courses": {
+      "id": "courses",
+      "type": "options",
+      "text": "請問是哪個課程呢？",
+      "options": [
+        { "label": "徐薇英文 UP學", "nodeId": "course_english" },
+        { "label": "偉智數學 WISE", "nodeId": "course_math" },
+        { "label": "暑假 / 寒假營隊", "nodeId": "course_camp" },
+        { "label": "← 回主選單", "nodeId": "root" }
+      ]
+    },
+    "course_english": {
+      "id": "course_english",
+      "type": "answer",
+      "text": "徐薇英文 UP學 適合國小一到六年級，依程度小班分組，從聽說讀寫全方位訓練。老師特別擅長讓原本對英文沒興趣的孩子也能慢慢愛上學英文！",
+      "cta": { "label": "預約免費試聽 →", "url": "/booking.html" },
+      "options": [
+        { "label": "費用怎麼算？", "nodeId": "pricing" },
+        { "label": "上課時間？", "nodeId": "schedule" },
+        { "label": "← 回主選單", "nodeId": "root" }
+      ]
+    },
+    "course_math": {
+      "id": "course_math",
+      "type": "answer",
+      "text": "偉智數學 WISE 用理解取代死記，讓孩子真的搞懂數學邏輯。適合國小一到六年級，小班制讓老師能掌握每個孩子的狀況，課後有問題也可以問老師。",
+      "cta": { "label": "預約免費試聽 →", "url": "/booking.html" },
+      "options": [
+        { "label": "費用怎麼算？", "nodeId": "pricing" },
+        { "label": "上課時間？", "nodeId": "schedule" },
+        { "label": "← 回主選單", "nodeId": "root" }
+      ]
+    },
+    "course_camp": {
+      "id": "course_camp",
+      "type": "answer",
+      "text": "暑假和寒假都有特別課程，通常名額很快就滿！建議直接加 LINE 詢問或看最新消息，第一時間掌握報名資訊。",
+      "cta": { "label": "查看最新消息", "url": "/news.html" },
+      "options": [
+        { "label": "加 LINE 詢問", "nodeId": "line_handoff" },
+        { "label": "← 回主選單", "nodeId": "root" }
+      ]
+    },
+    "pricing": {
+      "id": "pricing",
+      "type": "answer",
+      "text": "費用依課程、上課頻率而不同。建議先來一堂免費試聽課，老師評估後會詳細說明最適合的方案——試聽完全免費、不強迫報名。",
+      "cta": { "label": "預約免費試聽 →", "url": "/booking.html" },
+      "options": [
+        { "label": "直接電話詢問", "nodeId": "phone_handoff" },
+        { "label": "← 回主選單", "nodeId": "root" }
+      ]
+    },
+    "schedule": {
+      "id": "schedule",
+      "type": "answer",
+      "text": "上課時間是週一到週五，下午 1:30 開始到晚上 8:00，依不同年級和班別有不同時段。具體時段可以看課程介紹，或試聽時再跟老師確認。",
+      "cta": { "label": "查看課程時段", "url": "/courses.html#schedule" },
+      "options": [
+        { "label": "預約試聽", "nodeId": "booking" },
+        { "label": "← 回主選單", "nodeId": "root" }
+      ]
+    },
+    "location": {
+      "id": "location",
+      "type": "answer",
+      "text": "我們在台中市烏日區健行北路96號，就在旭光國小旁邊，附近有停車位，交通很方便。",
+      "cta": { "label": "Google Maps 導航", "url": "https://maps.google.com/?q=台中市烏日區健行北路96號" },
+      "options": [
+        { "label": "預約試聽", "nodeId": "booking" },
+        { "label": "← 回主選單", "nodeId": "root" }
+      ]
+    },
+    "booking": {
+      "id": "booking",
+      "type": "answer",
+      "text": "試聽完全免費、不強迫報名！填預約表單後，老師會先跟您聯繫確認，讓第一堂課就能有最好的體驗。",
+      "cta": { "label": "立即預約試聽 →", "url": "/booking.html" },
+      "options": [
+        { "label": "用 LINE 聯繫老師", "nodeId": "line_handoff" },
+        { "label": "← 回主選單", "nodeId": "root" }
+      ]
+    },
+    "other": {
+      "id": "other",
+      "type": "handoff",
+      "text": "這個問題讓老師親自回答更準確喔 😊 您可以：",
+      "options": []
+    },
+    "line_handoff": {
+      "id": "line_handoff",
+      "type": "handoff",
+      "text": "加入我們的 LINE 官方帳號，老師會直接回覆您的問題！",
+      "options": []
+    },
+    "phone_handoff": {
+      "id": "phone_handoff",
+      "type": "handoff",
+      "text": "直接撥電話也很歡迎！服務時間：週一至週五 13:30–20:00",
+      "options": []
+    }
+  }
+}

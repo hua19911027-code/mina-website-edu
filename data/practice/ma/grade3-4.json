@@ -1,0 +1,58 @@
+{
+  "subject": "ma",
+  "grade": "3-4",
+  "gradeLabel": "國小中年級（3–4年級）",
+  "updatedAt": "2026-01-01",
+  "questions": [
+    {
+      "id": "ma-34-001",
+      "type": "multiple_choice",
+      "chapter": "乘法",
+      "question": "7 × 8 = ?",
+      "options": ["54", "56", "58", "64"],
+      "answer": "56",
+      "explanation": "7 × 8 = 56。記憶口訣：七八五十六。",
+      "difficulty": 2
+    },
+    {
+      "id": "ma-34-002",
+      "type": "multiple_choice",
+      "chapter": "除法",
+      "question": "48 ÷ 6 = ?",
+      "options": ["6", "7", "8", "9"],
+      "answer": "8",
+      "explanation": "48 ÷ 6 = 8。驗算：6 × 8 = 48，確認答案正確。",
+      "difficulty": 2
+    },
+    {
+      "id": "ma-34-003",
+      "type": "multiple_choice",
+      "chapter": "分數",
+      "question": "½ + ¼ = ?",
+      "options": ["¾", "2/6", "3/8", "1/6"],
+      "answer": "¾",
+      "explanation": "½ = 2/4，所以 2/4 + 1/4 = 3/4（¾）。分數相加要先通分（分母相同）。",
+      "difficulty": 2
+    },
+    {
+      "id": "ma-34-004",
+      "type": "multiple_choice",
+      "chapter": "面積",
+      "question": "長方形長 5 公分，寬 3 公分，面積是幾平方公分？",
+      "options": ["8", "15", "16", "30"],
+      "answer": "15",
+      "explanation": "面積 = 長 × 寬 = 5 × 3 = 15 平方公分。",
+      "difficulty": 2
+    },
+    {
+      "id": "ma-34-005",
+      "type": "multiple_choice",
+      "chapter": "應用題",
+      "question": "小明有 24 顆糖，平均分給 4 個朋友，每人可以得到幾顆？",
+      "options": ["4", "5", "6", "7"],
+      "answer": "6",
+      "explanation": "24 ÷ 4 = 6。平均分配就是除法。",
+      "difficulty": 2
+    }
+  ]
+}
