@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>題庫練習 | Mina 補習班</title>
+  <meta name="description" content="英文、數學免費題庫練習，國小各年級，即時解析。">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    .subject-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 480px;
+      margin: 0 auto 40px;
+    }
+    .subject-btn {
+      padding: 20px 16px;
+      border: 2px solid var(--line);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      text-align: center;
+      background: var(--bg);
+      transition: all var(--trans);
+    }
+    .subject-btn:hover { border-color: var(--pink); }
+    .subject-btn.active.en { border-color: var(--pink); background: var(--pink-soft); }
+    .subject-btn.active.ma { border-color: var(--orange); background: #fff8f0; }
+    .subject-btn .ico { font-size: 32px; display: block; margin-bottom: 8px; }
+    .subject-btn .label { font-size: var(--fs-sm); font-weight: 700; color: var(--ink); }
+    .subject-btn .sub { font-size: var(--fs-xs); color: var(--ink-3); margin-top: 2px; }
+
+    .grade-selector {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .grade-btn {
+      padding: 8px 20px;
+      border: 2px solid var(--line);
+      border-radius: var(--radius-pill);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--ink-3);
+      transition: all var(--trans-fast);
+    }
+    .grade-btn:hover { border-color: var(--pink); color: var(--pink); }
+    .grade-btn.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .quiz-meta { font-size: var(--fs-sm); color: var(--ink-3); }
+    .quiz-score { font-weight: 700; color: var(--pink); }
+
+    .result-summary {
+      text-align: center;
+      padding: 48px 32px;
+      background: var(--bg-2);
+      border-radius: var(--radius-lg);
+    }
+    .result-score {
+      font-size: 64px;
+      font-weight: 800;
+      color: var(--pink);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .result-label { font-size: var(--fs-md); color: var(--ink-3); }
+    .result-actions { display: flex; gap: 12px; justify-content: center; margin-top: 28px; flex-wrap: wrap; }
+
+    #practice-setup   { }
+    #practice-quiz    { display: none; }
+    #practice-result  { display: none; }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" role="navigation" aria-label="主導覽">
+    <div class="wrap">
+      <a class="nav-logo" href="index.html">
+        <img src="https://placehold.co/120x36/B8005F/ffffff?text=Mina" alt="Mina 補習班" width="120" height="36">
+      </a>
+      <div class="nav-links">
+        <a href="index.html">首頁</a>
+        <a href="about.html">關於我們</a>
+        <a href="courses.html">課程介紹</a>
+        <a href="faq.html">常見問題</a>
+        <a href="booking.html" class="nav-cta">預約試聽</a>
+      </div>
+      <button class="nav-hamburger" aria-label="開啟選單" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" role="navigation" aria-label="行動裝置選單">
+    <a href="index.html">首頁</a>
+    <a href="about.html">關於我們</a>
+    <a href="courses.html">課程介紹</a>
+    <a href="faq.html">常見問題</a>
+    <a href="booking.html" class="mobile-cta">預約免費試聽</a>
+  </div>
+  <div class="nav-spacer"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="wrap">
+        <span class="kicker">PRACTICE</span>
+        <h1>題庫練習</h1>
+        <p>英文、數學各年級題目，在家輕鬆練習，即時解析</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+
+        <!-- Setup Panel -->
+        <div id="practice-setup">
+          <div class="sec-head">
+            <h2>選擇科目與年級</h2>
+          </div>
+          <div class="subject-selector">
+            <button class="subject-btn en active" data-subject="en">
+              <span class="ico">📖</span>
+              <span class="label">英文</span>
+              <span class="sub">UP學 English</span>
+            </button>
+            <button class="subject-btn ma" data-subject="ma">
+              <span class="ico">🔢</span>
+              <span class="label">數學</span>
+              <span class="sub">WISE Math</span>
+            </button>
+          </div>
+          <div class="grade-selector">
+            <button class="grade-btn active" data-grade="1-2">低年級（1–2年級）</button>
+            <button class="grade-btn" data-grade="3-4">中年級（3–4年級）</button>
+            <button class="grade-btn" data-grade="5-6">高年級（5–6年級）</button>
+          </div>
+          <div class="text-center">
+            <button class="btn btn-primary btn-lg" id="start-btn">開始練習 →</button>
+          </div>
+        </div>
+
+        <!-- Quiz Panel -->
+        <div id="practice-quiz" class="quiz-container">
+          <div class="quiz-header">
+            <span class="quiz-meta">第 <span id="q-current">1</span> / <span id="q-total">5</span> 題</span>
+            <span class="quiz-meta quiz-score">得分：<span id="q-score">0</span></span>
+          </div>
+          <div class="quiz-progress">
+            <div class="quiz-progress-bar" id="quiz-progress-bar" style="width:0%"></div>
+          </div>
+          <p class="quiz-question" id="quiz-question"></p>
+          <div class="quiz-options" id="quiz-options"></div>
+          <div class="quiz-explanation" id="quiz-explanation"></div>
+          <div style="display:flex;justify-content:space-between;margin-top:16px;">
+            <button class="btn btn-line btn-sm" id="quit-btn">放棄練習</button>
+            <button class="btn btn-primary btn-sm" id="next-btn" style="display:none;">下一題 →</button>
+          </div>
+        </div>
+
+        <!-- Result Panel -->
+        <div id="practice-result">
+          <div class="result-summary">
+            <p class="result-score" id="final-score">0</p>
+            <p class="result-label">分（滿分 <span id="max-score">100</span> 分）</p>
+            <p id="result-message" style="margin-top:16px;color:var(--ink-2);font-size:var(--fs-md);"></p>
+            <div class="result-actions">
+              <button class="btn btn-primary" id="retry-btn">重新練習</button>
+              <a href="booking.html" class="btn btn-w">預約試聽</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="mina-cta-block">
+      <div class="wrap">
+        <span class="kicker" style="color:rgba(255,255,255,0.7)">KEEP LEARNING</span>
+        <h2>練習後想進一步提升？</h2>
+        <p>試聽一堂課，讓老師診斷孩子的學習狀況，制定個人化計畫。</p>
+        <a href="booking.html" class="btn btn-w">預約免費試聽 →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <img src="https://placehold.co/120x36/ffffff/B8005F?text=Mina" alt="Mina 補習班" width="120" height="36">
+          </a>
+          <p class="footer-desc">台中市私立卓越國際文理短期補習班，提供英文、數學、安親小班教學。</p>
+          <div class="footer-contact">
+            <div class="footer-contact-item"><span class="ico">📞</span><span>04-2336-6868</span></div>
+            <div class="footer-contact-item"><span class="ico">📍</span><span>台中市烏日區健行北路96號</span></div>
+            <div class="footer-contact-item"><span class="ico">🕐</span><span>週一至週五 13:30–20:00</span></div>
+          </div>
+        </div>
+        <div>
+          <p class="footer-nav-title">課程</p>
+          <div class="footer-nav-links">
+            <a href="courses.html#english">徐薇英文 UP學</a>
+            <a href="courses.html#math">偉智數學 WISE</a>
+          </div>
+        </div>
+        <div>
+          <p class="footer-nav-title">關於</p>
+          <div class="footer-nav-links">
+            <a href="about.html">關於我們</a>
+            <a href="faq.html">常見問題</a>
+            <a href="booking.html">預約試聽</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 臺中市私立卓越國際文理短期補習班 版權所有</p>
+      </div>
+    </div>
+  </footer>
+
+  <button class="mina-widget-trigger" id="mina-trigger" aria-label="開啟 Mina 小幫手">
+    <span class="mina-avatar">🤖</span><span>Mina 小幫手</span>
+  </button>
+  <div class="mina-chat-panel" id="mina-panel" role="dialog" aria-label="Mina 小幫手對話" aria-hidden="true">
+    <div class="mina-chat-header">
+      <span style="width:32px;height:32px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">🤖</span>
+      <div><p class="mina-name">Mina 小幫手</p><p class="mina-status">線上中</p></div>
+      <button class="mina-close" id="mina-close" aria-label="關閉">✕</button>
+    </div>
+    <div class="mina-chat-body" id="mina-body"></div>
+  </div>
+
+  <script src="site.js"></script>
+  <script src="practice.js"></script>
+  <script src="faq.js"></script>
+</body>
+</html>
