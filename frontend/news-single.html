@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>2026 卓越夏令營開始報名｜最新消息｜卓越國際文理</title>
-<meta name="description" content="2026 卓越夏令營分英數加強與主題探索兩大路線，邊玩邊學、假期不退步。名額有限，歡迎預約諮詢。"/>
+<title>最新消息｜臺中市私立卓越國際文理短期補習班</title>
+<meta name="description" content="卓越國際文理最新消息單篇文章。"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet"/>
@@ -45,56 +45,41 @@
   <section class="page-hero" style="padding-bottom:18px;">
     <div class="blob" style="width:170px;height:170px;background:var(--orange-soft);top:26px;left:9%;"></div>
     <div class="wrap" style="max-width:780px;">
-      <div class="breadcrumb"><a href="index.html">首頁</a><span>›</span><a href="news.html">最新消息</a><span>›</span>2026 卓越夏令營</div>
-      <h1 style="font-size:clamp(28px,4.2vw,46px);">2026 卓越夏令營<br>開始報名囉！</h1>
+      <div class="breadcrumb"><a href="index.html">首頁</a><span>›</span><a href="news.html">最新消息</a><span>›</span><span id="breadcrumb-title">文章</span></div>
+      <h1 id="article-title" style="font-size:clamp(28px,4.2vw,46px);">載入中…</h1>
     </div>
   </section>
 
   <section class="sec-pad" style="padding-top:30px;">
     <div class="wrap">
-      <article class="article reveal">
+
+      <!-- Loading skeleton -->
+      <div id="article-skeleton" class="article reveal" style="max-width:780px;margin:0 auto;">
+        <div style="height:18px;background:var(--line);border-radius:4px;width:28%;margin-bottom:24px;"></div>
+        <div style="height:280px;background:var(--line);border-radius:var(--r);margin-bottom:28px;"></div>
+        <div style="height:15px;background:var(--line);border-radius:4px;width:94%;margin-bottom:10px;"></div>
+        <div style="height:15px;background:var(--line);border-radius:4px;width:86%;margin-bottom:10px;"></div>
+        <div style="height:15px;background:var(--line);border-radius:4px;width:72%;"></div>
+      </div>
+
+      <!-- Article body (populated by news.js) -->
+      <article id="article-body" class="article reveal" style="display:none;">
         <div class="art-meta">
-          <span class="nc-cat c-event">活動</span>
-          <span class="nc-date">2026.05.28</span>
+          <span id="article-category" class="nc-cat c-event"></span>
+          <span id="article-date" class="nc-date"></span>
         </div>
 
-        <div class="art-cover c-event"><span class="ac-ico">☀️</span></div>
+        <div id="article-cover" class="art-cover c-event"><span class="ac-ico">☀️</span></div>
 
-        <div class="photo-carousel" id="carousel" role="region" aria-label="活動照片">
-          <div class="carousel-track">
-            <div class="carousel-slide on"><div class="ph-slide"><span class="pi">📸</span>活動花絮照片 1</div></div>
-            <div class="carousel-slide"><div class="ph-slide"><span class="pi">🎒</span>活動花絮照片 2</div></div>
-            <div class="carousel-slide"><div class="ph-slide"><span class="pi">🙌</span>活動花絮照片 3</div></div>
-            <div class="carousel-slide"><div class="ph-slide"><span class="pi">🎉</span>活動花絮照片 4</div></div>
-            <div class="carousel-slide"><div class="ph-slide"><span class="pi">📝</span>活動花絮照片 5</div></div>
-          </div>
+        <div class="photo-carousel" id="photo-carousel" style="display:none;" role="region" aria-label="活動照片">
+          <div class="carousel-track"></div>
           <button class="carousel-prev" aria-label="上一張">‹</button>
           <button class="carousel-next" aria-label="下一張">›</button>
           <div class="carousel-dots" aria-hidden="true"></div>
-          <div class="carousel-counter" aria-live="polite">1 / 5</div>
+          <div class="carousel-counter" aria-live="polite"></div>
         </div>
 
-        <div class="art-body">
-          <p>暑假是孩子最容易「鬆掉」的兩個月，也是把基礎補回來、甚至超前的好機會。今年的卓越夏令營，我們把課程分成兩大路線，讓不同需求的孩子都能找到適合的節奏。</p>
-
-          <h2>兩大路線，依需求選擇</h2>
-          <ul>
-            <li><strong>英數加強路線</strong>：針對上學期較吃力的單元做系統複習，並預習下學期重點，開學不慌張。</li>
-            <li><strong>主題探索路線</strong>：用專題式學習結合英語會話與邏輯思考，邊玩邊學，培養興趣與表達力。</li>
-          </ul>
-
-          <div class="art-callout">兩條路線都採小班制，老師顧得到每個孩子的進度，也會在課後跟家長回報學習狀況。</div>
-
-          <h2>營隊資訊</h2>
-          <ul>
-            <li>對象：國小 1–6 年級</li>
-            <li>梯次：7 月、8 月，各分上下半月（示意，實際梯次以現場公告為準）</li>
-            <li>地點：台中市烏日區健行北路96號（旭光國小旁）</li>
-          </ul>
-
-          <h3>名額有限，建議提早預約</h3>
-          <p>每個梯次的名額都不多，想了解適合孩子的路線與時段，歡迎直接來電 04-2336-6868，或在線上預約一堂免費試聽，讓我們先認識孩子，再幫他安排最合適的安排。</p>
-        </div>
+        <div id="article-content" class="art-body"></div>
 
         <div class="art-foot">
           <a class="art-back" href="news.html">← 返回最新消息</a>
@@ -113,10 +98,19 @@
           </div>
         </div>
       </article>
+
+      <!-- 404 state -->
+      <div id="article-404" style="display:none;text-align:center;padding:80px 20px;">
+        <div style="font-size:48px;margin-bottom:16px;">🔍</div>
+        <h2 style="margin-bottom:12px;">找不到這篇文章</h2>
+        <p style="color:var(--ink-mute);margin-bottom:24px;">這篇文章可能已移除或網址有誤。</p>
+        <a href="news.html" class="btn-primary">返回最新消息</a>
+      </div>
+
     </div>
   </section>
 
-  <!-- RELATED -->
+  <!-- RELATED (static placeholder — API returns [] for now) -->
   <section class="sec-pad" style="background:var(--bg-2);padding-top:56px;">
     <div class="wrap">
       <div class="sec-head reveal" style="margin-bottom:30px;">
@@ -183,63 +177,11 @@
     </div>
     <div class="ft-bottom">
       <span>© 2026 臺中市私立卓越國際文理短期補習班</span>
-      <span>本頁為設計示意，文案與數據為佔位內容</span>
     </div>
   </div>
 </footer>
 
+<script src="news.js"></script>
 <script src="site.js"></script>
-<script>
-(function(){
-  var car=document.getElementById('carousel');
-  if(car){
-    var slides=Array.prototype.slice.call(car.querySelectorAll('.carousel-slide'));
-    var dotsWrap=car.querySelector('.carousel-dots');
-    var counter=car.querySelector('.carousel-counter');
-    var prev=car.querySelector('.carousel-prev');
-    var next=car.querySelector('.carousel-next');
-    var i=0,n=slides.length;
-    if(n<=1){prev.style.display=next.style.display=dotsWrap.style.display=counter.style.display='none';}
-    else if(n<=10){slides.forEach(function(s,idx){
-      var d=document.createElement('button');d.className='dot'+(idx===0?' on':'');
-      d.setAttribute('aria-label','第 '+(idx+1)+' 張');
-      d.addEventListener('click',function(){go(idx);});dotsWrap.appendChild(d);
-    });}
-    function go(k){
-      i=(k+n)%n;
-      slides.forEach(function(s,idx){s.classList.toggle('on',idx===i);});
-      var dots=dotsWrap.querySelectorAll('.dot');
-      dots.forEach(function(d,idx){d.classList.toggle('on',idx===i);});
-      counter.textContent=(i+1)+' / '+n;
-    }
-    prev.addEventListener('click',function(){go(i-1);});
-    next.addEventListener('click',function(){go(i+1);});
-    document.addEventListener('keydown',function(e){
-      if(e.key==='ArrowLeft')go(i-1);else if(e.key==='ArrowRight')go(i+1);
-    });
-    var x0=null;
-    car.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;},{passive:true});
-    car.addEventListener('touchend',function(e){
-      if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;
-      if(Math.abs(dx)>40)go(dx<0?i+1:i-1);x0=null;
-    },{passive:true});
-  }
-
-  var url=location.href, title=document.title;
-  var line=document.getElementById('shLine'),fb=document.getElementById('shFb'),
-      copy=document.getElementById('shCopy'),toast=document.getElementById('shToast');
-  if(line)line.addEventListener('click',function(){
-    window.open('https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(url),'_blank','noopener,width=560,height=640');
-  });
-  if(fb)fb.addEventListener('click',function(){
-    window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url),'_blank','noopener,width=560,height=640');
-  });
-  if(copy)copy.addEventListener('click',function(){
-    var done=function(){toast.classList.add('show');setTimeout(function(){toast.classList.remove('show');},1800);};
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done,done);}
-    else done();
-  });
-})();
-</script>
 </body>
 </html>
