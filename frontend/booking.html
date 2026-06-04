@@ -166,16 +166,7 @@
   </div>
 </footer>
 
-<script>
-document.querySelectorAll('#subjOpts .opt').forEach(o=>o.addEventListener('click',()=>o.classList.toggle('on')));
-document.getElementById('bookForm').addEventListener('submit',function(e){
-  e.preventDefault();
-  document.getElementById('bookForm').style.display='none';
-  var ok=document.getElementById('formOk');
-  ok.classList.add('show');
-  ok.scrollIntoView({block:'nearest'});
-});
-</script>
+<script src="booking.js"></script>
 <script src="site.js"></script>
 </body>
 </html>
