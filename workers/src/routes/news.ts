@@ -16,13 +16,13 @@ function transformPage(page: { id: string; properties: Record<string, unknown> }
 
   return {
     id: page.id,
-    slug: notion.getPropText(p, 'Slug'),
-    title: notion.getPropText(p, 'Title'),
-    category: notion.getPropText(p, 'Category'),
-    excerpt: notion.getPropText(p, 'Excerpt'),
+    slug: notion.getPropText(p, 'slug'),
+    title: notion.getPropText(p, 'Name'),
+    category: notion.getPropText(p, '分類'),
+    excerpt: notion.getPropText(p, '內容'),
     coverImage: notion.extractFileUrls(coverFiles)[0] || '',
     photos: [],
-    publishedAt: notion.getPropText(p, 'Published At'),
+    publishedAt: notion.getPropText(p, '發布日期'),
     tags: notion.getPropTags(p, 'Tags'),
   };
 }
@@ -58,12 +58,12 @@ route.get('/', async (c) => {
   try {
     const filter: Record<string, unknown> = {
       and: [
-        { property: 'Status', select: { equals: '已發布' } },
-        ...(category ? [{ property: 'Category', select: { equals: category } }] : []),
+        { property: '狀態', select: { equals: '已發布' } },
+        ...(category ? [{ property: '分類', select: { equals: category } }] : []),
       ],
     };
 
-    const sorts = [{ property: 'Published At', direction: 'descending' }];
+    const sorts = [{ property: '發布日期', direction: 'descending' }];
     const pageSize = limit * page + 1;
 
     const result = await notion.queryDatabase(c.env.NOTION_API_KEY, c.env.NOTION_NEWS_DB_ID, {
@@ -115,8 +115,8 @@ route.get('/:slug', async (c) => {
     const result = await notion.queryDatabase(c.env.NOTION_API_KEY, c.env.NOTION_NEWS_DB_ID, {
       filter: {
         and: [
-          { property: 'Status', select: { equals: '已發布' } },
-          { property: 'Slug', rich_text: { equals: slug } },
+          { property: '狀態', select: { equals: '已發布' } },
+          { property: 'slug', rich_text: { equals: slug } },
         ],
       },
       page_size: 1,
