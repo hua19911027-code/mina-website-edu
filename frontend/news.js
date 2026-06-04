@@ -9,14 +9,12 @@
   var hasMore = false;
 
   /* ── Helpers ── */
-
   function formatDate(iso) {
     if (!iso) return '';
     var d = new Date(iso);
-    var y = d.getFullYear();
-    var m = String(d.getMonth() + 1).padStart(2, '0');
-    var day = String(d.getDate()).padStart(2, '0');
-    return y + '.' + m + '.' + day;
+    return d.getFullYear() + '.' +
+      String(d.getMonth() + 1).padStart(2, '0') + '.' +
+      String(d.getDate()).padStart(2, '0');
   }
 
   function truncate(str, max) {
@@ -24,106 +22,110 @@
     return str.length > max ? str.slice(0, max) + '…' : str;
   }
 
-  function tagClass(category) {
-    var map = { '公告': '', '活動': 'tag-orange', '特別課程': 'tag-yellow', '文章': 'tag-green' };
-    return map[category] || '';
-  }
+  var CAT_CLASS = { '公告': 'c-notice', '活動': 'c-event', '特別課程': 'c-course', '文章': 'c-article' };
+  var CAT_EMOJI = { '公告': '📢', '活動': '☀️', '特別課程': '🔤', '文章': '📖' };
 
-  /* ── Article Card Factory ── */
-
+  /* ── Article Card Factory — matches .ncard prototype structure ── */
   function buildCard(article) {
     var a = document.createElement('a');
     a.href = 'news-single.html?slug=' + encodeURIComponent(article.slug);
-    a.className = 'news-card reveal';
+    a.className = 'ncard reveal';
 
-    var img = document.createElement('img');
-    img.src = article.coverImage || 'https://placehold.co/800x450/f0ece8/B8005F?text=Mina';
-    img.alt = article.title;
-    img.loading = 'lazy';
-    img.onerror = function () {
-      this.src = 'https://placehold.co/800x450/f0ece8/B8005F?text=Mina';
-    };
+    var catCls = CAT_CLASS[article.category] || '';
+    var cover = document.createElement('div');
+    cover.className = 'nc-cover ' + catCls;
 
-    var imgWrap = document.createElement('div');
-    imgWrap.className = 'news-card-img';
-    imgWrap.appendChild(img);
+    if (article.coverImage) {
+      var img = document.createElement('img');
+      img.src = article.coverImage;
+      img.alt = article.title;
+      img.loading = 'lazy';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+      img.onerror = function () {
+        this.style.display = 'none';
+        var ico = document.createElement('span');
+        ico.className = 'nc-ico';
+        ico.textContent = CAT_EMOJI[article.category] || '📰';
+        cover.appendChild(ico);
+      };
+      cover.appendChild(img);
+    } else {
+      var ico = document.createElement('span');
+      ico.className = 'nc-ico';
+      ico.textContent = CAT_EMOJI[article.category] || '📰';
+      cover.appendChild(ico);
+    }
 
-    var tagEl = document.createElement('span');
-    tagEl.className = 'tag ' + tagClass(article.category);
-    tagEl.textContent = article.category;
+    var catEl = document.createElement('span');
+    catEl.className = 'nc-cat ' + catCls;
+    catEl.textContent = article.category;
 
     var dateEl = document.createElement('span');
-    dateEl.className = 'news-card-date';
+    dateEl.className = 'nc-date';
     dateEl.textContent = formatDate(article.publishedAt);
 
     var meta = document.createElement('div');
-    meta.className = 'news-card-meta';
-    meta.appendChild(tagEl);
+    meta.className = 'nc-meta';
+    meta.appendChild(catEl);
     meta.appendChild(dateEl);
 
     var title = document.createElement('h3');
-    title.className = 'news-card-title';
     title.textContent = article.title;
 
     var excerpt = document.createElement('p');
-    excerpt.className = 'news-card-excerpt';
+    excerpt.className = 'nc-excerpt';
     excerpt.textContent = truncate(article.excerpt || '', 80);
 
+    var more = document.createElement('span');
+    more.className = 'nc-more';
+    more.textContent = '閱讀更多 →';
+
     var body = document.createElement('div');
-    body.className = 'news-card-body';
+    body.className = 'nc-body';
     body.appendChild(meta);
     body.appendChild(title);
     body.appendChild(excerpt);
+    body.appendChild(more);
 
-    a.appendChild(imgWrap);
+    a.appendChild(cover);
     a.appendChild(body);
     return a;
   }
 
-  /* ── Skeleton ── */
-
+  /* ── Skeleton card ── */
   function buildSkeleton() {
     var el = document.createElement('div');
-    el.className = 'skeleton-card';
+    el.className = 'ncard';
+    el.setAttribute('aria-hidden', 'true');
     el.innerHTML =
-      '<div class="skeleton skeleton-img"></div>' +
-      '<div class="skeleton-body">' +
-      '<div class="skeleton skeleton-line w-half"></div>' +
-      '<div class="skeleton skeleton-line w-full"></div>' +
-      '<div class="skeleton skeleton-line w-3q"></div>' +
+      '<div class="nc-cover" style="background:var(--bg-2);animation:shimmer 1.4s infinite;"></div>' +
+      '<div class="nc-body">' +
+      '<div style="height:13px;background:var(--line);border-radius:4px;width:38%;margin-bottom:10px;"></div>' +
+      '<div style="height:17px;background:var(--line);border-radius:4px;width:92%;margin-bottom:8px;"></div>' +
+      '<div style="height:13px;background:var(--line);border-radius:4px;width:68%;"></div>' +
       '</div>';
     return el;
   }
 
-  /* ── Reveal newly added cards ── */
-
-  function revealCards(container) {
+  /* ── Trigger reveal on dynamically added cards ── */
+  function revealNewCards(container) {
     if (!('IntersectionObserver' in window)) {
-      container.querySelectorAll('.reveal:not(.visible)').forEach(function (el) {
-        el.classList.add('visible');
-      });
+      container.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
       return;
     }
-    var observer = new IntersectionObserver(function (entries) {
+    var obs = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
+        if (entry.isIntersecting) { entry.target.classList.add('in'); obs.unobserve(entry.target); }
       });
-    }, { threshold: 0.1 });
-    container.querySelectorAll('.reveal:not(.visible)').forEach(function (el) {
-      observer.observe(el);
-    });
+    }, { threshold: 0.08 });
+    container.querySelectorAll('.reveal:not(.in)').forEach(function (el) { obs.observe(el); });
   }
 
-  /* ── Fetch and render (list page) ── */
-
+  /* ── Fetch and render list page ── */
   function fetchNews(category, page, append) {
-    var grid = document.getElementById('news-grid');
-    var emptyEl = document.getElementById('news-empty');
+    var grid = document.getElementById('newsGrid');
+    var emptyEl = document.getElementById('newsEmpty');
     var loadMoreWrap = document.getElementById('load-more-wrap');
-
     if (!grid) return;
 
     if (!append) {
@@ -139,52 +141,40 @@
       .then(function (data) {
         if (!append) grid.innerHTML = '';
         var articles = (data.data && data.data.articles) || [];
-        hasMore = data.data && data.data.hasMore;
+        hasMore = !!(data.data && data.data.hasMore);
 
         if (!articles.length && !append) {
-          emptyEl.style.display = 'block';
+          if (emptyEl) emptyEl.classList.add('show');
           if (loadMoreWrap) loadMoreWrap.style.display = 'none';
           return;
         }
-
-        emptyEl.style.display = 'none';
-        articles.forEach(function (a) {
-          grid.appendChild(buildCard(a));
-        });
-        revealCards(grid);
-
-        if (loadMoreWrap) {
-          loadMoreWrap.style.display = hasMore ? 'block' : 'none';
-        }
+        if (emptyEl) emptyEl.classList.remove('show');
+        articles.forEach(function (a) { grid.appendChild(buildCard(a)); });
+        revealNewCards(grid);
+        if (loadMoreWrap) loadMoreWrap.style.display = hasMore ? 'block' : 'none';
       })
       .catch(function () {
         if (!append) {
           grid.innerHTML = '';
-          emptyEl.style.display = 'block';
+          if (emptyEl) emptyEl.classList.add('show');
         }
       });
   }
 
   /* ── Init list page ── */
-
   function initListPage() {
-    var filterBar = document.getElementById('news-filter');
+    var filterBar = document.getElementById('newsFilter');
     var loadMoreBtn = document.getElementById('load-more-btn');
-
     if (!filterBar) return;
 
     fetchNews(currentCategory, 1, false);
 
     filterBar.addEventListener('click', function (e) {
-      var btn = e.target.closest('.filter-tab');
+      var btn = e.target.closest('.nfilter');
       if (!btn) return;
-      filterBar.querySelectorAll('.filter-tab').forEach(function (t) {
-        t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
-      });
+      filterBar.querySelectorAll('.nfilter').forEach(function (t) { t.classList.remove('active'); });
       btn.classList.add('active');
-      btn.setAttribute('aria-selected', 'true');
-      currentCategory = btn.dataset.category;
+      currentCategory = btn.dataset.cat;
       currentPage = 1;
       fetchNews(currentCategory, currentPage, false);
     });
@@ -198,95 +188,122 @@
   }
 
   /* ── Single article page ── */
-
   function initSinglePage() {
     var slug = new URLSearchParams(window.location.search).get('slug');
-    if (!slug) {
-      window.location.replace('news.html');
-      return;
-    }
+    if (!slug) { window.location.replace('news.html'); return; }
+    initShareButtons();
     loadArticle(slug);
+  }
+
+  function initShareButtons() {
+    var url = window.location.href;
+    var lineBtn = document.getElementById('shLine');
+    var fbBtn = document.getElementById('shFb');
+    var copyBtn = document.getElementById('shCopy');
+    var toast = document.getElementById('shToast');
+
+    if (lineBtn) lineBtn.addEventListener('click', function () {
+      window.open('https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(url), '_blank', 'noopener,width=560,height=640');
+    });
+    if (fbBtn) fbBtn.addEventListener('click', function () {
+      window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url), '_blank', 'noopener,width=560,height=640');
+    });
+    if (copyBtn) copyBtn.addEventListener('click', function () {
+      var done = function () {
+        if (toast) { toast.classList.add('show'); setTimeout(function () { toast.classList.remove('show'); }, 1800); }
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done, done);
+      } else { done(); }
+    });
   }
 
   function loadArticle(slug) {
     var skeleton = document.getElementById('article-skeleton');
     var body = document.getElementById('article-body');
     var notFound = document.getElementById('article-404');
-    var copyBtn = document.getElementById('copy-link-btn');
 
     fetch('/api/v1/news/' + encodeURIComponent(slug))
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (!data.ok || !data.data) {
-          skeleton.style.display = 'none';
-          notFound.style.display = 'block';
+          if (skeleton) skeleton.style.display = 'none';
+          if (notFound) notFound.style.display = 'block';
           return;
         }
-        var article = data.data;
-        renderArticle(article);
-        skeleton.style.display = 'none';
-        body.style.display = 'block';
-        document.title = article.title + ' | Mina 補習班';
+        renderArticle(data.data);
+        if (skeleton) skeleton.style.display = 'none';
+        if (body) body.style.display = 'block';
+        document.title = data.data.title + ' | 卓越國際文理';
       })
       .catch(function () {
-        skeleton.style.display = 'none';
-        notFound.style.display = 'block';
+        if (skeleton) skeleton.style.display = 'none';
+        if (notFound) notFound.style.display = 'block';
       });
-
-    if (copyBtn) {
-      copyBtn.addEventListener('click', function () {
-        navigator.clipboard.writeText(window.location.href)
-          .then(function () { window.showToast && window.showToast('連結已複製！'); })
-          .catch(function () { window.showToast && window.showToast('複製失敗，請手動複製網址。'); });
-      });
-    }
   }
 
   function renderArticle(article) {
     var catEl = document.getElementById('article-category');
     var dateEl = document.getElementById('article-date');
     var titleEl = document.getElementById('article-title');
-    var coverImg = document.getElementById('article-cover-img');
+    var bcTitle = document.getElementById('breadcrumb-title');
+    var coverEl = document.getElementById('article-cover');
     var contentEl = document.getElementById('article-content');
+    var catCls = CAT_CLASS[article.category] || '';
 
-    if (catEl) {
-      catEl.textContent = article.category;
-      catEl.className = 'tag ' + tagClass(article.category);
+    if (catEl) { catEl.textContent = article.category; catEl.className = 'nc-cat ' + catCls; }
+    if (dateEl) { dateEl.textContent = formatDate(article.publishedAt); dateEl.className = 'nc-date'; }
+    if (titleEl) { titleEl.textContent = article.title; }
+    if (bcTitle) { bcTitle.textContent = article.title; }
+
+    if (coverEl) {
+      coverEl.className = 'art-cover ' + catCls;
+      coverEl.innerHTML = '';
+      if (article.coverImage) {
+        var img = document.createElement('img');
+        img.src = article.coverImage;
+        img.alt = article.title;
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:var(--r);';
+        img.onerror = function () {
+          this.style.display = 'none';
+          coverEl.innerHTML = '<span class="ac-ico">' + (CAT_EMOJI[article.category] || '📰') + '</span>';
+        };
+        coverEl.appendChild(img);
+      } else {
+        coverEl.innerHTML = '<span class="ac-ico">' + (CAT_EMOJI[article.category] || '📰') + '</span>';
+      }
     }
-    if (dateEl) dateEl.textContent = formatDate(article.publishedAt);
-    if (titleEl) titleEl.textContent = article.title;
-    if (coverImg) {
-      coverImg.src = article.coverImage || 'https://placehold.co/800x450/f0ece8/B8005F?text=Mina';
-      coverImg.alt = article.title;
-    }
+
     if (contentEl) contentEl.innerHTML = article.content || '';
 
-    /* Carousel */
+    /* Carousel for events with photos */
     if (article.category === '活動' && article.photos && article.photos.length >= 1) {
       var carousel = document.getElementById('photo-carousel');
       if (carousel) {
-        carousel.classList.add('show');
-        initCarousel(article.photos, article.title);
+        carousel.style.display = 'block';
+        initCarousel(carousel, article.photos, article.title);
       }
     }
   }
 
-  /* ── Carousel (from spec §十四) ── */
-
-  function initCarousel(photos, articleTitle) {
+  /* ── Carousel ── */
+  function initCarousel(carousel, photos, articleTitle) {
     var items = photos.slice(0, 20);
-    if (items.length === 0) return;
+    if (!items.length) return;
 
-    var carousel = document.querySelector('.photo-carousel');
-    if (!carousel) return;
     var track = carousel.querySelector('.carousel-track');
     var dotsEl = carousel.querySelector('.carousel-dots');
     var counter = carousel.querySelector('.carousel-counter');
+    var prevBtn = carousel.querySelector('.carousel-prev');
+    var nextBtn = carousel.querySelector('.carousel-next');
     var current = 0;
+
+    track.innerHTML = '';
+    if (dotsEl) dotsEl.innerHTML = '';
 
     items.forEach(function (url, i) {
       var slide = document.createElement('div');
-      slide.className = 'carousel-slide' + (i === 0 ? ' active' : '');
+      slide.className = 'carousel-slide' + (i === 0 ? ' on' : '');
       var img = document.createElement('img');
       img.src = url;
       img.alt = articleTitle + ' 活動照片 ' + (i + 1);
@@ -294,42 +311,39 @@
       slide.appendChild(img);
       track.appendChild(slide);
 
-      if (items.length > 1 && items.length <= 10) {
-        var dot = document.createElement('span');
-        dot.className = 'dot' + (i === 0 ? ' active' : '');
-        dot.setAttribute('role', 'tab');
+      if (items.length > 1 && items.length <= 10 && dotsEl) {
+        var dot = document.createElement('button');
+        dot.className = 'dot' + (i === 0 ? ' on' : '');
         dot.setAttribute('aria-label', '第 ' + (i + 1) + ' 張');
-        dot.onclick = function () { goTo(i); };
+        (function (idx) { dot.addEventListener('click', function () { goTo(idx); }); }(i));
         dotsEl.appendChild(dot);
       }
     });
 
     if (items.length === 1) {
-      carousel.querySelector('.carousel-prev').hidden = true;
-      carousel.querySelector('.carousel-next').hidden = true;
-      if (dotsEl) dotsEl.hidden = true;
-      if (counter) counter.hidden = true;
+      if (prevBtn) prevBtn.style.display = 'none';
+      if (nextBtn) nextBtn.style.display = 'none';
+      if (dotsEl) dotsEl.style.display = 'none';
+      if (counter) counter.style.display = 'none';
       return;
     }
 
     function goTo(n) {
       var slides = track.querySelectorAll('.carousel-slide');
-      var dots = dotsEl.querySelectorAll('.dot');
-      slides[current].classList.remove('active');
-      if (dots[current]) dots[current].classList.remove('active');
+      var dots = dotsEl ? dotsEl.querySelectorAll('.dot') : [];
+      slides[current].classList.remove('on');
+      if (dots[current]) dots[current].classList.remove('on');
       current = (n + items.length) % items.length;
-      slides[current].classList.add('active');
-      if (dots[current]) dots[current].classList.add('active');
+      slides[current].classList.add('on');
+      if (dots[current]) dots[current].classList.add('on');
       if (counter) counter.textContent = (current + 1) + ' / ' + items.length;
     }
 
-    carousel.querySelector('.carousel-prev').onclick = function () { goTo(current - 1); };
-    carousel.querySelector('.carousel-next').onclick = function () { goTo(current + 1); };
+    if (prevBtn) prevBtn.addEventListener('click', function () { goTo(current - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { goTo(current + 1); });
 
     var startX = 0;
-    track.addEventListener('touchstart', function (e) {
-      startX = e.touches[0].clientX;
-    }, { passive: true });
+    track.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; }, { passive: true });
     track.addEventListener('touchend', function (e) {
       var diff = startX - e.changedTouches[0].clientX;
       if (Math.abs(diff) > 40) goTo(diff > 0 ? current + 1 : current - 1);
@@ -343,12 +357,12 @@
     if (counter) counter.textContent = '1 / ' + items.length;
   }
 
-  /* ── Route ── */
-
+  /* ── Route by data-screen-label ── */
   document.addEventListener('DOMContentLoaded', function () {
-    if (document.body.classList.contains('page-news-single')) {
+    var label = document.body.getAttribute('data-screen-label');
+    if (label === '最新消息單篇') {
       initSinglePage();
-    } else if (document.body.classList.contains('page-news-list')) {
+    } else if (label === '最新消息') {
       initListPage();
     }
   });
