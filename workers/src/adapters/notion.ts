@@ -27,6 +27,9 @@ export async function queryDatabase(
   dbId: string,
   opts: QueryOpts = {}
 ): Promise<{ results: NotionPage[]; has_more: boolean; next_cursor: string | null }> {
+  console.log('[notion] querying DB:', dbId);
+  console.log('[notion] filter:', JSON.stringify(opts.filter));
+
   const res = await fetch(`${BASE_URL}/databases/${dbId}/query`, {
     method: 'POST',
     headers: headers(apiKey),
@@ -48,6 +51,9 @@ export async function queryDatabase(
     has_more: boolean;
     next_cursor: string | null;
   };
+  const pages = json.results;
+  console.log('[notion] raw response pages:', pages.length);
+  if (pages.length > 0) console.log('[notion] first page props:', JSON.stringify(Object.keys(pages[0].properties)));
   return json;
 }
 
