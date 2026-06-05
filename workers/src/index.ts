@@ -10,17 +10,14 @@ import type { Bindings } from './types';
 const app = new Hono<{ Bindings: Bindings }>();
 
 app.use('*', cors({
-  origin: (origin, c) => {
-    const allowed = [
-      c.env.CORS_ORIGIN,
-      'http://localhost:3000',
-      'http://127.0.0.1:5500',
-      'http://localhost:5500',
-    ];
-    return allowed.includes(origin) ? origin : c.env.CORS_ORIGIN;
-  },
+  origin: [
+    'https://mina-website-edu.pages.dev',
+    'http://localhost:3000',
+    'http://127.0.0.1:5500',
+  ],
   allowMethods: ['GET', 'POST', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization'],
+  allowHeaders: ['Content-Type'],
+  maxAge: 86400,
 }));
 
 app.route('/api/v1/bookings', bookingsRoute);
