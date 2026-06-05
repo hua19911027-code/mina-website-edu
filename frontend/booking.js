@@ -3,6 +3,8 @@
 (function () {
   'use strict';
 
+  var API_BASE = 'https://mina-api.hua19911027.workers.dev';
+
   /* ── Subject option toggle ── */
   document.querySelectorAll('#subjOpts .opt').forEach(function (o) {
     o.addEventListener('click', function () { o.classList.toggle('on'); });
@@ -38,7 +40,7 @@
       return;
     }
 
-    fetch('/api/v1/bookings', {
+    fetch(API_BASE + '/api/v1/bookings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

@@ -3,6 +3,7 @@
 (function () {
   'use strict';
 
+  var API_BASE = 'https://mina-api.hua19911027.workers.dev';
   var PAGE_SIZE = 9;
   var currentCategory = 'all';
   var currentPage = 1;
@@ -133,7 +134,7 @@
       for (var i = 0; i < 3; i++) grid.appendChild(buildSkeleton());
     }
 
-    var url = '/api/v1/news?page=' + page + '&limit=' + PAGE_SIZE;
+    var url = API_BASE + '/api/v1/news?page=' + page + '&limit=' + PAGE_SIZE;
     if (category && category !== 'all') url += '&category=' + encodeURIComponent(category);
 
     fetch(url)
@@ -223,7 +224,7 @@
     var body = document.getElementById('article-body');
     var notFound = document.getElementById('article-404');
 
-    fetch('/api/v1/news/' + encodeURIComponent(slug))
+    fetch(API_BASE + '/api/v1/news/' + encodeURIComponent(slug))
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (!data.ok || !data.data) {

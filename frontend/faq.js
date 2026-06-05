@@ -18,12 +18,13 @@
     {category:'其他',question:'寒暑假有營隊嗎？',answer:'有夏令營與冬令營，並搭配正音與多元課程，讓孩子假期也能持續學習、探索興趣。詳情可參考課程介紹頁。'},
   ];
 
+  var API_BASE = 'https://mina-api.hua19911027.workers.dev';
   var allFaqs = [];
   var curCat = '全部';
 
   /* ── FAQ fetch and render ── */
   function loadFaq() {
-    fetch('/api/v1/faq')
+    fetch(API_BASE + '/api/v1/faq')
       .then(function (r) { return r.json(); })
       .then(function (data) {
         var faqs = (data.data && data.data.faqs) || [];
@@ -112,7 +113,7 @@
 
   function answer(msg) {
     var t = showTyping();
-    fetch('/api/v1/mina/query', {
+    fetch(API_BASE + '/api/v1/mina/query', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: msg })
