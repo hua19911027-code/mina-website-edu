@@ -28,6 +28,25 @@ app.route('/api/v1/mina', minaRoute);
 
 app.get('/health', (c) => c.json({ status: 'ok', env: c.env.ENVIRONMENT }));
 
+app.get('/debug/notion', async (c) => {
+  try {
+    const url = `https://api.notion.com/v1/databases/${c.env.NOTION_NEWS_DB_ID}/query`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${c.env.NOTION_API_KEY}`,
+        'Notion-Version': '2022-06-28',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ page_size: 1 }),
+    });
+    const data = await res.json();
+    return c.json({ status: res.status, data });
+  } catch (e) {
+    return c.json({ error: String(e) });
+  }
+});
+
 /* 404 fallback */
 app.notFound((c) => c.json({ ok: false, error: { code: 'NOT_FOUND', message: 'Route not found' } }, 404));
 
