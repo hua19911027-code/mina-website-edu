@@ -143,6 +143,7 @@
         if (!append) grid.innerHTML = '';
         var articles = (data.data && data.data.articles) || [];
         hasMore = !!(data.data && data.data.hasMore);
+        console.log('[news.js] articles loaded:', articles.length);
 
         if (!articles.length && !append) {
           if (emptyEl) emptyEl.classList.add('show');
