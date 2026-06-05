@@ -1,3 +1,5 @@
+> 所有回覆必須使用繁體中文。禁止使用日文、韓文或任何其他語言。
+
 # CLAUDE.md — Mina Website Project
 **這是 Claude Code 的唯一執行指令。讀完再動作，不得跳過任何段落。**
 
