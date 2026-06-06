@@ -34,7 +34,7 @@ route.get('/', async (c) => {
   const limit = Math.min(30, Math.max(1, parseInt(c.req.query('limit') || '9', 10)));
 
   /* Use sample data in development when Notion is not configured */
-  if (c.env.ENVIRONMENT !== 'production' && c.env.ENVIRONMENT !== 'staging') {
+  if (!c.env.NOTION_API_KEY || c.env.ENVIRONMENT !== 'production') {
     let articles: typeof sampleNews.articles = sampleNews.articles;
     if (category) {
       articles = articles.filter((a) => a.category === category);
@@ -101,7 +101,7 @@ route.get('/:slug', async (c) => {
   const slug = c.req.param('slug');
 
   /* Development: serve from sample data */
-  if (c.env.ENVIRONMENT !== 'production' && c.env.ENVIRONMENT !== 'staging') {
+  if (!c.env.NOTION_API_KEY || c.env.ENVIRONMENT !== 'production') {
     const found = sampleNews.articles.find((a) => a.slug === slug);
     if (!found) {
       return c.json({ ok: false, error: { code: 'NOT_FOUND', message: 'Article not found' } }, 404);
