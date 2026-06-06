@@ -267,6 +267,14 @@ function escHtml(s: string): string {
 
 /* ── getProperty helpers ── */
 
+export function getTitleText(page: NotionPage): string {
+  const props = Object.values(page.properties) as Record<string, unknown>[];
+  const prop = props.find((p) => p['type'] === 'title');
+  if (!prop) return '';
+  const arr = prop['title'] as NotionRichText[] | undefined;
+  return arr ? arr.map((t) => t.plain_text).join('') : '';
+}
+
 export function getPropText(page: NotionPage, name: string): string {
   const prop = (page.properties[name] as Record<string, unknown>) || {};
   const type = prop['type'] as string | undefined;

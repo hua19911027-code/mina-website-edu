@@ -16,9 +16,13 @@ function transformPage(page: { id: string; properties: Record<string, unknown> }
   return {
     id: page.id,
     slug: notion.getPropText(p, 'slug'),
-    title: notion.getPropText(p, '粗體摘要'),
+    title: notion.getTitleText(p),
     category: notion.getPropText(p, '分類'),
-    excerpt: notion.getPropText(p, '內容摘要'),
+    excerpt:
+      notion.getPropText(p, '內容摘要') ||
+      notion.getPropText(p, '摘要') ||
+      notion.getPropText(p, 'Excerpt') ||
+      notion.getPropText(p, '內容'),
     coverImage: notion.extractFileUrls(coverFiles)[0] || '',
     photos: [],
     publishedAt: notion.getPropText(p, '發布日期'),
