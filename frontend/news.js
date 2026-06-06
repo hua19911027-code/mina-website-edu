@@ -279,7 +279,7 @@
     var skeleton = document.getElementById('article-skeleton');
     var body = document.getElementById('article-body');
     if (skeleton) skeleton.style.display = 'none';
-    if (body) body.style.display = 'block';
+    if (body) { body.style.display = 'block'; body.classList.add('in'); }
     if (contentEl) contentEl.innerHTML = article.content || '';
 
     /* Carousel for events with photos */
