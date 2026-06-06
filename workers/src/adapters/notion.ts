@@ -99,122 +99,128 @@ export async function getPageBlocks(apiKey: string, pageId: string): Promise<Not
 
 /* ── blocksToHtml ── */
 
-export function blocksToHtml(blocks: NotionBlock[]): string {
-  const parts: string[] = [];
-  let ulOpen = false;
-  let olOpen = false;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function richTextToHtml(richTexts: any[]): string {
+  if (!Array.isArray(richTexts)) return '';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return richTexts.map((rt: any) => {
+    let text = (rt.plain_text ?? '') as string;
+    text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (rt.annotations?.bold) text = `<strong>${text}</strong>`;
+    if (rt.annotations?.italic) text = `<em>${text}</em>`;
+    if (rt.annotations?.strikethrough) text = `<s>${text}</s>`;
+    if (rt.annotations?.code) text = `<code>${text}</code>`;
+    if (rt.href) text = `<a href="${rt.href as string}" target="_blank" rel="noopener">${text}</a>`;
+    return text;
+  }).join('');
+}
 
-  function closeList() {
-    if (ulOpen) { parts.push('</ul>'); ulOpen = false; }
-    if (olOpen) { parts.push('</ol>'); olOpen = false; }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function blockToHtml(block: any): string {
+  const type = block.type as string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = block[type] as any;
+  if (!data) return '';
+
+  switch (type) {
+    case 'paragraph':
+      return `<p>${richTextToHtml(data.rich_text)}</p>`;
+
+    case 'heading_1':
+    case 'heading_2':
+      return `<h2>${richTextToHtml(data.rich_text)}</h2>`;
+
+    case 'heading_3':
+      return `<h3>${richTextToHtml(data.rich_text)}</h3>`;
+
+    case 'bulleted_list_item':
+    case 'numbered_list_item':
+      return `<li>${richTextToHtml(data.rich_text)}</li>`;
+
+    case 'quote':
+      return `<blockquote>${richTextToHtml(data.rich_text)}</blockquote>`;
+
+    case 'callout': {
+      const icon = (data.icon?.emoji ?? data.icon?.external?.url ?? '') as string;
+      const text = richTextToHtml(data.rich_text);
+      return `<div class="callout">${icon ? `<span>${icon}</span>` : ''}${text}</div>`;
+    }
+
+    case 'divider':
+      return '<hr/>';
+
+    case 'image': {
+      const url = (data.type === 'external' ? data.external?.url : data.file?.url) as string | undefined;
+      if (!url) return '';
+      const caption = richTextToHtml(data.caption ?? []);
+      return `<figure><img src="${url}" alt="${caption || '圖片'}" loading="lazy"/>${caption ? `<figcaption>${caption}</figcaption>` : ''}</figure>`;
+    }
+
+    case 'toggle':
+      return `<p>${richTextToHtml(data.rich_text)}</p>`;
+
+    case 'code':
+      return `<pre><code>${richTextToHtml(data.rich_text)}</code></pre>`;
+
+    case 'table':
+    case 'table_row':
+    case 'column_list':
+    case 'column':
+    case 'child_page':
+    case 'child_database':
+    case 'embed':
+    case 'bookmark':
+    case 'link_preview':
+    case 'template':
+    case 'synced_block':
+    case 'breadcrumb':
+    case 'table_of_contents':
+    case 'equation':
+    case 'pdf':
+    case 'video':
+    case 'audio':
+    case 'file':
+    case 'link_to_page':
+      return '';
+
+    default:
+      return '';
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function blocksToHtml(blocks: any[]): string {
+  if (!Array.isArray(blocks)) return '';
+
+  const parts: string[] = [];
+  let inBullet = false;
+  let inNumber = false;
 
   for (const block of blocks) {
     try {
       const type = block.type as string;
 
-      if (type !== 'bulleted_list_item' && ulOpen) { parts.push('</ul>'); ulOpen = false; }
-      if (type !== 'numbered_list_item' && olOpen) { parts.push('</ol>'); olOpen = false; }
-
-      const richTexts = getRichTexts(block, type);
-
-      switch (type) {
-        case 'paragraph': {
-          const html = richTextsToHtml(richTexts);
-          if (html) parts.push(`<p>${html}</p>`);
-          break;
-        }
-        case 'heading_1': {
-          const html = richTextsToHtml(richTexts);
-          if (html) parts.push(`<h1>${html}</h1>`);
-          break;
-        }
-        case 'heading_2': {
-          const html = richTextsToHtml(richTexts);
-          if (html) parts.push(`<h2>${html}</h2>`);
-          break;
-        }
-        case 'heading_3': {
-          const html = richTextsToHtml(richTexts);
-          if (html) parts.push(`<h3>${html}</h3>`);
-          break;
-        }
-        case 'bulleted_list_item': {
-          if (!ulOpen) { parts.push('<ul>'); ulOpen = true; }
-          parts.push(`<li>${richTextsToHtml(richTexts)}</li>`);
-          break;
-        }
-        case 'numbered_list_item': {
-          if (!olOpen) { parts.push('<ol>'); olOpen = true; }
-          parts.push(`<li>${richTextsToHtml(richTexts)}</li>`);
-          break;
-        }
-        case 'callout': {
-          closeList();
-          const b = block as Record<string, unknown>;
-          const calloutData = b['callout'] as Record<string, unknown> | undefined;
-          if (calloutData) {
-            const icon = calloutData['icon'] as Record<string, unknown> | undefined;
-            const emoji = (icon?.['type'] === 'emoji' ? icon['emoji'] as string : '') || '';
-            const calloutTexts = (calloutData['rich_text'] as NotionRichText[] | undefined) || [];
-            const html = richTextsToHtml(calloutTexts);
-            if (html || emoji) {
-              parts.push(`<div class="art-callout">${emoji}${emoji ? ' ' : ''}${html}</div>`);
-            }
-          }
-          break;
-        }
-        case 'quote': {
-          closeList();
-          const html = richTextsToHtml(richTexts);
-          if (html) parts.push(`<blockquote>${html}</blockquote>`);
-          break;
-        }
-        case 'divider': {
-          closeList();
-          parts.push('<hr>');
-          break;
-        }
-        case 'image': {
-          closeList();
-          const img = block as Record<string, unknown>;
-          let src = '';
-          const imgData = img['image'] as Record<string, unknown> | undefined;
-          if (imgData) {
-            if (imgData['type'] === 'file') {
-              src = ((imgData['file'] as Record<string, unknown>)['url'] as string) || '';
-            } else if (imgData['type'] === 'external') {
-              src = ((imgData['external'] as Record<string, unknown>)['url'] as string) || '';
-            }
-          }
-          if (src) {
-            const capArr = imgData?.['caption'] as NotionRichText[] | undefined;
-            const cap = capArr ? richTextsToHtml(capArr) : '';
-            parts.push(`<figure><img src="${escHtml(src)}" alt="${escHtml(cap)}" loading="lazy"></figure>`);
-          }
-          break;
-        }
-        case 'toggle': {
-          closeList();
-          const html = richTextsToHtml(richTexts);
-          if (html) parts.push(`<p>${html}</p>`);
-          break;
-        }
-        case 'table':
-        case 'table_row':
-        case 'column_list':
-        case 'column':
-          break;
-        default:
-          break;
+      if (type === 'bulleted_list_item') {
+        if (!inBullet) { parts.push('<ul>'); inBullet = true; }
+        if (inNumber) { parts.push('</ol>'); inNumber = false; }
+      } else if (type === 'numbered_list_item') {
+        if (!inNumber) { parts.push('<ol>'); inNumber = true; }
+        if (inBullet) { parts.push('</ul>'); inBullet = false; }
+      } else {
+        if (inBullet) { parts.push('</ul>'); inBullet = false; }
+        if (inNumber) { parts.push('</ol>'); inNumber = false; }
       }
+
+      parts.push(blockToHtml(block));
     } catch {
-      // skip unrenderable block
+      // 單個 block 出錯，跳過，不影響其餘內容
     }
   }
 
-  closeList();
-  return parts.join('\n');
+  if (inBullet) parts.push('</ul>');
+  if (inNumber) parts.push('</ol>');
+
+  return parts.join('');
 }
 
 /* ── extractFileUrls ── */
@@ -228,41 +234,6 @@ export function extractFileUrls(prop: NotionFilesProperty | undefined): string[]
       return null;
     })
     .filter((u): u is string => u !== null);
-}
-
-/* ── Helpers ── */
-
-function getRichTexts(block: NotionBlock, type: string): NotionRichText[] {
-  const b = block as Record<string, unknown>;
-  const inner = b[type] as Record<string, unknown> | undefined;
-  if (!inner) return [];
-  return (inner['rich_text'] as NotionRichText[] | undefined) || [];
-}
-
-function richTextsToHtml(texts: NotionRichText[]): string {
-  return texts
-    .map((t) => {
-      let text = escHtml(t.plain_text || '');
-      const ann = t.annotations;
-      if (ann) {
-        if (ann.bold) text = `<strong>${text}</strong>`;
-        if (ann.italic) text = `<em>${text}</em>`;
-        if (ann.code) text = `<code>${text}</code>`;
-        if (ann.strikethrough) text = `<s>${text}</s>`;
-        if (ann.underline) text = `<u>${text}</u>`;
-      }
-      if (t.href) text = `<a href="${escHtml(t.href)}" target="_blank" rel="noopener">${text}</a>`;
-      return text;
-    })
-    .join('');
-}
-
-function escHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 }
 
 /* ── getProperty helpers ── */
