@@ -461,7 +461,7 @@ footer{background:var(--pink-deep);color:rgba(255,255,255,.7);padding:56px 0 30p
 .cd-deco.d1{width:150px;height:150px;top:-40px;left:-30px;}
 .cd-deco.d2{width:90px;height:90px;bottom:-24px;right:18px;}
 .cd-media .logo-card{position:relative;z-index:2;background:none;border-radius:0;padding:0 12px;box-shadow:none;display:flex;align-items:center;justify-content:center;width:100%;margin:auto;}
-.logo-card img{width:100%;height:auto;display:block;margin:auto;max-width:none;}
+.logo-card img{width:auto;max-width:90%;max-height:160px;height:auto;display:block;margin:auto;}
 .cd-sticker{position:absolute;z-index:3;width:48px;height:48px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:25px;box-shadow:0 12px 22px -8px rgba(0,0,0,.2);animation:floatY 5s ease-in-out infinite;}
 @keyframes floatY{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-13px) rotate(4deg);}}
 .cd-media .s1{top:13%;left:8%;}
