@@ -100,6 +100,8 @@ export async function getPageBlocks(apiKey: string, pageId: string): Promise<Not
 /* ── blocksToHtml ── */
 
 export function blocksToHtml(blocks: NotionBlock[]): string {
+  console.log('[blocksToHtml] block types:', blocks.map(b => b.type));
+
   const parts: string[] = [];
   let ulOpen = false;
   let olOpen = false;
@@ -123,6 +125,11 @@ export function blocksToHtml(blocks: NotionBlock[]): string {
         if (html) parts.push(`<p>${html}</p>`);
         break;
       }
+      case 'heading_1': {
+        const html = richTextsToHtml(richTexts);
+        if (html) parts.push(`<h1>${html}</h1>`);
+        break;
+      }
       case 'heading_2': {
         const html = richTextsToHtml(richTexts);
         if (html) parts.push(`<h2>${html}</h2>`);
@@ -141,6 +148,21 @@ export function blocksToHtml(blocks: NotionBlock[]): string {
       case 'numbered_list_item': {
         if (!olOpen) { parts.push('<ol>'); olOpen = true; }
         parts.push(`<li>${richTextsToHtml(richTexts)}</li>`);
+        break;
+      }
+      case 'callout': {
+        closeList();
+        const b = block as Record<string, unknown>;
+        const calloutData = b['callout'] as Record<string, unknown> | undefined;
+        if (calloutData) {
+          const icon = calloutData['icon'] as Record<string, unknown> | undefined;
+          const emoji = (icon?.['type'] === 'emoji' ? icon['emoji'] as string : '') || '';
+          const calloutTexts = (calloutData['rich_text'] as NotionRichText[] | undefined) || [];
+          const html = richTextsToHtml(calloutTexts);
+          if (html || emoji) {
+            parts.push(`<div class="art-callout">${emoji}${emoji ? ' ' : ''}${html}</div>`);
+          }
+        }
         break;
       }
       case 'quote': {
