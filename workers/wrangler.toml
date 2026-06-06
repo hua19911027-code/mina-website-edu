@@ -1,6 +1,7 @@
 name = "mina-api"
 main = "src/index.ts"
 compatibility_date = "2025-01-01"
+keep_vars = true
 
 [vars]
 ENVIRONMENT = "production"

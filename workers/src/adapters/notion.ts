@@ -100,8 +100,6 @@ export async function getPageBlocks(apiKey: string, pageId: string): Promise<Not
 /* ── blocksToHtml ── */
 
 export function blocksToHtml(blocks: NotionBlock[]): string {
-  console.log('[blocksToHtml] block types:', blocks.map(b => b.type));
-
   const parts: string[] = [];
   let ulOpen = false;
   let olOpen = false;
@@ -112,90 +110,106 @@ export function blocksToHtml(blocks: NotionBlock[]): string {
   }
 
   for (const block of blocks) {
-    const type = block.type as string;
+    try {
+      const type = block.type as string;
 
-    if (type !== 'bulleted_list_item' && ulOpen) { parts.push('</ul>'); ulOpen = false; }
-    if (type !== 'numbered_list_item' && olOpen) { parts.push('</ol>'); olOpen = false; }
+      if (type !== 'bulleted_list_item' && ulOpen) { parts.push('</ul>'); ulOpen = false; }
+      if (type !== 'numbered_list_item' && olOpen) { parts.push('</ol>'); olOpen = false; }
 
-    const richTexts = getRichTexts(block, type);
+      const richTexts = getRichTexts(block, type);
 
-    switch (type) {
-      case 'paragraph': {
-        const html = richTextsToHtml(richTexts);
-        if (html) parts.push(`<p>${html}</p>`);
-        break;
-      }
-      case 'heading_1': {
-        const html = richTextsToHtml(richTexts);
-        if (html) parts.push(`<h1>${html}</h1>`);
-        break;
-      }
-      case 'heading_2': {
-        const html = richTextsToHtml(richTexts);
-        if (html) parts.push(`<h2>${html}</h2>`);
-        break;
-      }
-      case 'heading_3': {
-        const html = richTextsToHtml(richTexts);
-        if (html) parts.push(`<h3>${html}</h3>`);
-        break;
-      }
-      case 'bulleted_list_item': {
-        if (!ulOpen) { parts.push('<ul>'); ulOpen = true; }
-        parts.push(`<li>${richTextsToHtml(richTexts)}</li>`);
-        break;
-      }
-      case 'numbered_list_item': {
-        if (!olOpen) { parts.push('<ol>'); olOpen = true; }
-        parts.push(`<li>${richTextsToHtml(richTexts)}</li>`);
-        break;
-      }
-      case 'callout': {
-        closeList();
-        const b = block as Record<string, unknown>;
-        const calloutData = b['callout'] as Record<string, unknown> | undefined;
-        if (calloutData) {
-          const icon = calloutData['icon'] as Record<string, unknown> | undefined;
-          const emoji = (icon?.['type'] === 'emoji' ? icon['emoji'] as string : '') || '';
-          const calloutTexts = (calloutData['rich_text'] as NotionRichText[] | undefined) || [];
-          const html = richTextsToHtml(calloutTexts);
-          if (html || emoji) {
-            parts.push(`<div class="art-callout">${emoji}${emoji ? ' ' : ''}${html}</div>`);
+      switch (type) {
+        case 'paragraph': {
+          const html = richTextsToHtml(richTexts);
+          if (html) parts.push(`<p>${html}</p>`);
+          break;
+        }
+        case 'heading_1': {
+          const html = richTextsToHtml(richTexts);
+          if (html) parts.push(`<h1>${html}</h1>`);
+          break;
+        }
+        case 'heading_2': {
+          const html = richTextsToHtml(richTexts);
+          if (html) parts.push(`<h2>${html}</h2>`);
+          break;
+        }
+        case 'heading_3': {
+          const html = richTextsToHtml(richTexts);
+          if (html) parts.push(`<h3>${html}</h3>`);
+          break;
+        }
+        case 'bulleted_list_item': {
+          if (!ulOpen) { parts.push('<ul>'); ulOpen = true; }
+          parts.push(`<li>${richTextsToHtml(richTexts)}</li>`);
+          break;
+        }
+        case 'numbered_list_item': {
+          if (!olOpen) { parts.push('<ol>'); olOpen = true; }
+          parts.push(`<li>${richTextsToHtml(richTexts)}</li>`);
+          break;
+        }
+        case 'callout': {
+          closeList();
+          const b = block as Record<string, unknown>;
+          const calloutData = b['callout'] as Record<string, unknown> | undefined;
+          if (calloutData) {
+            const icon = calloutData['icon'] as Record<string, unknown> | undefined;
+            const emoji = (icon?.['type'] === 'emoji' ? icon['emoji'] as string : '') || '';
+            const calloutTexts = (calloutData['rich_text'] as NotionRichText[] | undefined) || [];
+            const html = richTextsToHtml(calloutTexts);
+            if (html || emoji) {
+              parts.push(`<div class="art-callout">${emoji}${emoji ? ' ' : ''}${html}</div>`);
+            }
           }
+          break;
         }
-        break;
-      }
-      case 'quote': {
-        const html = richTextsToHtml(richTexts);
-        if (html) parts.push(`<blockquote>${html}</blockquote>`);
-        break;
-      }
-      case 'divider': {
-        closeList();
-        parts.push('<hr>');
-        break;
-      }
-      case 'image': {
-        closeList();
-        const img = block as Record<string, unknown>;
-        let src = '';
-        const imgData = img['image'] as Record<string, unknown> | undefined;
-        if (imgData) {
-          if (imgData['type'] === 'file') {
-            src = ((imgData['file'] as Record<string, unknown>)['url'] as string) || '';
-          } else if (imgData['type'] === 'external') {
-            src = ((imgData['external'] as Record<string, unknown>)['url'] as string) || '';
+        case 'quote': {
+          closeList();
+          const html = richTextsToHtml(richTexts);
+          if (html) parts.push(`<blockquote>${html}</blockquote>`);
+          break;
+        }
+        case 'divider': {
+          closeList();
+          parts.push('<hr>');
+          break;
+        }
+        case 'image': {
+          closeList();
+          const img = block as Record<string, unknown>;
+          let src = '';
+          const imgData = img['image'] as Record<string, unknown> | undefined;
+          if (imgData) {
+            if (imgData['type'] === 'file') {
+              src = ((imgData['file'] as Record<string, unknown>)['url'] as string) || '';
+            } else if (imgData['type'] === 'external') {
+              src = ((imgData['external'] as Record<string, unknown>)['url'] as string) || '';
+            }
           }
+          if (src) {
+            const capArr = imgData?.['caption'] as NotionRichText[] | undefined;
+            const cap = capArr ? richTextsToHtml(capArr) : '';
+            parts.push(`<figure><img src="${escHtml(src)}" alt="${escHtml(cap)}" loading="lazy"></figure>`);
+          }
+          break;
         }
-        if (src) {
-          const capArr = imgData?.['caption'] as NotionRichText[] | undefined;
-          const cap = capArr ? richTextsToHtml(capArr) : '';
-          parts.push(`<figure><img src="${escHtml(src)}" alt="${escHtml(cap)}" loading="lazy"></figure>`);
+        case 'toggle': {
+          closeList();
+          const html = richTextsToHtml(richTexts);
+          if (html) parts.push(`<p>${html}</p>`);
+          break;
         }
-        break;
+        case 'table':
+        case 'table_row':
+        case 'column_list':
+        case 'column':
+          break;
+        default:
+          break;
       }
-      default:
-        break;
+    } catch {
+      // skip unrenderable block
     }
   }
 
