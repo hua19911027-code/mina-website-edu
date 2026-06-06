@@ -2,7 +2,6 @@
 
 import { Hono } from 'hono';
 import type { Bindings, BookingPayload } from '../types';
-import * as notion from '../adapters/notion';
 
 const route = new Hono<{ Bindings: Bindings }>();
 

@@ -12,14 +12,13 @@ const route = new Hono<{ Bindings: Bindings }>();
 function transformPage(page: { id: string; properties: Record<string, unknown> }): Article {
   const p = page as Parameters<typeof notion.getPropText>[0];
   const coverFiles = notion.getPropFiles(p, 'Cover Image');
-  const photoFiles = notion.getPropFiles(p, '活動照片');
 
   return {
     id: page.id,
     slug: notion.getPropText(p, 'slug'),
-    title: notion.getPropText(p, 'Name'),
+    title: notion.getPropText(p, '粗體摘要'),
     category: notion.getPropText(p, '分類'),
-    excerpt: notion.getPropText(p, '內容'),
+    excerpt: notion.getPropText(p, '內容摘要'),
     coverImage: notion.extractFileUrls(coverFiles)[0] || '',
     photos: [],
     publishedAt: notion.getPropText(p, '發布日期'),
