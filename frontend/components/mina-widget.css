@@ -1,0 +1,329 @@
+/* ─── Mina 小幫手 Widget ───────────────────────── */
+#mina-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── FAB 按鈕 ── */
+.mina-fab {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: #E60D85;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 22px rgba(230,13,133,.45);
+  transition: transform .2s, box-shadow .2s;
+  position: relative;
+  outline: none;
+}
+.mina-fab:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 8px 30px rgba(230,13,133,.55);
+}
+.mina-fab:focus-visible {
+  outline: 3px solid #FFB3DC;
+  outline-offset: 3px;
+}
+.mina-fab-icon { font-size: 22px; line-height: 1; }
+.mina-fab-label { font-size: 9.5px; font-weight: 800; margin-top: 2px; letter-spacing: .3px; }
+
+/* ── Panel ── */
+.mina-panel {
+  position: absolute;
+  bottom: 74px;
+  right: 0;
+  width: 360px;
+  max-height: 72vh;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 16px 56px rgba(0,0,0,.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(14px) scale(.97);
+  transition: opacity .25s ease, transform .25s ease;
+  pointer-events: none;
+}
+.mina-panel.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.mina-panel[hidden] { display: none; }
+
+/* ── Header ── */
+.mina-panel-header {
+  background: #E60D85;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.mina-header-info {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 1;
+  min-width: 0;
+}
+.mina-avatar-wrap {
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,.25);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.mina-header-text { flex: 1; min-width: 0; }
+.mina-name { font-weight: 800; font-size: 14px; color: #fff; line-height: 1.2; }
+.mina-status { font-size: 11px; color: rgba(255,255,255,.85); line-height: 1.3; }
+.mina-status::before { content: '● '; font-size: 8px; vertical-align: 1px; }
+
+.mina-close {
+  width: 30px;
+  height: 30px;
+  background: rgba(255,255,255,.2);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background .15s;
+  outline: none;
+}
+.mina-close:hover { background: rgba(255,255,255,.35); }
+.mina-close:focus-visible { outline: 2px solid rgba(255,255,255,.6); outline-offset: 1px; }
+
+/* ── Chat body ── */
+.mina-chat-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 12px 8px;
+  background: #FFF6FB;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 160px;
+  scroll-behavior: smooth;
+}
+.mina-chat-body::-webkit-scrollbar { width: 4px; }
+.mina-chat-body::-webkit-scrollbar-track { background: transparent; }
+.mina-chat-body::-webkit-scrollbar-thumb { background: #F2D9E7; border-radius: 4px; }
+
+/* ── 訊息列 ── */
+.mina-msg-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .25s, transform .25s;
+}
+.mina-msg-row.visible { opacity: 1; transform: translateY(0); }
+.mina-msg-row.user { justify-content: flex-end; }
+
+.mina-msg-avatar {
+  width: 28px;
+  height: 28px;
+  background: #FFE3F1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ── 泡泡 ── */
+.mina-bubble {
+  background: #FFE3F1;
+  color: #241019;
+  border-radius: 4px 16px 16px 16px;
+  padding: 10px 13px;
+  max-width: 82%;
+  font-size: 13px;
+  line-height: 1.7;
+  word-break: break-word;
+}
+.mina-bubble.user {
+  background: #E60D85;
+  color: #fff;
+  border-radius: 16px 4px 16px 16px;
+  font-size: 12.5px;
+}
+
+/* ── 選項按鈕 ── */
+.mina-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-left: 36px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .25s, transform .25s;
+}
+.mina-options.visible { opacity: 1; transform: translateY(0); }
+
+.mina-opt-btn {
+  background: #fff;
+  color: #E60D85;
+  border: 1.5px solid #E60D85;
+  border-radius: 20px;
+  padding: 6px 13px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s, color .15s, opacity .15s, border-color .15s;
+  font-family: inherit;
+  line-height: 1.4;
+  outline: none;
+}
+.mina-opt-btn:hover:not(:disabled) {
+  background: #E60D85;
+  color: #fff;
+}
+.mina-opt-btn:focus-visible {
+  outline: 2px solid #E60D85;
+  outline-offset: 2px;
+}
+.mina-opt-btn:disabled { opacity: .35; cursor: default; }
+.mina-opt-btn.chosen {
+  background: #E60D85;
+  color: #fff;
+  opacity: 1 !important;
+  border-color: #E60D85;
+}
+
+/* ── CTA 按鈕區 ── */
+.mina-cta-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding-left: 36px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .25s, transform .25s;
+}
+.mina-cta-wrap.visible { opacity: 1; transform: translateY(0); }
+
+.mina-cta-btn {
+  display: block;
+  text-align: center;
+  padding: 10px 16px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform .15s, box-shadow .15s;
+  cursor: pointer;
+  font-family: inherit;
+}
+.mina-cta-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+
+.cta-primary  { background: #E60D85; color: #fff !important; }
+.cta-line     { background: #06C755; color: #fff !important; }
+.cta-secondary {
+  background: #fff;
+  color: #241019 !important;
+  border: 1.5px solid #E0DEDE;
+}
+.cta-map {
+  background: #fff;
+  color: #1a73e8 !important;
+  border: 1.5px solid #E0DEDE;
+}
+
+.mina-line-note {
+  font-size: 10.5px;
+  color: #A593A0;
+  text-align: center;
+  margin-top: -1px;
+  padding: 0 4px;
+}
+
+/* ── 文章連結 ── */
+.mina-articles {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-left: 36px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .25s, transform .25s;
+}
+.mina-articles.visible { opacity: 1; transform: translateY(0); }
+
+.articles-label {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #A593A0;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 2px;
+}
+.mina-articles a {
+  font-size: 12.5px;
+  color: #E60D85;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity .15s;
+}
+.mina-articles a:hover { opacity: .72; }
+
+/* ── Footer ── */
+.mina-panel-footer {
+  padding: 7px 12px;
+  background: #fff;
+  border-top: 1px solid #F2D9E7;
+  flex-shrink: 0;
+}
+.mina-reset {
+  background: none;
+  border: none;
+  color: #A593A0;
+  font-size: 11.5px;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: color .15s, background .15s;
+  outline: none;
+}
+.mina-reset:hover { color: #E60D85; background: #FFE3F1; }
+
+/* ── 行動裝置 ── */
+@media (max-width: 420px) {
+  #mina-widget { bottom: 16px; right: 16px; }
+  .mina-panel {
+    width: calc(100vw - 32px);
+    right: 0;
+    bottom: 70px;
+    max-height: 78vh;
+  }
+}

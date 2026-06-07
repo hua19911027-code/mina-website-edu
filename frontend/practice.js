@@ -70,4 +70,12 @@ const AppState={subj:'en',chip:'觀念拆解'};
     c.classList.add('active');AppState.chip=c.dataset.chip;renderQ();
   }));
   renderQ();
+
+  // Mina widget quiz filter: 收到科目篩選事件時切換 subject tab
+  document.addEventListener('minaQuizFilter', function (e) {
+    var subj = e.detail && e.detail.subject;
+    if (!subj) return;
+    var tab = document.querySelector('.tab[data-subj="' + subj + '"]');
+    if (tab) tab.click();
+  });
 })();
