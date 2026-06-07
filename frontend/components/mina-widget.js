@@ -740,10 +740,22 @@
   // ─── 初始化 ──────────────────────────────────────
   function init() {
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', createWidget);
+      document.addEventListener('DOMContentLoaded', function () {
+        createWidget();
+        exposeApi();
+      });
     } else {
       createWidget();
+      exposeApi();
     }
+  }
+
+  function exposeApi() {
+    window.minaWidget = {
+      open:  openPanel,
+      close: closePanel,
+      reset: resetConversation
+    };
   }
 
   init();
