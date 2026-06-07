@@ -71,7 +71,7 @@ const AppState={subj:'en',chip:'觀念拆解'};
   }));
   renderQ();
 
-  // Mina widget quiz filter: 收到科目篩選事件時切換 subject tab
+  // Mina widget quiz filter: 切換科目 tab，grade_1~grade_6 對應低/中/高年級 chip 分類
   document.addEventListener('minaQuizFilter', function (e) {
     var subj = e.detail && e.detail.subject;
     if (!subj) return;

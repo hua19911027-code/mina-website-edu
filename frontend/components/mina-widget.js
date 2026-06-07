@@ -9,7 +9,7 @@
     "meta": { "version": "1.0.0" },
     "global": {
       "cta": {
-        "trial": { "type": "trial", "label": "📅 預約免費試聽", "url": "/reservation" },
+        "trial": { "type": "trial", "label": "📅 預約免費試聽", "url": "/預約試聽.html#bookForm" },
         "line":  { "type": "line",  "label": "💬 加 LINE 詢問", "url": "#LINE_URL" },
         "phone": { "type": "phone", "label": "📞 直接電話聯絡", "url": "tel:04-2336-6868" },
         "map":   { "type": "map",   "label": "📍 Google Maps 導航", "url": "https://maps.app.goo.gl/aPqkAwvC9KkYAcSN9" }
@@ -235,74 +235,140 @@
         "id": "quiz_grade_en", "type": "options",
         "text": "幾年級的英文題庫？",
         "options": [
-          { "label": "🎒 國小 1–2 年級","next": "quiz_result_en_e12" },
-          { "label": "📚 國小 3–4 年級","next": "quiz_result_en_e34" },
-          { "label": "✏️ 國小 5–6 年級","next": "quiz_result_en_e56" }
+          { "label": "1 年級","next": "quiz_result_en_g1" },
+          { "label": "2 年級","next": "quiz_result_en_g2" },
+          { "label": "3 年級","next": "quiz_result_en_g3" },
+          { "label": "4 年級","next": "quiz_result_en_g4" },
+          { "label": "5 年級","next": "quiz_result_en_g5" },
+          { "label": "6 年級","next": "quiz_result_en_g6" }
         ]
       },
       "quiz_grade_ma": {
         "id": "quiz_grade_ma", "type": "options",
         "text": "幾年級的數學題庫？",
         "options": [
-          { "label": "🎒 國小 1–2 年級","next": "quiz_result_ma_e12" },
-          { "label": "📚 國小 3–4 年級","next": "quiz_result_ma_e34" },
-          { "label": "✏️ 國小 5–6 年級","next": "quiz_result_ma_e56" }
+          { "label": "1 年級","next": "quiz_result_ma_g1" },
+          { "label": "2 年級","next": "quiz_result_ma_g2" },
+          { "label": "3 年級","next": "quiz_result_ma_g3" },
+          { "label": "4 年級","next": "quiz_result_ma_g4" },
+          { "label": "5 年級","next": "quiz_result_ma_g5" },
+          { "label": "6 年級","next": "quiz_result_ma_g6" }
         ]
       },
-      "quiz_result_en_e12": {
-        "id": "quiz_result_en_e12", "type": "quiz_result",
-        "filter": { "subject": "en", "grade": "elementary_1_2" },
-        "text": "已幫你篩選「國小 1–2 年級 / 英文」題庫 📖\n上面有符合的題目嗎？😊",
+      "quiz_result_en_g1": {
+        "id": "quiz_result_en_g1", "type": "quiz_result",
+        "filter": { "subject": "en", "grade": "grade_1" },
+        "text": "已幫你篩選「1 年級 / 英文」題庫 📖\n上面有符合的題目嗎？😊",
         "options": [
           { "label": "換個年級",   "next": "quiz_grade_en" },
           { "label": "換數學題庫", "next": "quiz_grade_ma" },
           { "label": "找不到我要的","next": "quiz_not_found" }
         ]
       },
-      "quiz_result_en_e34": {
-        "id": "quiz_result_en_e34", "type": "quiz_result",
-        "filter": { "subject": "en", "grade": "elementary_3_4" },
-        "text": "已幫你篩選「國小 3–4 年級 / 英文」題庫 📖\n上面有符合的題目嗎？😊",
+      "quiz_result_en_g2": {
+        "id": "quiz_result_en_g2", "type": "quiz_result",
+        "filter": { "subject": "en", "grade": "grade_2" },
+        "text": "已幫你篩選「2 年級 / 英文」題庫 📖\n上面有符合的題目嗎？😊",
         "options": [
           { "label": "換個年級",   "next": "quiz_grade_en" },
           { "label": "換數學題庫", "next": "quiz_grade_ma" },
           { "label": "找不到我要的","next": "quiz_not_found" }
         ]
       },
-      "quiz_result_en_e56": {
-        "id": "quiz_result_en_e56", "type": "quiz_result",
-        "filter": { "subject": "en", "grade": "elementary_5_6" },
-        "text": "已幫你篩選「國小 5–6 年級 / 英文」題庫 📖\n上面有符合的題目嗎？😊",
+      "quiz_result_en_g3": {
+        "id": "quiz_result_en_g3", "type": "quiz_result",
+        "filter": { "subject": "en", "grade": "grade_3" },
+        "text": "已幫你篩選「3 年級 / 英文」題庫 📖\n上面有符合的題目嗎？😊",
         "options": [
           { "label": "換個年級",   "next": "quiz_grade_en" },
           { "label": "換數學題庫", "next": "quiz_grade_ma" },
           { "label": "找不到我要的","next": "quiz_not_found" }
         ]
       },
-      "quiz_result_ma_e12": {
-        "id": "quiz_result_ma_e12", "type": "quiz_result",
-        "filter": { "subject": "ma", "grade": "elementary_1_2" },
-        "text": "已幫你篩選「國小 1–2 年級 / 數學」題庫 🔢\n上面有符合的題目嗎？😊",
+      "quiz_result_en_g4": {
+        "id": "quiz_result_en_g4", "type": "quiz_result",
+        "filter": { "subject": "en", "grade": "grade_4" },
+        "text": "已幫你篩選「4 年級 / 英文」題庫 📖\n上面有符合的題目嗎？😊",
+        "options": [
+          { "label": "換個年級",   "next": "quiz_grade_en" },
+          { "label": "換數學題庫", "next": "quiz_grade_ma" },
+          { "label": "找不到我要的","next": "quiz_not_found" }
+        ]
+      },
+      "quiz_result_en_g5": {
+        "id": "quiz_result_en_g5", "type": "quiz_result",
+        "filter": { "subject": "en", "grade": "grade_5" },
+        "text": "已幫你篩選「5 年級 / 英文」題庫 📖\n上面有符合的題目嗎？😊",
+        "options": [
+          { "label": "換個年級",   "next": "quiz_grade_en" },
+          { "label": "換數學題庫", "next": "quiz_grade_ma" },
+          { "label": "找不到我要的","next": "quiz_not_found" }
+        ]
+      },
+      "quiz_result_en_g6": {
+        "id": "quiz_result_en_g6", "type": "quiz_result",
+        "filter": { "subject": "en", "grade": "grade_6" },
+        "text": "已幫你篩選「6 年級 / 英文」題庫 📖\n上面有符合的題目嗎？😊",
+        "options": [
+          { "label": "換個年級",   "next": "quiz_grade_en" },
+          { "label": "換數學題庫", "next": "quiz_grade_ma" },
+          { "label": "找不到我要的","next": "quiz_not_found" }
+        ]
+      },
+      "quiz_result_ma_g1": {
+        "id": "quiz_result_ma_g1", "type": "quiz_result",
+        "filter": { "subject": "ma", "grade": "grade_1" },
+        "text": "已幫你篩選「1 年級 / 數學」題庫 🔢\n上面有符合的題目嗎？😊",
         "options": [
           { "label": "換個年級",   "next": "quiz_grade_ma" },
           { "label": "換英文題庫", "next": "quiz_grade_en" },
           { "label": "找不到我要的","next": "quiz_not_found" }
         ]
       },
-      "quiz_result_ma_e34": {
-        "id": "quiz_result_ma_e34", "type": "quiz_result",
-        "filter": { "subject": "ma", "grade": "elementary_3_4" },
-        "text": "已幫你篩選「國小 3–4 年級 / 數學」題庫 🔢\n上面有符合的題目嗎？😊",
+      "quiz_result_ma_g2": {
+        "id": "quiz_result_ma_g2", "type": "quiz_result",
+        "filter": { "subject": "ma", "grade": "grade_2" },
+        "text": "已幫你篩選「2 年級 / 數學」題庫 🔢\n上面有符合的題目嗎？😊",
         "options": [
           { "label": "換個年級",   "next": "quiz_grade_ma" },
           { "label": "換英文題庫", "next": "quiz_grade_en" },
           { "label": "找不到我要的","next": "quiz_not_found" }
         ]
       },
-      "quiz_result_ma_e56": {
-        "id": "quiz_result_ma_e56", "type": "quiz_result",
-        "filter": { "subject": "ma", "grade": "elementary_5_6" },
-        "text": "已幫你篩選「國小 5–6 年級 / 數學」題庫 🔢\n上面有符合的題目嗎？😊",
+      "quiz_result_ma_g3": {
+        "id": "quiz_result_ma_g3", "type": "quiz_result",
+        "filter": { "subject": "ma", "grade": "grade_3" },
+        "text": "已幫你篩選「3 年級 / 數學」題庫 🔢\n上面有符合的題目嗎？😊",
+        "options": [
+          { "label": "換個年級",   "next": "quiz_grade_ma" },
+          { "label": "換英文題庫", "next": "quiz_grade_en" },
+          { "label": "找不到我要的","next": "quiz_not_found" }
+        ]
+      },
+      "quiz_result_ma_g4": {
+        "id": "quiz_result_ma_g4", "type": "quiz_result",
+        "filter": { "subject": "ma", "grade": "grade_4" },
+        "text": "已幫你篩選「4 年級 / 數學」題庫 🔢\n上面有符合的題目嗎？😊",
+        "options": [
+          { "label": "換個年級",   "next": "quiz_grade_ma" },
+          { "label": "換英文題庫", "next": "quiz_grade_en" },
+          { "label": "找不到我要的","next": "quiz_not_found" }
+        ]
+      },
+      "quiz_result_ma_g5": {
+        "id": "quiz_result_ma_g5", "type": "quiz_result",
+        "filter": { "subject": "ma", "grade": "grade_5" },
+        "text": "已幫你篩選「5 年級 / 數學」題庫 🔢\n上面有符合的題目嗎？😊",
+        "options": [
+          { "label": "換個年級",   "next": "quiz_grade_ma" },
+          { "label": "換英文題庫", "next": "quiz_grade_en" },
+          { "label": "找不到我要的","next": "quiz_not_found" }
+        ]
+      },
+      "quiz_result_ma_g6": {
+        "id": "quiz_result_ma_g6", "type": "quiz_result",
+        "filter": { "subject": "ma", "grade": "grade_6" },
+        "text": "已幫你篩選「6 年級 / 數學」題庫 🔢\n上面有符合的題目嗎？😊",
         "options": [
           { "label": "換個年級",   "next": "quiz_grade_ma" },
           { "label": "換英文題庫", "next": "quiz_grade_en" },
@@ -501,7 +567,7 @@
       '<div class="mina-panel" role="dialog" aria-modal="true" aria-label="Mina 小幫手" hidden>' +
         '<div class="mina-panel-header">' +
           '<div class="mina-header-info">' +
-            '<div class="mina-avatar-wrap">🌸</div>' +
+            '<div class="mina-avatar-wrap"><img src="assets/logo/zhuoyue-logo.svg" alt="卓越" style="width:100%;height:100%;object-fit:contain;padding:4px;"></div>' +
             '<div class="mina-header-text">' +
               '<div class="mina-name">Mina 小幫手</div>' +
               '<div class="mina-status">線上回覆中</div>' +
