@@ -27,7 +27,8 @@
       "about":    "about_welcome",
       "news":     "news_welcome",
       "faq":      "faq_welcome",
-      "quiz":     "quiz_welcome"
+      "quiz":     "quiz_welcome",
+      "quiz_archive": "archive_welcome"
     },
     "nodes": {
       "home_welcome": {
@@ -380,6 +381,55 @@
         "text": "😱 Mina 暫時翻不到這份題庫耶～\n\n題庫我們一直在更新！\n如果找不到你要的章節或題型，\n加 LINE 告訴老師，我們會幫你準備 😊",
         "cta": ["line","phone","trial"]
       },
+      "archive_welcome": {
+        "id": "archive_welcome", "type": "options",
+        "text": "幫你查歷屆題庫！😊\n\n（近三個月以前的題目，最多顯示 36 題）\n\n先選科目：",
+        "options": [
+          { "label": "📖 英文", "next": "archive_grade_en", "setFilter": {"subject":"英文"} },
+          { "label": "🔢 數學", "next": "archive_grade_ma", "setFilter": {"subject":"數學"} }
+        ]
+      },
+      "archive_grade_en": {
+        "id": "archive_grade_en", "type": "options",
+        "text": "幾年級的英文？",
+        "options": [
+          { "label": "小一", "next": "archive_fetch", "setFilter": {"grade":"小一"} },
+          { "label": "小二", "next": "archive_fetch", "setFilter": {"grade":"小二"} },
+          { "label": "小三", "next": "archive_fetch", "setFilter": {"grade":"小三"} },
+          { "label": "小四", "next": "archive_fetch", "setFilter": {"grade":"小四"} },
+          { "label": "小五", "next": "archive_fetch", "setFilter": {"grade":"小五"} },
+          { "label": "小六", "next": "archive_fetch", "setFilter": {"grade":"小六"} }
+        ]
+      },
+      "archive_grade_ma": {
+        "id": "archive_grade_ma", "type": "options",
+        "text": "幾年級的數學？",
+        "options": [
+          { "label": "小一", "next": "archive_fetch", "setFilter": {"grade":"小一"} },
+          { "label": "小二", "next": "archive_fetch", "setFilter": {"grade":"小二"} },
+          { "label": "小三", "next": "archive_fetch", "setFilter": {"grade":"小三"} },
+          { "label": "小四", "next": "archive_fetch", "setFilter": {"grade":"小四"} },
+          { "label": "小五", "next": "archive_fetch", "setFilter": {"grade":"小五"} },
+          { "label": "小六", "next": "archive_fetch", "setFilter": {"grade":"小六"} }
+        ]
+      },
+      "archive_fetch": {
+        "id": "archive_fetch", "type": "archive_fetch",
+        "text": "查詢中，請稍候 🔍"
+      },
+      "archive_not_found": {
+        "id": "archive_not_found", "type": "options",
+        "text": "😊 這個範圍暫時沒有歷屆題目\n\n可以換個年級或科目看看嗎？",
+        "options": [
+          { "label": "換英文年級", "next": "archive_grade_en" },
+          { "label": "換數學年級", "next": "archive_grade_ma" }
+        ]
+      },
+      "archive_limit_reached": {
+        "id": "archive_limit_reached", "type": "answer",
+        "text": "📚 已顯示 36 題（歷屆題庫查詢上限）\n\n如果需要更多題目，歡迎直接聯絡老師！",
+        "cta": ["line","phone","trial"]
+      },
       "ans_en_e12": {
         "id": "ans_en_e12", "type": "answer",
         "text": "小一小二的英文，從這裡起步最剛好！🌱\n\n我們不急著塞單字給孩子背——\n而是先讓他「不怕開口說英文」。\n\n從聽說入手，帶入自然發音，\n讓英文從一開始就是有趣的事 🎉\n\n很多一開始說「英文好可怕」的孩子，\n試聽完都說「好想再來！」\n（真的不是廣告詞 😄）",
@@ -521,7 +571,8 @@
     currentNodeId: null,
     history: [],
     depth: 0,
-    sessionId: getOrCreateSessionId()
+    sessionId: getOrCreateSessionId(),
+    archiveFilter: {}
   };
 
   var chatBody, isOpen = false;
@@ -631,6 +682,7 @@
     state.currentNodeId = null;
     state.history = [];
     state.depth = 0;
+    state.archiveFilter = {};
     startConversation();
   }
 
@@ -655,6 +707,9 @@
     } else if (node.type === 'quiz_result') {
       if (node.filter) dispatchQuizFilter(node.filter);
       if (node.options && node.options.length) addOptions(node.options);
+    } else if (node.type === 'archive_fetch') {
+      renderArchiveFetch(node);
+      return;
     }
 
     scrollToBottom();
@@ -700,6 +755,11 @@
       btn.className = 'mina-opt-btn';
       btn.textContent = opt.label;
       btn.addEventListener('click', function () {
+        if (opt.setFilter) {
+          Object.keys(opt.setFilter).forEach(function (k) {
+            state.archiveFilter[k] = opt.setFilter[k];
+          });
+        }
         addUserBubble(opt.label);
         wrap.querySelectorAll('.mina-opt-btn').forEach(function (b) {
           b.disabled = true;
@@ -788,6 +848,113 @@
     }
   }
 
+  // ─── Archive Fetch ───────────────────────────────
+  var API_BASE = 'https://mina-api.hua19911027.workers.dev';
+
+  function renderArchiveFetch(node) {
+    state.currentNodeId = node.id;
+    state.history.push(node.id);
+    state.depth++;
+
+    if (node.text) addBubble(node.text);
+
+    var loadingRow = document.createElement('div');
+    loadingRow.className = 'mina-msg-row';
+    var loadingBubble = document.createElement('div');
+    loadingBubble.className = 'mina-bubble';
+    loadingBubble.innerHTML = '<span class="mina-loading-dots"><i></i><i></i><i></i></span>';
+    loadingRow.appendChild(loadingBubble);
+    chatBody.appendChild(loadingRow);
+    scrollToBottom();
+
+    var params = Object.assign({ page: 1, limit: 6 }, state.archiveFilter);
+
+    fetch(API_BASE + '/api/v1/practice/archive?' + new URLSearchParams(params))
+      .then(function (r) { return r.json(); })
+      .then(function (json) {
+        chatBody.removeChild(loadingRow);
+        if (!json.ok || !json.data.questions.length) {
+          renderNode('archive_not_found');
+          return;
+        }
+        renderArchiveCards(json.data.questions);
+        if (json.data.reachedLimit) {
+          setTimeout(function () { renderNode('archive_limit_reached'); }, 200);
+        } else {
+          addOptions([
+            { label: '換英文年級', next: 'archive_grade_en' },
+            { label: '換數學年級', next: 'archive_grade_ma' },
+            { label: '回主選單',   next: 'archive_welcome' }
+          ]);
+        }
+        scrollToBottom();
+      })
+      .catch(function () {
+        chatBody.removeChild(loadingRow);
+        addBubble('抱歉，題庫暫時無法載入，請稍後再試 😅');
+        addOptions([
+          { label: '重新查詢', next: 'archive_fetch' },
+          { label: '回主選單', next: 'archive_welcome' }
+        ]);
+        scrollToBottom();
+      });
+  }
+
+  function renderArchiveCards(questions) {
+    var wrap = document.createElement('div');
+    wrap.className = 'mina-q-list';
+
+    questions.forEach(function (q, i) {
+      var card = document.createElement('div');
+      card.className = 'mina-q-card';
+
+      var header = document.createElement('button');
+      header.className = 'mina-q-header';
+      header.setAttribute('aria-expanded', 'false');
+      header.innerHTML =
+        '<span class="mina-q-number">Q' + (i + 1) + '</span>' +
+        '<span class="mina-q-title">' + escHtml(q.question) + '</span>' +
+        '<span class="mina-q-toggle">+</span>';
+
+      var body = document.createElement('div');
+      body.className = 'mina-q-body';
+      body.hidden = true;
+
+      var optLabels = ['A', 'B', 'C', 'D'];
+      var optsHtml = '<div class="mina-q-options">' +
+        q.options.map(function (o, j) {
+          var letter = optLabels[j] || String(j + 1);
+          var isAns = letter === q.answer;
+          return '<div class="mina-q-opt' + (isAns ? ' correct' : '') + '">' +
+            '<span class="mina-q-letter">' + letter + '</span>' +
+            '<span>' + escHtml(o) + '</span>' +
+            (isAns ? '<span class="mina-q-ans-badge">✓</span>' : '') +
+            '</div>';
+        }).join('') +
+        '</div>';
+
+      body.innerHTML = optsHtml +
+        '<div class="mina-exp ok"><b>✓ 正確觀念</b><p>' + escHtml(q.explanation.concept) + '</p></div>' +
+        '<div class="mina-exp err"><b>✕ 常見錯誤</b><p>' + escHtml(q.explanation.commonMistake) + '</p></div>' +
+        '<div class="mina-exp tip"><b>★ 記憶提示</b><p>' + escHtml(q.explanation.memoryTip) + '</p></div>';
+
+      header.addEventListener('click', function () {
+        var expanded = header.getAttribute('aria-expanded') === 'true';
+        header.setAttribute('aria-expanded', String(!expanded));
+        header.querySelector('.mina-q-toggle').textContent = expanded ? '+' : '×';
+        body.hidden = expanded;
+        scrollToBottom();
+      });
+
+      card.appendChild(header);
+      card.appendChild(body);
+      wrap.appendChild(card);
+    });
+
+    chatBody.appendChild(wrap);
+    requestAnimationFrame(function () { wrap.classList.add('visible'); });
+  }
+
   // ─── Helpers ─────────────────────────────────────
   function escHtml(str) {
     return str
@@ -820,7 +987,18 @@
     window.minaWidget = {
       open:  openPanel,
       close: closePanel,
-      reset: resetConversation
+      reset: resetConversation,
+      openToNode: function (nodeId) {
+        openPanel();
+        if (nodeId) {
+          chatBody.innerHTML = '';
+          state.currentNodeId = null;
+          state.history = [];
+          state.depth = 0;
+          state.archiveFilter = {};
+          renderNode(nodeId);
+        }
+      }
     };
   }
 
