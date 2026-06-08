@@ -561,7 +561,7 @@
     widget.id = 'mina-widget';
     widget.innerHTML =
       '<button class="mina-fab" aria-label="開啟 Mina 小幫手" aria-expanded="false">' +
-        '<span class="mina-fab-icon">💬</span>' +
+        '<span class="mina-fab-icon"><img src="assets/logo/zhuoyue-logo.svg" alt="Mina" style="width:30px;height:30px;object-fit:contain;display:block;"></span>' +
         '<span class="mina-fab-label">問 Mina</span>' +
       '</button>' +
       '<div class="mina-panel" role="dialog" aria-modal="true" aria-label="Mina 小幫手" hidden>' +
