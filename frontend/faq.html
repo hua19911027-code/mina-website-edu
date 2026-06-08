@@ -12,30 +12,7 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/svg+xml" href="/assets/logo/zhuoyue-logo.svg">
 <meta name="theme-color" content="#E60D85">
-<style>
-.minachat{max-width:560px;margin:0 auto;background:#fff;border:2px solid var(--pink-soft);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);}
-.mc-head{display:flex;align-items:center;gap:12px;padding:16px 20px;background:linear-gradient(135deg,var(--pink),var(--orange));color:#fff;}
-.mc-head .av{width:46px;height:46px;border-radius:50%;background:#fff;color:var(--pink);display:flex;align-items:center;justify-content:center;font-family:var(--fred);font-weight:700;font-size:20px;}
-.mc-head b{font-size:16px;display:block;line-height:1.2;}
-.mc-head span{font-size:12.5px;opacity:.9;display:flex;align-items:center;gap:6px;}
-.mc-head span::before{content:'';width:8px;height:8px;border-radius:50%;background:#7CF29B;}
-.mc-body{height:340px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px;background:var(--bg-2);}
-.mc-body .b{max-width:82%;padding:11px 15px;border-radius:16px;font-size:14.5px;font-weight:500;line-height:1.6;animation:pop .3s;}
-@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.mc-body .b.me{align-self:flex-end;background:#06C755;color:#fff;border-bottom-right-radius:5px;}
-.mc-body .b.mina{align-self:flex-start;background:#fff;color:var(--ink);border:1.5px solid var(--line);border-bottom-left-radius:5px;}
-.mc-quick{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px 4px;}
-.mc-quick button{background:var(--pink-soft);color:var(--pink);border:none;border-radius:30px;padding:8px 15px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:.2s;}
-.mc-quick button:hover{background:var(--pink);color:#fff;}
-.mc-input{display:flex;gap:10px;padding:14px 20px 18px;border-top:1px solid var(--line);background:#fff;}
-.mc-input input{flex:1;border:2px solid var(--pink-soft);border-radius:30px;padding:12px 18px;font-size:15px;font-family:var(--sans);background:var(--bg-2);}
-.mc-input input:focus{outline:none;border-color:var(--pink);background:#fff;}
-.mc-input button{width:48px;height:48px;flex-shrink:0;border:none;border-radius:50%;background:var(--pink);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;}
-.mc-input button:hover{transform:scale(1.08);}
-.mc-typing{align-self:flex-start;background:#fff;border:1.5px solid var(--line);border-radius:16px;border-bottom-left-radius:5px;padding:13px 16px;display:flex;gap:5px;}
-.mc-typing i{width:7px;height:7px;border-radius:50%;background:var(--ink-mute);animation:dot 1.2s infinite;}
-.mc-typing i:nth-child(2){animation-delay:.2s}.mc-typing i:nth-child(3){animation-delay:.4s}
-</style>
+<link rel="stylesheet" href="components/mina-widget.css"/>
 </head>
 <body data-screen-label="常見問題">
 
@@ -93,32 +70,28 @@
     </div>
   </section>
 
-  <!-- LIVE MINA CHAT -->
+  <!-- MINA WIDGET CTA -->
   <section class="sec-pad" style="background:var(--bg-2);">
     <div class="wrap">
-      <div class="sec-head center reveal">
-        <span class="kicker">✦ Chat with Mina</span>
-        <h2 class="sec-h">直接問 Mina 小幫手<span style="display:inline-block;">💬</span></h2>
-        <p class="sec-lead">找不到答案？直接在這裡跟 Mina 小幫手 聊聊。（此為示意對話，正式上線將串接真人客服）</p>
-      </div>
-      <div class="minachat reveal">
-        <div class="mc-head">
-          <div class="av">M</div>
-          <div><b>Mina 小幫手</b><span>線上・通常幾分鐘內回覆</span></div>
+      <div class="linecta reveal">
+        <div class="lc-left">
+          <span class="lc-badge"><span class="pulse"></span>Mina 小幫手 在線上回覆中</span>
+          <h3>還有其他問題？<span class="wig">👋</span></h3>
+          <p>找不到答案沒關係，跟 Mina 小幫手說說看，<br class="br-soft">Mina 小幫手 解決不了的，<b>老師都會親自回覆</b>喔！</p>
+          <a class="btn-w" href="#" onclick="window.minaWidget && window.minaWidget.open(); return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> 跟 Mina 小幫手 聊聊</a>
         </div>
-        <div class="mc-body" id="mcBody">
-          <div class="b mina">嗨！我是 Mina 小幫手 👋 想問試聽、課程還是費用呢？直接點下面的問題，或打字問我都可以喔！</div>
+        <div class="chat">
+          <div class="chat-top">
+            <div class="chat-av">M</div>
+            <div><b>Mina 小幫手</b><span>● 在線</span></div>
+          </div>
+          <div class="chat-body">
+            <div class="bub me b1">請問報名費怎麼計算？</div>
+            <div class="bub mina b2">費用依科目和時段不同，我幫您安排一次免費試聽，現場老師直接說明最清楚！😊</div>
+            <div class="bub me b3">好，那要怎麼預約？</div>
+            <div class="typing"><i></i><i></i><i></i></div>
+          </div>
         </div>
-        <div class="mc-quick" id="mcQuick">
-          <button data-q="怎麼預約試聽？">怎麼預約試聽？</button>
-          <button data-q="費用怎麼算？">費用怎麼算？</button>
-          <button data-q="有安親接送嗎？">有安親接送嗎？</button>
-          <button data-q="在哪裡上課？">在哪裡上課？</button>
-        </div>
-        <form class="mc-input" id="mcForm">
-          <input id="mcText" type="text" placeholder="輸入訊息問 Mina…" autocomplete="off"/>
-          <button type="submit" aria-label="送出"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
-        </form>
       </div>
     </div>
   </section>
@@ -158,5 +131,6 @@
 
 <script src="faq.js"></script>
 <script src="site.js"></script>
+<script src="components/mina-widget.js"></script>
 </body>
 </html>
