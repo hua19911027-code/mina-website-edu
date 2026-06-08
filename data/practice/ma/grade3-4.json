@@ -1,58 +1,113 @@
 {
   "subject": "ma",
-  "grade": "3-4",
+  "grade": "grade3-4",
   "gradeLabel": "國小中年級（3–4年級）",
-  "updatedAt": "2026-01-01",
+  "updatedAt": "2026-06-08",
   "questions": [
     {
-      "id": "ma-34-001",
-      "type": "multiple_choice",
-      "chapter": "乘法",
-      "question": "7 × 8 = ?",
-      "options": ["54", "56", "58", "64"],
-      "answer": "56",
-      "explanation": "7 × 8 = 56。記憶口訣：七八五十六。",
-      "difficulty": 2
+      "id": "ma-4-001",
+      "grade": "小四",
+      "subject": "數學",
+      "type": "觀念拆解",
+      "unit": "分數除法",
+      "question": "分數除法為什麼要「顛倒相乘」？",
+      "options": [
+        "這是規定，沒有理由",
+        "除以一個數等於乘以它的倒數，所以把除數分子分母對調再相乘",
+        "把被除數也顛倒",
+        "分子除分子，分母除分母"
+      ],
+      "answer": "B",
+      "explanation": {
+        "concept": "除以一個數＝乘以它的倒數，所以把除數分子分母對調再相乘。",
+        "commonMistake": "把被除數也一起顛倒，整題算錯。",
+        "memoryTip": "只翻「後面那個」，前面不動。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "ma-34-002",
-      "type": "multiple_choice",
-      "chapter": "除法",
-      "question": "48 ÷ 6 = ?",
-      "options": ["6", "7", "8", "9"],
-      "answer": "8",
-      "explanation": "48 ÷ 6 = 8。驗算：6 × 8 = 48，確認答案正確。",
-      "difficulty": 2
+      "id": "ma-4-002",
+      "grade": "小四",
+      "subject": "數學",
+      "type": "錯題診斷",
+      "unit": "移項",
+      "question": "移項常常忘了變號？等號兩側移動的規則是？",
+      "options": [
+        "符號不需要變",
+        "加變除、乘變減",
+        "加變減、乘變除",
+        "全部都要加負號"
+      ],
+      "answer": "C",
+      "explanation": {
+        "concept": "移到等號另一邊：加變減、乘變除。",
+        "commonMistake": "直接把項搬過去卻沒變號，導致等式不成立。",
+        "memoryTip": "過橋（等號）就要換裝（變號）。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "ma-34-003",
-      "type": "multiple_choice",
-      "chapter": "分數",
-      "question": "½ + ¼ = ?",
-      "options": ["¾", "2/6", "3/8", "1/6"],
-      "answer": "¾",
-      "explanation": "½ = 2/4，所以 2/4 + 1/4 = 3/4（¾）。分數相加要先通分（分母相同）。",
-      "difficulty": 2
+      "id": "ma-3-001",
+      "grade": "小三",
+      "subject": "數學",
+      "type": "標準題型",
+      "unit": "計算習慣",
+      "question": "計算常常粗心，最有效的檢查方式是？",
+      "options": [
+        "重新計算一遍",
+        "把答案帶回題目驗算（回代）",
+        "換一個方法計算",
+        "只檢查最後一步"
+      ],
+      "answer": "B",
+      "explanation": {
+        "concept": "養成「回代檢查」習慣，把答案帶回題目驗算。",
+        "commonMistake": "算完就交，從不檢查，或只重算一遍但用同樣的錯誤方式。",
+        "memoryTip": "最後留兩分鐘回頭驗算。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "ma-34-004",
-      "type": "multiple_choice",
-      "chapter": "面積",
-      "question": "長方形長 5 公分，寬 3 公分，面積是幾平方公分？",
-      "options": ["8", "15", "16", "30"],
-      "answer": "15",
-      "explanation": "面積 = 長 × 寬 = 5 × 3 = 15 平方公分。",
-      "difficulty": 2
+      "id": "ma-3-002",
+      "grade": "小三",
+      "subject": "數學",
+      "type": "觀念拆解",
+      "unit": "應用題",
+      "question": "應用題讀不懂？正確的做法是？",
+      "options": [
+        "直接猜答案",
+        "還沒讀完就急著算",
+        "圈出關鍵數字與問句，設未知數再列式",
+        "把題目背起來"
+      ],
+      "answer": "C",
+      "explanation": {
+        "concept": "圈出關鍵數字與問句，設未知數再列式。",
+        "commonMistake": "還沒讀完題目就急著算，容易題目搞錯。",
+        "memoryTip": "把文字一句一句翻成算式。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "ma-34-005",
-      "type": "multiple_choice",
-      "chapter": "應用題",
-      "question": "小明有 24 顆糖，平均分給 4 個朋友，每人可以得到幾顆？",
-      "options": ["4", "5", "6", "7"],
-      "answer": "6",
-      "explanation": "24 ÷ 4 = 6。平均分配就是除法。",
-      "difficulty": 2
+      "id": "ma-4-003",
+      "grade": "小四",
+      "subject": "數學",
+      "type": "標準題型",
+      "unit": "段考準備",
+      "question": "數學段考前怎麼準備最有效？",
+      "options": [
+        "一直做會的題目刷成就感",
+        "先重做考卷上錯過的題，再練同類型變化題，最後限時模擬",
+        "只看課本不做題目",
+        "背所有公式"
+      ],
+      "answer": "B",
+      "explanation": {
+        "concept": "先重做考卷上錯過的題，再練同類型變化題，最後限時模擬一次。",
+        "commonMistake": "一直做會的題目刷成就感，難題反而沒碰。",
+        "memoryTip": "專攻錯題，不重複舒適圈。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     }
   ]
 }

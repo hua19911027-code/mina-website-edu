@@ -1,58 +1,88 @@
 {
   "subject": "en",
-  "grade": "1-2",
+  "grade": "grade1-2",
   "gradeLabel": "國小低年級（1–2年級）",
-  "updatedAt": "2026-01-01",
+  "updatedAt": "2026-06-08",
   "questions": [
     {
-      "id": "en-12-001",
-      "type": "multiple_choice",
-      "chapter": "顏色與形狀",
+      "id": "en-1-001",
+      "grade": "小一",
+      "subject": "英文",
+      "type": "標準題型",
+      "unit": "顏色與形狀",
       "question": "看圖選出正確的英文單字：🔴",
       "options": ["Blue", "Red", "Green", "Yellow"],
-      "answer": "Red",
-      "explanation": "紅色的英文是 Red。Blue 是藍色，Green 是綠色，Yellow 是黃色。",
-      "difficulty": 1
+      "answer": "B",
+      "explanation": {
+        "concept": "紅色的英文是 Red。Blue 是藍色，Green 是綠色，Yellow 是黃色。",
+        "commonMistake": "把 Red 和 Blue 搞混，因為兩者都是短單字常見顏色。",
+        "memoryTip": "Red 的 R 想成紅燈（Red light），記住就不忘。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "en-12-002",
-      "type": "multiple_choice",
-      "chapter": "數字",
+      "id": "en-1-002",
+      "grade": "小一",
+      "subject": "英文",
+      "type": "標準題型",
+      "unit": "數字",
       "question": "「五」的英文怎麼說？",
       "options": ["Three", "Four", "Five", "Six"],
-      "answer": "Five",
-      "explanation": "Five 是 5 的英文。Three=3，Four=4，Six=6。",
-      "difficulty": 1
+      "answer": "C",
+      "explanation": {
+        "concept": "Five 是 5 的英文。Three=3，Four=4，Six=6。",
+        "commonMistake": "容易把 Four 和 Five 混淆，兩者都是 F 開頭。",
+        "memoryTip": "Five 有 5 個字母，剛好對應數字 5。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "en-12-003",
-      "type": "multiple_choice",
-      "chapter": "身體部位",
+      "id": "en-2-001",
+      "grade": "小二",
+      "subject": "英文",
+      "type": "標準題型",
+      "unit": "身體部位",
       "question": "「眼睛」的英文是什麼？",
       "options": ["Ear", "Nose", "Eye", "Mouth"],
-      "answer": "Eye",
-      "explanation": "Eye 是眼睛。Ear=耳朵，Nose=鼻子，Mouth=嘴巴。",
-      "difficulty": 1
+      "answer": "C",
+      "explanation": {
+        "concept": "Eye 是眼睛。Ear=耳朵，Nose=鼻子，Mouth=嘴巴。",
+        "commonMistake": "Ear 和 Eye 都是三個字母，很容易混淆。",
+        "memoryTip": "Eye 形狀像眼睛，想像 E-y-e 中的 y 是睫毛。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "en-12-004",
-      "type": "multiple_choice",
-      "chapter": "動物",
-      "question": "「貓」的英文是什麼？",
-      "options": ["Dog", "Cat", "Bird", "Fish"],
-      "answer": "Cat",
-      "explanation": "Cat 是貓。Dog=狗，Bird=鳥，Fish=魚。",
-      "difficulty": 1
-    },
-    {
-      "id": "en-12-005",
-      "type": "multiple_choice",
-      "chapter": "問候語",
+      "id": "en-2-002",
+      "grade": "小二",
+      "subject": "英文",
+      "type": "觀念拆解",
+      "unit": "問候語",
       "question": "早上見到朋友應該說什麼？",
       "options": ["Good night!", "Good afternoon!", "Good morning!", "Goodbye!"],
-      "answer": "Good morning!",
-      "explanation": "早上打招呼說 Good morning！下午說 Good afternoon，晚上說 Good night，離開說 Goodbye。",
-      "difficulty": 1
+      "answer": "C",
+      "explanation": {
+        "concept": "早上打招呼說 Good morning！下午說 Good afternoon，晚上說 Good night，離開說 Goodbye。",
+        "commonMistake": "把 Good night 和 Good morning 搞反，以為兩者都是打招呼用語。",
+        "memoryTip": "Morning＝早晨，morning 有太陽升起的感覺；night＝夜晚，是睡覺時說的。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
+    },
+    {
+      "id": "en-1-003",
+      "grade": "小一",
+      "subject": "英文",
+      "type": "標準題型",
+      "unit": "動物",
+      "question": "「貓」的英文是什麼？",
+      "options": ["Dog", "Cat", "Bird", "Fish"],
+      "answer": "B",
+      "explanation": {
+        "concept": "Cat 是貓。Dog=狗，Bird=鳥，Fish=魚。",
+        "commonMistake": "Dog 和 Cat 最常搞混，因為這兩個是最基本的家寵物。",
+        "memoryTip": "Cat 想成「可愛的貓」，C-A-T，三個字母很簡單。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     }
   ]
 }

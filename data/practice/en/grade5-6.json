@@ -1,63 +1,113 @@
 {
   "subject": "en",
-  "grade": "5-6",
+  "grade": "grade5-6",
   "gradeLabel": "國小高年級（5–6年級）",
-  "updatedAt": "2026-01-01",
+  "updatedAt": "2026-06-08",
   "questions": [
     {
-      "id": "en-56-001",
-      "type": "multiple_choice",
-      "chapter": "過去式",
-      "question": "Yesterday, I ___ my homework before dinner.",
-      "options": ["finish", "finishes", "finished", "finishing"],
-      "answer": "finished",
-      "explanation": "Yesterday 表示過去，動詞要用過去式。finish → finished（規則動詞加 -ed）。",
-      "difficulty": 3
-    },
-    {
-      "id": "en-56-002",
-      "type": "multiple_choice",
-      "chapter": "比較級",
-      "question": "Tom is ___ than his brother.",
-      "options": ["tall", "taller", "tallest", "more tall"],
-      "answer": "taller",
-      "explanation": "兩者比較用比較級。tall 是一個音節的形容詞，比較級加 -er → taller。",
-      "difficulty": 3
-    },
-    {
-      "id": "en-56-003",
-      "type": "multiple_choice",
-      "chapter": "被動語態",
-      "question": "The letter ___ by Mary yesterday.",
-      "options": ["writes", "wrote", "was written", "is writing"],
-      "answer": "was written",
-      "explanation": "被動語態結構：be + 過去分詞。yesterday 表過去，所以用 was + written。",
-      "difficulty": 3
-    },
-    {
-      "id": "en-56-004",
-      "type": "multiple_choice",
-      "chapter": "連接詞",
-      "question": "___ it was raining, we went out.",
-      "options": ["Because", "Although", "If", "When"],
-      "answer": "Although",
-      "explanation": "雖然下雨，我們還是出去了。表示讓步用 Although（雖然）。Because=因為，If=如果，When=當…時候。",
-      "difficulty": 3
-    },
-    {
-      "id": "en-56-005",
-      "type": "multiple_choice",
-      "chapter": "閱讀理解",
-      "question": "Which sentence is correct?",
+      "id": "en-5-001",
+      "grade": "小五",
+      "subject": "英文",
+      "type": "觀念拆解",
+      "unit": "現在完成式",
+      "question": "have been to 和 have gone to 差在哪？",
       "options": [
-        "She don't like apples.",
-        "She doesn't likes apples.",
-        "She doesn't like apples.",
-        "She not like apples."
+        "沒有差別，可互換",
+        "have been to 表示去了還沒回來",
+        "have been to 表示去過（已回來），have gone to 表示去了還在那裡",
+        "have gone to 只用在問句"
       ],
-      "answer": "She doesn't like apples.",
-      "explanation": "第三人稱單數否定用 doesn't + 原形動詞。不能說 don't 或 doesn't likes。",
-      "difficulty": 3
+      "answer": "C",
+      "explanation": {
+        "concept": "have been to＝「去過」（人已經回來了）；have gone to＝「去了」（人還在那裡沒回來）。",
+        "commonMistake": "把兩者當同義字，導致語意整個顛倒。",
+        "memoryTip": "been＝back 回來了；gone＝走了還沒回。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
+    },
+    {
+      "id": "en-5-002",
+      "grade": "小五",
+      "subject": "英文",
+      "type": "標準題型",
+      "unit": "不定詞與動名詞",
+      "question": "to V 和 V-ing 怎麼選？",
+      "options": [
+        "永遠用 to V",
+        "永遠用 V-ing",
+        "不同動詞固定接法不同，需分開記",
+        "只看主詞是人還是事物"
+      ],
+      "answer": "C",
+      "explanation": {
+        "concept": "不同動詞固定接法不同，want to do、enjoy doing 要分開記。部分動詞兩者皆可但意思有差（like to/liking）。",
+        "commonMistake": "全部用同一種接法硬套。",
+        "memoryTip": "把常見動詞分兩袋背：接 to / 接 -ing。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
+    },
+    {
+      "id": "en-6-001",
+      "grade": "小六",
+      "subject": "英文",
+      "type": "觀念拆解",
+      "unit": "時態",
+      "question": "時態總是搞混，找對線索的關鍵是？",
+      "options": [
+        "只看中文翻譯來決定",
+        "找句中的時間副詞當線索",
+        "用動詞長短判斷",
+        "看句子長度決定"
+      ],
+      "answer": "B",
+      "explanation": {
+        "concept": "先確定句子的「時間點」，再決定用哪個時態。時間副詞（yesterday/now/tomorrow/already）是最可靠的線索。",
+        "commonMistake": "只看中文翻譯硬套時態，中文時態概念不清晰容易出錯。",
+        "memoryTip": "找句中的時間副詞當線索。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
+    },
+    {
+      "id": "en-5-003",
+      "grade": "小五",
+      "subject": "英文",
+      "type": "錯題診斷",
+      "unit": "克漏字",
+      "question": "克漏字（Cloze）怎麼作答最穩？",
+      "options": [
+        "只填文法正確的",
+        "先看上下文脈絡再選語意最通順的",
+        "跳過再猜",
+        "選最長選項"
+      ],
+      "answer": "B",
+      "explanation": {
+        "concept": "先看上下句的時態與連接詞，再挑語意最通順的選項；不確定就用刪去法。",
+        "commonMistake": "只看空格那一行就選，忽略整段語意。",
+        "memoryTip": "先讀完整段，再回頭填空。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
+    },
+    {
+      "id": "en-6-002",
+      "grade": "小六",
+      "subject": "英文",
+      "type": "標準題型",
+      "unit": "段考複習",
+      "question": "段考前一週英文該複習什麼順序？",
+      "options": [
+        "先做題目再背單字",
+        "先背單字→看文法→做題目",
+        "只背單字就夠了",
+        "直接全部重背"
+      ],
+      "answer": "B",
+      "explanation": {
+        "concept": "先掃單字與片語，再回頭看課文文法重點，最後做一份模擬題抓手感。",
+        "commonMistake": "只背單字不看文法，題目換句型就答不出來。",
+        "memoryTip": "單字→文法→題目，三步驟順序別顛倒。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     }
   ]
 }

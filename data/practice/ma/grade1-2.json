@@ -1,58 +1,113 @@
 {
   "subject": "ma",
-  "grade": "1-2",
+  "grade": "grade1-2",
   "gradeLabel": "國小低年級（1–2年級）",
-  "updatedAt": "2026-01-01",
+  "updatedAt": "2026-06-08",
   "questions": [
     {
-      "id": "ma-12-001",
-      "type": "multiple_choice",
-      "chapter": "加法",
+      "id": "ma-1-001",
+      "grade": "小一",
+      "subject": "數學",
+      "type": "標準題型",
+      "unit": "加法",
       "question": "5 + 3 = ?",
-      "options": ["6", "7", "8", "9"],
-      "answer": "8",
-      "explanation": "5 加 3 等於 8。用手指頭數：5 之後再數 3 個就是 6、7、8。",
-      "difficulty": 1
+      "options": [
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "answer": "C",
+      "explanation": {
+        "concept": "5 加 3 等於 8。用手指頭數：5 之後再數 3 個就是 6、7、8。",
+        "commonMistake": "加法不熟練時少算一格，算成 7。",
+        "memoryTip": "用跳格方式：5→6→7→8，數了 3 格。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "ma-12-002",
-      "type": "multiple_choice",
-      "chapter": "減法",
+      "id": "ma-1-002",
+      "grade": "小一",
+      "subject": "數學",
+      "type": "標準題型",
+      "unit": "減法",
       "question": "10 - 4 = ?",
-      "options": ["4", "5", "6", "7"],
-      "answer": "6",
-      "explanation": "10 減掉 4 剩下 6。10 往回數 4 個：9、8、7、6。",
-      "difficulty": 1
+      "options": [
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "answer": "C",
+      "explanation": {
+        "concept": "10 減掉 4 剩下 6。10 往回數 4 個：9、8、7、6。",
+        "commonMistake": "從 10 往回數時多數一格算成 5。",
+        "memoryTip": "用倒數方式：10→9→8→7→6，數了 4 格。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "ma-12-003",
-      "type": "multiple_choice",
-      "chapter": "比大小",
+      "id": "ma-2-001",
+      "grade": "小二",
+      "subject": "數學",
+      "type": "觀念拆解",
+      "unit": "比大小",
       "question": "下列哪個數字最大？",
-      "options": ["15", "21", "9", "18"],
-      "answer": "21",
-      "explanation": "比較大小時，先比十位數：21 的十位是 2，其他都是 1 或 0，所以 21 最大。",
-      "difficulty": 1
+      "options": [
+        "15",
+        "21",
+        "9",
+        "18"
+      ],
+      "answer": "B",
+      "explanation": {
+        "concept": "比較大小時，先比十位數：21 的十位是 2，其他都是 1 或 0，所以 21 最大。",
+        "commonMistake": "只看個位數比較，忘記先比十位數。",
+        "memoryTip": "先比最左邊的數字（最高位數）。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "ma-12-004",
-      "type": "multiple_choice",
-      "chapter": "形狀",
+      "id": "ma-2-002",
+      "grade": "小二",
+      "subject": "數學",
+      "type": "標準題型",
+      "unit": "形狀",
       "question": "正方形有幾個角？",
-      "options": ["3", "4", "5", "6"],
-      "answer": "4",
-      "explanation": "正方形有 4 個角、4 條邊，而且每條邊一樣長。",
-      "difficulty": 1
+      "options": [
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "answer": "B",
+      "explanation": {
+        "concept": "正方形有 4 個角、4 條邊，而且每條邊一樣長，每個角都是直角。",
+        "commonMistake": "把正方形和三角形的角數搞混。",
+        "memoryTip": "正方形＝四邊形，4 條邊就有 4 個角。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "ma-12-005",
-      "type": "multiple_choice",
-      "chapter": "時間",
+      "id": "ma-1-003",
+      "grade": "小一",
+      "subject": "數學",
+      "type": "觀念拆解",
+      "unit": "時間",
       "question": "一小時等於幾分鐘？",
-      "options": ["30分鐘", "60分鐘", "100分鐘", "24分鐘"],
-      "answer": "60分鐘",
-      "explanation": "1 小時 = 60 分鐘。記憶方法：時鐘的長針走一圈就是 60 分鐘，也就是 1 小時。",
-      "difficulty": 1
+      "options": [
+        "30分鐘",
+        "60分鐘",
+        "100分鐘",
+        "24分鐘"
+      ],
+      "answer": "B",
+      "explanation": {
+        "concept": "1 小時 = 60 分鐘。時鐘的長針走一圈就是 60 分鐘，也就是 1 小時。",
+        "commonMistake": "和一天有 24 小時搞混，誤答 24 分鐘。",
+        "memoryTip": "時鐘有 12 格，每格 5 分鐘，12×5=60 分鐘。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     }
   ]
 }

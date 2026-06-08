@@ -1,58 +1,113 @@
 {
   "subject": "ma",
-  "grade": "5-6",
+  "grade": "grade5-6",
   "gradeLabel": "國小高年級（5–6年級）",
-  "updatedAt": "2026-01-01",
+  "updatedAt": "2026-06-08",
   "questions": [
     {
-      "id": "ma-56-001",
-      "type": "multiple_choice",
-      "chapter": "百分比",
-      "question": "200 的 30% 是多少？",
-      "options": ["40", "60", "80", "90"],
-      "answer": "60",
-      "explanation": "200 × 30% = 200 × 0.3 = 60。百分比轉小數：30% = 0.3。",
-      "difficulty": 3
+      "id": "ma-5-001",
+      "grade": "小五",
+      "subject": "數學",
+      "type": "觀念拆解",
+      "unit": "負數",
+      "question": "為什麼「負負得正」？",
+      "options": [
+        "這是規定，不需要理由",
+        "把「負」想成相反方向，相反的相反就轉回原本方向所以變正",
+        "負數乘法特殊規則",
+        "只有整數才適用"
+      ],
+      "answer": "B",
+      "explanation": {
+        "concept": "把「負」想成「相反方向」，相反的相反就轉回原本的方向，所以變正。",
+        "commonMistake": "死背口訣卻不懂方向意義，遇到變化題就卡住。",
+        "memoryTip": "「敵人的敵人，是朋友」。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "ma-56-002",
-      "type": "multiple_choice",
-      "chapter": "比例",
-      "question": "3:5 = 12:?",
-      "options": ["15", "18", "20", "25"],
-      "answer": "20",
-      "explanation": "比例相等：3/5 = 12/x，所以 x = 12 × 5 ÷ 3 = 20。",
-      "difficulty": 3
+      "id": "ma-5-002",
+      "grade": "小五",
+      "subject": "數學",
+      "type": "錯題診斷",
+      "unit": "次方",
+      "question": "計算 -3² 為什麼不是 9？",
+      "options": [
+        "-3² 就是 9，沒有錯",
+        "-3² 是 -(3²)=-9；要得到 9 需要寫 (-3)²",
+        "應該是 -6",
+        "次方先算，負號後加，所以是 -9"
+      ],
+      "answer": "B",
+      "explanation": {
+        "concept": "-3² 是 -(3×3)=-9；要得到 9 必須寫成 (-3)²。",
+        "commonMistake": "忽略次方優先於負號，少了括號就算錯。",
+        "memoryTip": "沒括號，負號站旁邊看戲，先算次方。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "ma-56-003",
-      "type": "multiple_choice",
-      "chapter": "圓形",
-      "question": "半徑為 7 公分的圓，其周長約為多少公分？（π ≈ 3.14）",
-      "options": ["21.98", "43.96", "153.86", "87.92"],
-      "answer": "43.96",
-      "explanation": "圓周長 = 2πr = 2 × 3.14 × 7 = 43.96 公分。注意是半徑不是直徑。",
-      "difficulty": 3
+      "id": "ma-6-001",
+      "grade": "小六",
+      "subject": "數學",
+      "type": "錯題診斷",
+      "unit": "括號展開",
+      "question": "去括號 -(a-b) 會變成什麼？",
+      "options": [
+        "-a-b",
+        "-a+b",
+        "a-b",
+        "a+b"
+      ],
+      "answer": "B",
+      "explanation": {
+        "concept": "負號要分配到每一項：-(a-b)=-a+b。",
+        "commonMistake": "只變第一項符號，寫成 -a-b。",
+        "memoryTip": "負號要「雨露均霑」每一項。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "ma-56-004",
-      "type": "multiple_choice",
-      "chapter": "應用題",
-      "question": "一件衣服原價 800 元，打八折後售價是多少？",
-      "options": ["640", "680", "720", "760"],
-      "answer": "640",
-      "explanation": "打八折 = 乘以 0.8。800 × 0.8 = 640 元。",
-      "difficulty": 3
+      "id": "ma-6-002",
+      "grade": "小六",
+      "subject": "數學",
+      "type": "觀念拆解",
+      "unit": "次方",
+      "question": "任何數的 0 次方為什麼是 1？",
+      "options": [
+        "0 次方定義為 0",
+        "由次方相除規律：aⁿ÷aⁿ=a⁰=1（a≠0）",
+        "這只是規定沒有理由",
+        "0 次方是不合法的運算"
+      ],
+      "answer": "B",
+      "explanation": {
+        "concept": "由次方相除規律：aⁿ÷aⁿ=a⁰=1（a≠0）。",
+        "commonMistake": "誤以為 0 次方等於 0。",
+        "memoryTip": "相同底數相除，指數相減：n-n=0，結果等於 1。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     },
     {
-      "id": "ma-56-005",
-      "type": "multiple_choice",
-      "chapter": "統計",
-      "question": "數列 2, 4, 6, 8, 10 的平均數是？",
-      "options": ["4", "5", "6", "7"],
-      "answer": "6",
-      "explanation": "平均數 = 總和 ÷ 個數 = (2+4+6+8+10) ÷ 5 = 30 ÷ 5 = 6。",
-      "difficulty": 3
+      "id": "ma-5-003",
+      "grade": "小五",
+      "subject": "數學",
+      "type": "標準題型",
+      "unit": "幾何證明",
+      "question": "幾何證明不知從何下手，正確方法是？",
+      "options": [
+        "只在腦中空想",
+        "直接背答案",
+        "先標出已知與要證的，找對應定理把它們連起來",
+        "問同學抄答案"
+      ],
+      "answer": "C",
+      "explanation": {
+        "concept": "先標出已知與要證的，找對應的定理把它們連起來。",
+        "commonMistake": "只在腦中空想，不動手畫圖。",
+        "memoryTip": "先把已知條件標在圖上。"
+      },
+      "publishedAt": "2026-06-01T01:00:00.000Z"
     }
   ]
 }
