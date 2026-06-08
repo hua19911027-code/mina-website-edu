@@ -5,6 +5,8 @@ export type Bindings = {
   NOTION_BOOKING_DB_ID: string;
   NOTION_NEWS_DB_ID: string;
   NOTION_FAQ_DB_ID: string;
+  NOTION_PRACTICE_DB_ID: string;
+  NOTION_EXAM_REVIEW_DB_ID: string;
   LINE_OFFICIAL_URL: string;
   ADMIN_SECRET: string;
   CORS_ORIGIN: string;
@@ -80,15 +82,49 @@ export interface FaqList {
 
 /* ── Practice ── */
 
+export interface PracticeExplanation {
+  concept: string;
+  commonMistake: string;
+  memoryTip: string;
+}
+
 export interface PracticeQuestion {
   id: string;
+  grade: string;
+  subject: string;
   type: string;
-  chapter: string;
+  unit: string;
   question: string;
   options: string[];
   answer: string;
-  explanation: string;
-  difficulty: number;
+  explanation: PracticeExplanation;
+  publishedAt: string;
+}
+
+export interface PracticeList {
+  questions: PracticeQuestion[];
+  total: number;
+  page: number;
+  limit: number;
+  hasMore: boolean;
+  lastUpdated: string;
+  reachedLimit?: boolean;
+}
+
+export interface ExamReviewItem {
+  id: string;
+  name: string;
+  subject: string;
+  grade: string;
+  pdfUrl: string;
+  startAt: string;
+  endAt: string;
+}
+
+export interface ExamReviewData {
+  active: boolean;
+  grade: string;
+  items: ExamReviewItem[];
 }
 
 export interface PracticeData {
