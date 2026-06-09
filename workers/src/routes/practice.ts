@@ -272,19 +272,18 @@ route.get('/exam-review', async (c) => {
 
   try {
     const n = now();
+    // 只過濾啟用狀態和年級；時間比對在 JS 端用「展示時間」欄位的 start/end 進行
     const filter = {
       and: [
         { property: '是否啟用', checkbox: { equals: true } },
         { property: '年級', select: { equals: grade } },
-        { property: '開始時間', date: { on_or_before: n.toISOString() } },
-        { property: '結束時間', date: { on_or_after: n.toISOString() } },
       ],
     };
 
     const result = await notion.queryDatabase(c.env.NOTION_API_KEY, c.env.NOTION_EXAM_REVIEW_DB_ID, {
       filter,
       sorts: [{ property: '科目', direction: 'ascending' }],
-      page_size: 10,
+      page_size: 20,
     });
 
     const items = (result.results as unknown[])
@@ -304,11 +303,6 @@ route.get('/exam-review', async (c) => {
           const sel = prop['select'] as Record<string, unknown> | null | undefined;
           return sel ? (sel['name'] as string) || '' : '';
         }
-        function getDateField(name: string): string {
-          const prop = (props[name] as Record<string, unknown>) || {};
-          const d = prop['date'] as Record<string, unknown> | null | undefined;
-          return d ? (d['start'] as string) || '' : '';
-        }
 
         const pdfProp = props['PDF'] as { type: string; files: Array<{ type: string; file?: { url: string }; external?: { url: string } }> } | undefined;
         const pdfUrl = pdfProp?.files?.[0]
@@ -317,14 +311,22 @@ route.get('/exam-review', async (c) => {
 
         if (!pdfUrl) return null;
 
+        // 時間比對：「展示時間」欄位（Date 型別，開啟結束日期）
+        // 若欄位不存在（schema 尚未更新）則不做時間過濾，保持向下相容
+        const displayTimeProp = (props['展示時間'] as Record<string, unknown>) || {};
+        const dateRange = displayTimeProp['date'] as { start?: string; end?: string } | null | undefined;
+        if (dateRange?.start && dateRange?.end) {
+          const displayStart = new Date(dateRange.start);
+          const displayEnd   = new Date(dateRange.end);
+          if (n < displayStart || n > displayEnd) return null;
+        }
+
         return {
           id: (p.id as string) || '',
           name: getTitle(),
           subject: getSelect('科目'),
           grade: getSelect('年級'),
           pdfUrl,
-          startAt: getDateField('開始時間'),
-          endAt: getDateField('結束時間'),
         };
       })
       .filter((item): item is NonNullable<typeof item> => item !== null);
