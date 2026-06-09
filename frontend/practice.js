@@ -51,10 +51,9 @@
       '.qcard[open] .q-opt.correct{border-color:#22c55e;background:rgba(34,197,94,.08);}',
       '.qcard[open] .q-opt.correct .q-opt-lbl{color:#16A34A;}',
       '.qcard[open] .q-correct-tag{display:inline;margin-left:auto;font-size:12px;color:#16A34A;font-weight:600;}',
-      /* answer reveal row in qbody */
-      '.q-ans-row{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(34,197,94,.04));border:1.5px solid #86efac;margin-bottom:14px;}',
-      '.q-ans-badge{width:34px;height:34px;border-radius:10px;background:#22c55e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;flex-shrink:0;}',
-      '.q-ans-text{font-size:.8rem;color:#15803d;font-weight:700;margin-bottom:2px;letter-spacing:.2px;}',
+      /* answer badge inside 正確觀念 */
+      '.q-ans-inline{display:inline-flex;align-items:center;gap:8px;margin:6px 0 8px;}',
+      '.q-ans-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;background:#22c55e;color:#fff;font-weight:900;font-size:.85rem;flex-shrink:0;}',
       '.q-ans-val{font-size:1rem;font-weight:800;color:#14532d;}',
       /* exam overlay */
       '#exam-grade-section{animation:examFadeIn .22s ease both;}',
@@ -124,14 +123,14 @@
         + '<span class="plus">+</span>'
       + '</summary>'
       + '<div class="qbody">'
-        + '<div class="q-ans-row">'
-          + '<div class="q-ans-badge">' + esc(answerLbl) + '</div>'
-          + '<div>'
-            + '<div class="q-ans-text">✓ 正確答案</div>'
-            + '<div class="q-ans-val">' + esc(answerVal) + '</div>'
+        + '<div class="qseg ok">'
+          + '<span class="st">&#10003; 正確觀念</span>'
+          + '<div class="q-ans-inline">'
+            + '<span class="q-ans-badge">' + esc(answerLbl) + '</span>'
+            + '<span class="q-ans-val">' + esc(answerVal) + '</span>'
           + '</div>'
+          + (exp.concept ? '<span class="sx">' + esc(exp.concept) + '</span>' : '')
         + '</div>'
-        + '<div class="qseg ok"><span class="st">&#10003; 正確觀念</span><span class="sx">' + esc(exp.concept || '') + '</span></div>'
         + '<div class="qseg err"><span class="st">&#10007; 常見錯誤</span><span class="sx">' + esc(exp.commonMistake || '') + '</span></div>'
         + '<div class="qseg tip"><span class="st">&#9733; 記憶提示</span><span class="sx">' + esc(exp.memoryTip || '') + '</span></div>'
       + '</div>'
