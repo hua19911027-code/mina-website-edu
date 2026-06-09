@@ -652,7 +652,8 @@
     requestAnimationFrame(function () { panel.classList.add('open'); });
     fab.setAttribute('aria-expanded', 'true');
     isOpen = true;
-    if (!state.currentNodeId) startConversation();
+    var chatBody = document.getElementById('mina-chat-body');
+    if (!state.currentNodeId || (chatBody && chatBody.children.length === 0)) startConversation();
     else scrollToBottom();
   }
 
