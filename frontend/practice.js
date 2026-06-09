@@ -52,7 +52,7 @@
       '.qcard[open] .q-opt.correct .q-opt-lbl{color:#16A34A;}',
       '.qcard[open] .q-correct-tag{display:inline;margin-left:auto;font-size:12px;color:#16A34A;font-weight:600;}',
       /* answer badge inside 正確觀念 */
-      '.q-ans-inline{display:inline-flex;align-items:center;gap:8px;margin:6px 0 14px;}',
+      '.q-ans-inline{display:flex;align-items:center;gap:8px;margin:6px 0 14px;}',
       '.q-ans-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;background:#22c55e;color:#fff;font-weight:900;font-size:.85rem;flex-shrink:0;}',
       '.q-ans-val{font-size:1rem;font-weight:800;color:#14532d;}',
       /* exam overlay */
