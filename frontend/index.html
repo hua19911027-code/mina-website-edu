@@ -156,16 +156,16 @@
       <div class="reveal">
         <div class="hp-prac">
           <div class="hp-prac-row">
-            <button class="hp-btn hp-grade active" data-grade="1-2">小1</button>
-            <button class="hp-btn hp-grade" data-grade="1-2">小2</button>
-            <button class="hp-btn hp-grade" data-grade="3-4">小3</button>
-            <button class="hp-btn hp-grade" data-grade="3-4">小4</button>
-            <button class="hp-btn hp-grade" data-grade="5-6">小5</button>
-            <button class="hp-btn hp-grade" data-grade="5-6">小6</button>
+            <button class="hp-btn hp-grade active" data-grade="小一">小1</button>
+            <button class="hp-btn hp-grade" data-grade="小二">小2</button>
+            <button class="hp-btn hp-grade" data-grade="小三">小3</button>
+            <button class="hp-btn hp-grade" data-grade="小四">小4</button>
+            <button class="hp-btn hp-grade" data-grade="小五">小5</button>
+            <button class="hp-btn hp-grade" data-grade="小六">小6</button>
           </div>
           <div class="hp-prac-row">
-            <button class="hp-btn hp-subj active" data-subj="en">英文</button>
-            <button class="hp-btn hp-subj" data-subj="ma">數學</button>
+            <button class="hp-btn hp-subj active" data-subj="英文">英文</button>
+            <button class="hp-btn hp-subj" data-subj="數學">數學</button>
           </div>
           <div class="hp-prac-row">
             <button class="hp-btn hp-type active" data-type="">標準題型</button>
@@ -259,7 +259,7 @@
 <script>
 (function(){
   var API = 'https://mina-api.hua19911027.workers.dev/api/v1';
-  var s = {grade:'1-2', subj:'en', type:''};
+  var s = {grade:'小一', subj:'英文', type:''};
   function esc(v){return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function load(){
     var wrap = document.getElementById('hp-qcard');
@@ -280,8 +280,8 @@
         }).join('');
         var ai=LBL.indexOf(q.answer), av=(q.options&&ai>=0)?q.options[ai]:'';
         var exp=q.explanation||{};if(typeof exp==='string')exp={concept:exp};
-        var gl=s.grade==='1-2'?'小一/小二':s.grade==='3-4'?'小三/小四':'小五/小六';
-        var sl=s.subj==='en'?'英文':'數學';
+        var gl=s.grade;
+        var sl=s.subj;
         wrap.innerHTML='<details class="qcard" style="max-width:760px;margin:0 auto">'
           +'<summary><span class="qnum">1</span><span style="flex:1"><span class="q-meta">'+gl+' &middot; '+sl+(q.type?' &middot; '+esc(q.type):'')+'</span><br>'+esc(q.question)+'</span><span class="plus">+</span></summary>'
           +'<div style="padding:0 24px 20px"><div class="q-opts">'+opts+'</div>'
