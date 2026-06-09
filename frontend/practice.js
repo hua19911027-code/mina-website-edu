@@ -48,6 +48,14 @@
       '.q-opt-lbl{font-weight:700;min-width:18px;color:#bbb;}',
       '.q-opt.correct .q-opt-lbl{color:#16A34A;}',
       '.q-correct-tag{margin-left:auto;font-size:12px;color:#16A34A;font-weight:600;}',
+      /* exam overlay */
+      '.exam-grade-btn{padding:14px 0;border-radius:14px;border:2px solid var(--pink-soft,#FFE3F1);background:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:background .18s,border-color .18s,color .18s;color:var(--ink,#241019);}',
+      '.exam-grade-btn:hover{background:var(--pink-soft,#FFE3F1);border-color:var(--pink,#E60D85);}',
+      '.exam-grade-btn.selected{background:var(--pink,#E60D85);border-color:var(--pink,#E60D85);color:#fff;}',
+      '.exam-subj-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 28px;border-radius:18px;border:2.5px solid var(--pink-soft,#FFE3F1);background:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:background .18s,border-color .18s,transform .15s;color:var(--ink,#241019);min-width:110px;}',
+      '.exam-subj-btn:hover{transform:translateY(-3px);border-color:var(--pink,#E60D85);background:var(--pink-soft,#FFE3F1);}',
+      '.exam-subj-btn .subj-icon{font-size:2rem;line-height:1;}',
+      '.exam-subj-btn .subj-label{font-size:.85rem;color:var(--ink-mute,#A593A0);}',
     ].join('')
     ;(document.head || document.documentElement).appendChild(s)
   }
@@ -178,10 +186,13 @@
         if (!subjectList) return
         subjectList.style.display = 'flex'
         subjectList.innerHTML = ''
+        var SUBJ_ICONS = { '英文': '📘', '數學': '📐' }
         ;(json.data.items || []).forEach(function(item) {
           var btn = document.createElement('button')
-          btn.textContent = item.subject
-          btn.className = 'exam-subject-btn'
+          btn.className = 'exam-subj-btn'
+          btn.innerHTML = '<span class="subj-icon">' + (SUBJ_ICONS[item.subject] || '📄') + '</span>'
+            + '<span>' + item.subject + '</span>'
+            + '<span class="subj-label">點此下載 PDF</span>'
           btn.addEventListener('click', function() { window.open(item.pdfUrl, '_blank') })
           subjectList.appendChild(btn)
         })
@@ -196,19 +207,20 @@
 
     var panel = document.createElement('div')
     panel.id = 'exam-grade-section'
-    panel.style.cssText = 'display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.45);align-items:center;justify-content:center;'
+    panel.style.cssText = 'display:none;position:fixed;inset:0;z-index:9000;background:rgba(20,8,16,.55);align-items:center;justify-content:center;backdrop-filter:blur(2px);'
     panel.innerHTML =
-      '<div style="background:#fff;border-radius:24px;padding:32px 28px;max-width:400px;width:90%;text-align:center;box-shadow:0 24px 60px -16px rgba(0,0,0,.3);">'
-        + '<h3 style="margin:0 0 8px;font-size:1.25rem;color:var(--ink,#241019);">選擇年級</h3>'
-        + '<p style="margin:0 0 20px;font-size:.9rem;color:var(--ink-mute,#A593A0);">複習卷於段考前週六中午開放</p>'
+      '<div style="background:#fff;border-radius:28px;padding:36px 32px 28px;max-width:420px;width:92%;text-align:center;box-shadow:0 32px 80px -20px rgba(0,0,0,.35);">'
+        + '<div style="width:48px;height:48px;border-radius:16px;background:var(--pink,#E60D85);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.5rem;">📌</div>'
+        + '<h3 style="margin:0 0 6px;font-size:1.3rem;font-weight:900;color:var(--ink,#241019);">選擇年級</h3>'
+        + '<p style="margin:0 0 24px;font-size:.875rem;color:var(--ink-mute,#A593A0);line-height:1.5;">複習卷於段考前週六中午開放<br>選擇年級後即可下載 PDF 複習卷</p>'
         + '<div id="exam-grade-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">'
           + ['小一','小二','小三','小四','小五','小六'].map(function(g) {
-              return '<button data-exam-grade="' + g + '" style="padding:12px 0;border-radius:12px;border:2px solid var(--pink-soft,#FFE3F1);background:#fff;font-size:.95rem;font-weight:700;cursor:pointer;transition:.2s;">' + g + '</button>'
+              return '<button class="exam-grade-btn" data-exam-grade="' + g + '">' + g + '</button>'
             }).join('')
         + '</div>'
-        + '<div id="exam-inactive-msg" style="display:none;padding:14px;border-radius:12px;background:var(--bg-2,#FFF6FB);font-size:.88rem;color:var(--ink-soft,#6A5560);margin-bottom:16px;"></div>'
-        + '<div id="exam-subject-list" style="display:none;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:16px;"></div>'
-        + '<button id="exam-panel-close" style="padding:10px 24px;border-radius:30px;border:none;background:var(--pink-soft,#FFE3F1);color:var(--pink,#E60D85);font-weight:700;cursor:pointer;">關閉</button>'
+        + '<div id="exam-inactive-msg" style="display:none;padding:16px 20px;border-radius:14px;background:var(--bg-2,#FFF6FB);font-size:.875rem;color:var(--ink-soft,#6A5560);margin-bottom:20px;line-height:1.6;"></div>'
+        + '<div id="exam-subject-list" style="display:none;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:20px;"></div>'
+        + '<button id="exam-panel-close" style="padding:11px 32px;border-radius:30px;border:none;background:var(--pink-soft,#FFE3F1);color:var(--pink,#E60D85);font-weight:700;cursor:pointer;font-size:.95rem;">關閉</button>'
       + '</div>'
 
     document.body.appendChild(panel)
@@ -219,10 +231,10 @@
     panel.addEventListener('click', function(e) {
       if (e.target === panel) panel.style.display = 'none'
     })
-    panel.querySelectorAll('[data-exam-grade]').forEach(function(btn) {
+    panel.querySelectorAll('.exam-grade-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        panel.querySelectorAll('[data-exam-grade]').forEach(function(b) { b.style.background = '#fff' })
-        btn.style.background = 'var(--pink-soft,#FFE3F1)'
+        panel.querySelectorAll('.exam-grade-btn').forEach(function(b) { b.classList.remove('selected') })
+        btn.classList.add('selected')
         loadExamReview(btn.dataset.examGrade)
       })
     })
@@ -304,7 +316,7 @@
         e.preventDefault()
         e.stopImmediatePropagation()
         if (window.minaWidget && window.minaWidget.openToNode) {
-          window.minaWidget.openToNode('root')
+          window.minaWidget.openToNode('quiz_welcome')
         } else if (window.minaWidget && window.minaWidget.open) {
           window.minaWidget.open()
         } else {
@@ -331,6 +343,26 @@
         }
       })
     }
+
+    /* Mina widget 選完科目/年級後，同步篩選題庫 */
+    document.addEventListener('minaQuizFilter', function(e) {
+      var subj = e.detail && e.detail.subject
+      var gradeCode = e.detail && e.detail.grade
+      var gradeNum = gradeCode ? gradeCode.replace('grade_', '') : null
+      if (subj) {
+        document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active') })
+        var tabEl = document.querySelector('.tab[data-subj="' + subj + '"]')
+        if (tabEl) tabEl.classList.add('active')
+      }
+      if (gradeNum) {
+        document.querySelectorAll('.grade').forEach(function(g) { g.classList.remove('active') })
+        var gradeEl = document.querySelector('.grade[data-g="' + gradeNum + '"]')
+        if (gradeEl) gradeEl.classList.add('active')
+      }
+      fetchQuestions(false)
+      var qcards = document.getElementById('qcards')
+      if (qcards) setTimeout(function() { qcards.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, 600)
+    })
   }
 
   function init() {
@@ -339,7 +371,9 @@
     initialized = true
     ensureStyles()
     bindAll()
-    fetchQuestions(false)
+    /* 不自動載入題目，等使用者點選年級或科目後再觸發 */
+    var c = getContainer()
+    if (c) c.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:40px 20px;font-size:.95rem;">請選擇上方年級與科目，開始練習 😊</p>'
   }
 
   /* Bundler detection:
