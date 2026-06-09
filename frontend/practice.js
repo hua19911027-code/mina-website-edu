@@ -49,13 +49,35 @@
       '.q-opt.correct .q-opt-lbl{color:#16A34A;}',
       '.q-correct-tag{margin-left:auto;font-size:12px;color:#16A34A;font-weight:600;}',
       /* exam overlay */
-      '.exam-grade-btn{padding:14px 0;border-radius:14px;border:2px solid var(--pink-soft,#FFE3F1);background:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:background .18s,border-color .18s,color .18s;color:var(--ink,#241019);}',
-      '.exam-grade-btn:hover{background:var(--pink-soft,#FFE3F1);border-color:var(--pink,#E60D85);}',
-      '.exam-grade-btn.selected{background:var(--pink,#E60D85);border-color:var(--pink,#E60D85);color:#fff;}',
-      '.exam-subj-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 28px;border-radius:18px;border:2.5px solid var(--pink-soft,#FFE3F1);background:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:background .18s,border-color .18s,transform .15s;color:var(--ink,#241019);min-width:110px;}',
-      '.exam-subj-btn:hover{transform:translateY(-3px);border-color:var(--pink,#E60D85);background:var(--pink-soft,#FFE3F1);}',
-      '.exam-subj-btn .subj-icon{font-size:2rem;line-height:1;}',
-      '.exam-subj-btn .subj-label{font-size:.85rem;color:var(--ink-mute,#A593A0);}',
+      '#exam-grade-section{animation:examFadeIn .22s ease both;}',
+      '@keyframes examFadeIn{from{opacity:0}to{opacity:1}}',
+      '.exam-dialog{animation:examSlideUp .26s cubic-bezier(.34,1.4,.64,1) both;}',
+      '@keyframes examSlideUp{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}',
+      /* grade buttons — 6 cells, each with its own accent color */
+      '.exam-grade-btn{position:relative;padding:16px 0 14px;border-radius:16px;border:2.5px solid transparent;font-size:1rem;font-weight:900;cursor:pointer;transition:transform .18s,box-shadow .18s;color:#fff;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:3px;}',
+      '.exam-grade-btn .eg-num{font-family:var(--fred,"Fredoka",sans-serif);font-size:1.6rem;line-height:1;font-weight:700;}',
+      '.exam-grade-btn .eg-lbl{font-size:.7rem;letter-spacing:.5px;opacity:.85;font-weight:600;}',
+      '.exam-grade-btn:hover{transform:translateY(-4px) scale(1.04);box-shadow:0 10px 24px -8px rgba(0,0,0,.25);}',
+      '.exam-grade-btn.selected{box-shadow:0 0 0 3px #fff, 0 0 0 5px currentColor;transform:scale(1.04);}',
+      '.exam-grade-btn:nth-child(1){background:linear-gradient(135deg,#FF6BA8,#E60D85);}',
+      '.exam-grade-btn:nth-child(2){background:linear-gradient(135deg,#FF9A3C,#EE7700);}',
+      '.exam-grade-btn:nth-child(3){background:linear-gradient(135deg,#FFD726,#F0A800);color:#241019;}',
+      '.exam-grade-btn:nth-child(3) .eg-lbl{opacity:.7;}',
+      '.exam-grade-btn:nth-child(4){background:linear-gradient(135deg,#4ECDC4,#0EA89E);}',
+      '.exam-grade-btn:nth-child(5){background:linear-gradient(135deg,#A78BFA,#7C3AED);}',
+      '.exam-grade-btn:nth-child(6){background:linear-gradient(135deg,#FB7185,#E11D48);}',
+      /* subject list */
+      '.exam-subj-btn{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 20px 16px;border-radius:20px;border:none;font-size:1rem;font-weight:800;cursor:pointer;transition:transform .2s,box-shadow .2s;overflow:hidden;min-width:120px;flex:1 1 calc(33% - 10px);max-width:160px;}',
+      '.exam-subj-btn:hover{transform:translateY(-5px);box-shadow:0 12px 28px -8px rgba(0,0,0,.25);}',
+      '.exam-subj-btn .subj-icon{font-size:2.4rem;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.15));}',
+      '.exam-subj-btn .subj-name{font-size:1.05rem;font-weight:900;}',
+      '.exam-subj-btn .subj-label{font-size:.78rem;font-weight:500;opacity:.75;}',
+      '.exam-subj-btn.s-en{background:linear-gradient(145deg,#FFE3F1,#FFC8E6);color:#8F0048;}',
+      '.exam-subj-btn.s-ma{background:linear-gradient(145deg,#FFF0D6,#FFD99A);color:#7A3D00;}',
+      '.exam-subj-btn.s-chi{background:linear-gradient(145deg,#E8F4FD,#BAE0FF);color:#054A79;}',
+      '.exam-subj-btn.s-sci{background:linear-gradient(145deg,#E8F5E9,#A5D6A7);color:#1B5E20;}',
+      '.exam-subj-btn.s-soc{background:linear-gradient(145deg,#F3E8FF,#D5B3FF);color:#4A1080;}',
+      '.exam-subj-btn.s-other{background:linear-gradient(145deg,#FFF9E6,#FFEEA0);color:#5A4500;}',
     ].join('')
     ;(document.head || document.documentElement).appendChild(s)
   }
@@ -175,24 +197,33 @@
         var inactiveMsg  = document.getElementById('exam-inactive-msg')
         var subjectList  = document.getElementById('exam-subject-list')
         var gradeGrid = document.getElementById('exam-grade-grid')
+        var backBtn   = document.getElementById('exam-back-btn')
         if (gradeGrid) gradeGrid.style.display = 'none'
+        if (backBtn)   backBtn.style.display = 'inline-flex'
         if (!json.data.active) {
           if (inactiveMsg) {
             inactiveMsg.style.display = 'block'
-            inactiveMsg.textContent = '現在還不是考試季，先好好休息一下吧！😴 考前複習卷會在段考前一週的週六中午開放，到時候再來找我喔～🌟'
+            inactiveMsg.innerHTML = '😴 <b>現在不是考試季</b><br>複習卷會在段考前一週的週六中午開放<br>到時候再來找我喔～ 🌟'
           }
           return
         }
         if (!subjectList) return
         subjectList.style.display = 'flex'
         subjectList.innerHTML = ''
-        var SUBJ_ICONS = { '英文': '📘', '數學': '📐' }
+        var SUBJ_META = {
+          '英文': { icon: '📘', cls: 's-en' },
+          '數學': { icon: '📐', cls: 's-ma' },
+          '國語': { icon: '✏️', cls: 's-chi' },
+          '自然': { icon: '🔬', cls: 's-sci' },
+          '社會': { icon: '🌍', cls: 's-soc' }
+        }
         ;(json.data.items || []).forEach(function(item) {
+          var meta = SUBJ_META[item.subject] || { icon: '📄', cls: 's-other' }
           var btn = document.createElement('button')
-          btn.className = 'exam-subj-btn'
-          btn.innerHTML = '<span class="subj-icon">' + (SUBJ_ICONS[item.subject] || '📄') + '</span>'
-            + '<span>' + item.subject + '</span>'
-            + '<span class="subj-label">點此下載 PDF</span>'
+          btn.className = 'exam-subj-btn ' + meta.cls
+          btn.innerHTML = '<span class="subj-icon">' + meta.icon + '</span>'
+            + '<span class="subj-name">' + esc(item.subject) + '</span>'
+            + '<span class="subj-label">⬇ 下載 PDF 複習卷</span>'
           btn.addEventListener('click', function() { window.open(item.pdfUrl, '_blank') })
           subjectList.appendChild(btn)
         })
@@ -207,20 +238,37 @@
 
     var panel = document.createElement('div')
     panel.id = 'exam-grade-section'
-    panel.style.cssText = 'display:none;position:fixed;inset:0;z-index:9000;background:rgba(20,8,16,.55);align-items:center;justify-content:center;backdrop-filter:blur(2px);'
+    panel.style.cssText = 'display:none;position:fixed;inset:0;z-index:9000;background:rgba(20,8,16,.6);align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px;'
     panel.innerHTML =
-      '<div style="background:#fff;border-radius:28px;padding:36px 32px 28px;max-width:420px;width:92%;text-align:center;box-shadow:0 32px 80px -20px rgba(0,0,0,.35);">'
-        + '<div style="width:48px;height:48px;border-radius:16px;background:var(--pink,#E60D85);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.5rem;">📌</div>'
-        + '<h3 style="margin:0 0 6px;font-size:1.3rem;font-weight:900;color:var(--ink,#241019);">選擇年級</h3>'
-        + '<p style="margin:0 0 24px;font-size:.875rem;color:var(--ink-mute,#A593A0);line-height:1.5;">複習卷於段考前週六中午開放<br>選擇年級後即可下載 PDF 複習卷</p>'
+      '<div class="exam-dialog" style="background:#fff;border-radius:32px;padding:32px 28px 28px;max-width:460px;width:100%;text-align:center;box-shadow:0 40px 100px -20px rgba(0,0,0,.4);position:relative;">'
+        /* decorative blobs */
+        + '<div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:var(--pink-soft,#FFE3F1);opacity:.7;pointer-events:none;"></div>'
+        + '<div style="position:absolute;bottom:-16px;left:-16px;width:60px;height:60px;border-radius:50%;background:var(--yellow-soft,#FFF7C2);opacity:.8;pointer-events:none;"></div>'
+        /* header */
+        + '<div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--pink-soft,#FFE3F1),#FFD5EE);border-radius:30px;padding:6px 16px 6px 8px;margin-bottom:16px;">'
+          + '<span style="font-size:1.2rem;">📌</span>'
+          + '<span style="font-size:.8rem;font-weight:700;color:var(--pink,#E60D85);letter-spacing:.3px;">EXAM REVIEW</span>'
+        + '</div>'
+        + '<h3 style="margin:0 0 6px;font-size:1.4rem;font-weight:900;color:var(--ink,#241019);letter-spacing:-.3px;">選擇你的年級</h3>'
+        + '<p style="margin:0 0 24px;font-size:.85rem;color:var(--ink-mute,#A593A0);line-height:1.6;">段考前週六中午開放複習卷<br>點選年級，找到你的科目 👇</p>'
+        /* grade grid */
         + '<div id="exam-grade-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">'
-          + ['小一','小二','小三','小四','小五','小六'].map(function(g) {
-              return '<button class="exam-grade-btn" data-exam-grade="' + g + '">' + g + '</button>'
+          + [['小一','1'],['小二','2'],['小三','3'],['小四','4'],['小五','5'],['小六','6']].map(function(pair) {
+              return '<button class="exam-grade-btn" data-exam-grade="' + pair[0] + '">'
+                + '<span class="eg-num">' + pair[1] + '</span>'
+                + '<span class="eg-lbl">' + pair[0] + '</span>'
+              + '</button>'
             }).join('')
         + '</div>'
-        + '<div id="exam-inactive-msg" style="display:none;padding:16px 20px;border-radius:14px;background:var(--bg-2,#FFF6FB);font-size:.875rem;color:var(--ink-soft,#6A5560);margin-bottom:20px;line-height:1.6;"></div>'
-        + '<div id="exam-subject-list" style="display:none;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:20px;"></div>'
-        + '<button id="exam-panel-close" style="padding:11px 32px;border-radius:30px;border:none;background:var(--pink-soft,#FFE3F1);color:var(--pink,#E60D85);font-weight:700;cursor:pointer;font-size:.95rem;">關閉</button>'
+        /* inactive message */
+        + '<div id="exam-inactive-msg" style="display:none;padding:16px 20px;border-radius:16px;background:linear-gradient(135deg,var(--yellow-soft,#FFF7C2),#FFFAE8);font-size:.875rem;color:#6A4F00;margin-bottom:20px;line-height:1.7;border:1.5px solid #FFE68A;"></div>'
+        /* subject list */
+        + '<div id="exam-subject-list" style="display:none;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;"></div>'
+        /* bottom row: back + close */
+        + '<div style="display:flex;gap:10px;justify-content:center;align-items:center;">'
+          + '<button id="exam-back-btn" style="display:none;padding:12px 20px;border-radius:30px;border:1.5px solid var(--line,#F2D9E7);background:#fff;color:var(--ink-soft,#6A5560);font-weight:700;cursor:pointer;font-size:.9rem;">← 重選年級</button>'
+          + '<button id="exam-panel-close" style="padding:12px 36px;border-radius:30px;border:none;background:var(--pink-soft,#FFE3F1);color:var(--pink,#E60D85);font-weight:800;cursor:pointer;font-size:.95rem;letter-spacing:.2px;">關閉</button>'
+        + '</div>'
       + '</div>'
 
     document.body.appendChild(panel)
@@ -230,6 +278,17 @@
     })
     panel.addEventListener('click', function(e) {
       if (e.target === panel) panel.style.display = 'none'
+    })
+    panel.querySelector('#exam-back-btn').addEventListener('click', function() {
+      var gradeGrid   = panel.querySelector('#exam-grade-grid')
+      var subjectList = panel.querySelector('#exam-subject-list')
+      var inactiveMsg = panel.querySelector('#exam-inactive-msg')
+      var backBtn     = panel.querySelector('#exam-back-btn')
+      if (gradeGrid)   gradeGrid.style.display = 'grid'
+      if (subjectList) { subjectList.style.display = 'none'; subjectList.innerHTML = '' }
+      if (inactiveMsg) inactiveMsg.style.display = 'none'
+      if (backBtn)     backBtn.style.display = 'none'
+      panel.querySelectorAll('.exam-grade-btn').forEach(function(b) { b.classList.remove('selected') })
     })
     panel.querySelectorAll('.exam-grade-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -280,12 +339,16 @@
         e.stopImmediatePropagation()
         var panel = ensureExamPanel()
         panel.style.display = 'flex'
-        /* reset inactive/subject state */
+        /* reset to grade selection state */
+        var gradeGrid   = panel.querySelector('#exam-grade-grid')
         var inactiveMsg = panel.querySelector('#exam-inactive-msg')
         var subjectList = panel.querySelector('#exam-subject-list')
+        var backBtn     = panel.querySelector('#exam-back-btn')
+        if (gradeGrid)   gradeGrid.style.display = 'grid'
         if (inactiveMsg) inactiveMsg.style.display = 'none'
         if (subjectList) { subjectList.style.display = 'none'; subjectList.innerHTML = '' }
-        panel.querySelectorAll('[data-exam-grade]').forEach(function(b) { b.style.background = '#fff' })
+        if (backBtn)     backBtn.style.display = 'none'
+        panel.querySelectorAll('.exam-grade-btn').forEach(function(b) { b.classList.remove('selected') })
       })
     } else {
       console.warn('practice.js: .qbanner.b-review not found')
