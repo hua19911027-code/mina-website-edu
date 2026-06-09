@@ -13,6 +13,27 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/svg+xml" href="/assets/logo/zhuoyue-logo.svg">
 <meta name="theme-color" content="#E60D85">
+<style>
+/* mini practice widget */
+.hp-prac{max-width:640px;margin:0 auto 28px;}
+.hp-prac-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;}
+.hp-prac-row:first-child{margin-bottom:10px;}
+.hp-btn{padding:8px 20px;border-radius:30px;font-size:14px;font-weight:700;color:var(--ink-soft,#6B546A);background:#fff;border:2px solid var(--pink-soft,#FFE3F1);cursor:pointer;transition:.18s;font-family:var(--sans);}
+.hp-btn.active{background:var(--pink,#E8007D);color:#fff;border-color:var(--pink,#E8007D);}
+.hp-btn:hover:not(.active){border-color:var(--pink,#E8007D);color:var(--pink,#E8007D);}
+/* q-opt (needed since practice.js not loaded here) */
+.q-meta{font-size:12px;color:var(--pink,#E8007D);font-weight:500;}
+.q-opts{display:flex;flex-direction:column;gap:5px;margin:12px 0 4px;}
+.q-opt{display:flex;align-items:center;gap:10px;padding:7px 14px;border-radius:10px;border:1.5px solid var(--pink-soft,#FFE3F1);background:var(--bg-2,#FFF6FB);font-size:14px;}
+.q-opt-lbl{font-weight:700;min-width:18px;color:#bbb;}
+.q-correct-tag{display:none;}
+.qcard[open] .q-opt.correct{border-color:#22c55e;background:rgba(34,197,94,.08);}
+.qcard[open] .q-opt.correct .q-opt-lbl{color:#16A34A;}
+.qcard[open] .q-correct-tag{display:inline;margin-left:auto;font-size:12px;color:#16A34A;font-weight:600;}
+.q-ans-inline{display:flex;align-items:center;gap:8px;margin:6px 0 14px;}
+.q-ans-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;background:#22c55e;color:#fff;font-weight:900;font-size:.85rem;flex-shrink:0;}
+.q-ans-val{font-size:1rem;font-weight:800;color:#14532d;}
+</style>
 </head>
 <body data-screen-label="首頁">
 
@@ -129,22 +150,31 @@
     <div class="wrap">
       <div class="sec-head center reveal">
         <span class="kicker">✦ Free Practice</span>
-        <h2 class="sec-h">考前題庫，免費玩中學</h2>
-        <p class="sec-lead">挑科目、選題型，把最常錯的觀念一次弄懂，考前兩週最有感！</p>
+        <h2 class="sec-h">題庫練習</h2>
+        <p class="sec-lead">挑年級、選科目、選題型，把最常錯的觀念一次弄懂！</p>
       </div>
       <div class="reveal">
-        <div class="tabs" id="tabs">
-          <button class="tab active" data-subj="en">英文</button>
-          <button class="tab" data-subj="ma">數學</button>
+        <div class="hp-prac">
+          <div class="hp-prac-row">
+            <button class="hp-btn hp-grade active" data-grade="1-2">小1</button>
+            <button class="hp-btn hp-grade" data-grade="1-2">小2</button>
+            <button class="hp-btn hp-grade" data-grade="3-4">小3</button>
+            <button class="hp-btn hp-grade" data-grade="3-4">小4</button>
+            <button class="hp-btn hp-grade" data-grade="5-6">小5</button>
+            <button class="hp-btn hp-grade" data-grade="5-6">小6</button>
+          </div>
+          <div class="hp-prac-row">
+            <button class="hp-btn hp-subj active" data-subj="en">英文</button>
+            <button class="hp-btn hp-subj" data-subj="ma">數學</button>
+          </div>
+          <div class="hp-prac-row">
+            <button class="hp-btn hp-type active" data-type="">標準題型</button>
+            <button class="hp-btn hp-type" data-type="觀念拆解">觀念拆解</button>
+            <button class="hp-btn hp-type" data-type="錯題診斷">錯題診斷</button>
+          </div>
         </div>
-        <div class="chips" id="chips">
-          <span class="chip active" data-chip="觀念拆解">觀念拆解</span>
-          <span class="chip" data-chip="錯題診斷">錯題診斷</span>
-          <span class="chip" data-chip="考前清單">考前清單</span>
-          <span class="chip" data-chip="資源整理">資源整理</span>
-        </div>
-        <div class="qcards" id="qcards"></div>
-        <p class="practice-note">這只是示意題庫。看更多請到 <b><a href="practice.html" style="color:var(--pink);border-bottom:2px solid var(--pink);">完整題庫練習 →</a></b></p>
+        <div class="qcards" id="hp-qcard"></div>
+        <p class="practice-note">看更多請到 <b><a href="practice.html" style="color:var(--pink);border-bottom:2px solid var(--pink);">完整題庫練習 →</a></b></p>
       </div>
     </div>
   </section>
@@ -226,6 +256,59 @@
   </div>
 </footer>
 
+<script>
+(function(){
+  var API = 'https://mina-api.hua19911027.workers.dev/api/v1';
+  var s = {grade:'1-2', subj:'en', type:''};
+  function esc(v){return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function load(){
+    var wrap = document.getElementById('hp-qcard');
+    if(!wrap) return;
+    wrap.innerHTML = '<div style="height:90px;background:var(--bg-2,#FFF6FB);border-radius:14px;animation:hpPulse 1.5s infinite"></div>';
+    if(!document.getElementById('hp-ks')){var ks=document.createElement('style');ks.id='hp-ks';ks.textContent='@keyframes hpPulse{0%,100%{opacity:1}50%{opacity:.45}}';document.head.appendChild(ks);}
+    var p = 'page=1&limit=1&grade='+encodeURIComponent(s.grade)+'&subject='+encodeURIComponent(s.subj)+(s.type?'&type='+encodeURIComponent(s.type):'');
+    fetch(API+'/practice?'+p)
+      .then(function(r){return r.json();})
+      .then(function(j){
+        if(!j.ok||!j.data||!j.data.questions||!j.data.questions.length){
+          wrap.innerHTML='<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:24px 0">此條件暫無題目，請換個選項試試。</p>';return;
+        }
+        var q=j.data.questions[0], LBL=['A','B','C','D','E'];
+        var opts=(q.options||[]).map(function(o,i){
+          var l=LBL[i],ok=(l===q.answer);
+          return '<div class="q-opt'+(ok?' correct':'')+'"><span class="q-opt-lbl">'+l+'</span><span>'+esc(o)+'</span>'+(ok?'<span class="q-correct-tag">✓ 正解</span>':'')+'</div>';
+        }).join('');
+        var ai=LBL.indexOf(q.answer), av=(q.options&&ai>=0)?q.options[ai]:'';
+        var exp=q.explanation||{};if(typeof exp==='string')exp={concept:exp};
+        var gl=s.grade==='1-2'?'小一/小二':s.grade==='3-4'?'小三/小四':'小五/小六';
+        var sl=s.subj==='en'?'英文':'數學';
+        wrap.innerHTML='<details class="qcard" style="max-width:760px;margin:0 auto">'
+          +'<summary><span class="qnum">1</span><span style="flex:1"><span class="q-meta">'+gl+' &middot; '+sl+(q.type?' &middot; '+esc(q.type):'')+'</span><br>'+esc(q.question)+'</span><span class="plus">+</span></summary>'
+          +'<div style="padding:0 24px 20px"><div class="q-opts">'+opts+'</div>'
+          +'<div class="qbody"><div class="qseg ok"><span class="st">&#10003; 正確觀念</span>'
+          +'<div class="q-ans-inline"><span class="q-ans-badge">'+esc(q.answer)+'</span><span class="q-ans-val">'+esc(av)+'</span></div>'
+          +(exp.concept?'<span class="sx">'+esc(exp.concept)+'</span>':'')
+          +'</div>'
+          +(exp.commonMistake?'<div class="qseg err"><span class="st">&#10007; 常見錯誤</span><span class="sx">'+esc(exp.commonMistake)+'</span></div>':'')
+          +(exp.memoryTip?'<div class="qseg tip"><span class="st">&#9733; 記憶提示</span><span class="sx">'+esc(exp.memoryTip)+'</span></div>':'')
+          +'</div></div></details>';
+      })
+      .catch(function(){wrap.innerHTML='<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:24px 0">載入失敗，請稍後再試。</p>';});
+  }
+  function bind(cls, key){
+    document.querySelectorAll('.'+cls).forEach(function(b){
+      b.addEventListener('click',function(){
+        document.querySelectorAll('.'+cls).forEach(function(x){x.classList.remove('active');});
+        b.classList.add('active');
+        s[key]=b.dataset[key==='subj'?'subj':key==='type'?'type':'grade'];
+        load();
+      });
+    });
+  }
+  bind('hp-grade','grade'); bind('hp-subj','subj'); bind('hp-type','type');
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',load);}else{load();}
+})();
+</script>
 <script src="site.js"></script>
 <script src="components/mina-widget.js"></script>
 </body>
