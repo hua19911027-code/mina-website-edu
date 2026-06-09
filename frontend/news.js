@@ -195,6 +195,40 @@
     if (!slug) { window.location.replace('news.html'); return; }
     initShareButtons();
     loadArticle(slug);
+    loadRelated(slug);
+  }
+
+  function loadRelated(currentSlug) {
+    var wrap = document.getElementById('related-list');
+    if (!wrap) return;
+    fetch(API_BASE + '/api/v1/news?page=1&limit=4')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.ok || !data.data || !data.data.articles) return;
+        var items = data.data.articles
+          .filter(function (a) { return a.slug !== currentSlug; })
+          .slice(0, 3);
+        if (!items.length) return;
+        wrap.innerHTML = items.map(function (a) {
+          var catCls = CAT_CLASS[a.category] || '';
+          var emoji  = CAT_EMOJI[a.category] || '📰';
+          return '<a class="ncard reveal" href="news-single.html?slug=' + encodeURIComponent(a.slug) + '">' +
+            '<div class="nc-cover ' + catCls + '">' +
+              (a.coverImage
+                ? '<img src="' + a.coverImage + '" alt="' + a.title + '" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display=\'none\'">'
+                : '<span class="nc-ico">' + emoji + '</span>') +
+            '</div>' +
+            '<div class="nc-body">' +
+              '<div class="nc-meta"><span class="nc-cat ' + catCls + '">' + a.category + '</span>' +
+              '<span class="nc-date">' + formatDate(a.publishedAt) + '</span></div>' +
+              '<h3>' + a.title + '</h3>' +
+              '<p class="nc-excerpt">' + truncate(a.excerpt, 60) + '</p>' +
+              '<span class="nc-more">閱讀更多 →</span>' +
+            '</div>' +
+            '</a>';
+        }).join('');
+      })
+      .catch(function () { /* 保留原靜態佔位不動 */ });
   }
 
   function initShareButtons() {
