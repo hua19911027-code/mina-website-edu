@@ -212,7 +212,7 @@
         wrap.innerHTML = items.map(function (a) {
           var catCls = CAT_CLASS[a.category] || '';
           var emoji  = CAT_EMOJI[a.category] || '📰';
-          return '<a class="ncard reveal" href="news-single.html?slug=' + encodeURIComponent(a.slug) + '">' +
+          return '<a class="ncard reveal in" href="news-single.html?slug=' + encodeURIComponent(a.slug) + '">' +
             '<div class="nc-cover ' + catCls + '">' +
               (a.coverImage
                 ? '<img src="' + a.coverImage + '" alt="' + a.title + '" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display=\'none\'">'
