@@ -44,10 +44,18 @@
       '.q-title{font-size:16px;font-weight:700;margin:4px 0 8px;}',
       '.q-opts{display:flex;flex-direction:column;gap:5px;margin-top:4px;}',
       '.q-opt{display:flex;align-items:center;gap:10px;padding:7px 14px;border-radius:10px;border:1.5px solid var(--pink-soft,#FFE3F1);background:var(--bg-2,#FFF6FB);font-size:14px;}',
-      '.q-opt.correct{border-color:#22c55e;background:rgba(34,197,94,.08);}',
+      /* closed: correct option looks identical to others (no spoiler) */
       '.q-opt-lbl{font-weight:700;min-width:18px;color:#bbb;}',
-      '.q-opt.correct .q-opt-lbl{color:#16A34A;}',
-      '.q-correct-tag{margin-left:auto;font-size:12px;color:#16A34A;font-weight:600;}',
+      '.q-correct-tag{display:none;}',
+      /* open: reveal correct option */
+      '.qcard[open] .q-opt.correct{border-color:#22c55e;background:rgba(34,197,94,.08);}',
+      '.qcard[open] .q-opt.correct .q-opt-lbl{color:#16A34A;}',
+      '.qcard[open] .q-correct-tag{display:inline;margin-left:auto;font-size:12px;color:#16A34A;font-weight:600;}',
+      /* answer reveal row in qbody */
+      '.q-ans-row{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(34,197,94,.04));border:1.5px solid #86efac;margin-bottom:14px;}',
+      '.q-ans-badge{width:34px;height:34px;border-radius:10px;background:#22c55e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;flex-shrink:0;}',
+      '.q-ans-text{font-size:.8rem;color:#15803d;font-weight:700;margin-bottom:2px;letter-spacing:.2px;}',
+      '.q-ans-val{font-size:1rem;font-weight:800;color:#14532d;}',
       /* exam overlay */
       '#exam-grade-section{animation:examFadeIn .22s ease both;}',
       '@keyframes examFadeIn{from{opacity:0}to{opacity:1}}',
@@ -97,6 +105,12 @@
     }).join('')
 
     var exp = q.explanation || {}
+    /* find correct option value for the answer reveal row */
+    var LABELS = ['A','B','C','D']
+    var answerIdx = LABELS.indexOf(String(q.answer || '').toUpperCase())
+    var answerVal = answerIdx >= 0 && q.options ? q.options[answerIdx] : ''
+    var answerLbl = answerIdx >= 0 ? LABELS[answerIdx] : String(q.answer || '')
+
     var card = document.createElement('details')
     card.className = 'qcard'
     card.innerHTML =
@@ -110,6 +124,13 @@
         + '<span class="plus">+</span>'
       + '</summary>'
       + '<div class="qbody">'
+        + '<div class="q-ans-row">'
+          + '<div class="q-ans-badge">' + esc(answerLbl) + '</div>'
+          + '<div>'
+            + '<div class="q-ans-text">✓ 正確答案</div>'
+            + '<div class="q-ans-val">' + esc(answerVal) + '</div>'
+          + '</div>'
+        + '</div>'
         + '<div class="qseg ok"><span class="st">&#10003; 正確觀念</span><span class="sx">' + esc(exp.concept || '') + '</span></div>'
         + '<div class="qseg err"><span class="st">&#10007; 常見錯誤</span><span class="sx">' + esc(exp.commonMistake || '') + '</span></div>'
         + '<div class="qseg tip"><span class="st">&#9733; 記憶提示</span><span class="sx">' + esc(exp.memoryTip || '') + '</span></div>'
