@@ -1,333 +1,346 @@
-/* practice.js — Mina 題庫 API 整合層
- * 卡片使用 bundler 模板原有 CSS class（不新增 HTML 結構）
- * 新行為：選項 ABCD 預設顯示；+ 按鈕只展開三塊解析
- * 容器 #qcards；篩選 .grade[data-g]、.tab[data-subj]、.chip[data-chip]
- */
 ;(function () {
-  'use strict';
+  'use strict'
 
-  var API_BASE = 'https://mina-api.hua19911027.workers.dev/api/v1';
-  var page     = 1;
-  var loaded   = 0;
-  var LIMIT    = 12;
-  var MAX      = 36;
-  var initialized = false;
+  var API_BASE = 'https://mina-api.hua19911027.workers.dev/api/v1'
+  var page = 1
+  var loaded = 0
+  var LIMIT = 12
+  var MAX = 36
+  var initialized = false
 
-  /* 年級 data-g → API 值 */
-  var GRADE_MAP = { '1':'小一','2':'小二','3':'小三','4':'小四','5':'小五','6':'小六' };
-  /* 科目 data-subj → API 值 */
-  var SUBJ_MAP  = { 'en':'英文','ma':'數學' };
+  var GRADE_MAP = { '1':'小一','2':'小二','3':'小三','4':'小四','5':'小五','6':'小六' }
+  var SUBJ_MAP  = { 'en':'英文','ma':'數學' }
 
-  /* ── HTML 轉義 ── */
   function esc(s) {
     return String(s || '')
       .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
   }
 
-  /* ── 讀取當前篩選條件 ── */
-  function getFilters() {
-    var gEl = document.querySelector('.grade.active');
-    var sEl = document.querySelector('.tab.active');
-    var tEl = document.querySelector('.chip.active');
-    return {
-      grade:   gEl ? (GRADE_MAP[gEl.dataset.g]   || gEl.dataset.g)   : '',
-      subject: sEl ? (SUBJ_MAP[sEl.dataset.subj] || sEl.dataset.subj) : '',
-      type:    tEl ? (tEl.dataset.chip || '')                          : ''
-    };
-  }
-
-  /* ── 注入動態樣式（解析區塊 toggle 用）── */
-  function ensureStyles() {
-    if (document.getElementById('pjs-styles')) return;
-    var s = document.createElement('style');
-    s.id = 'pjs-styles';
-    s.textContent = [
-      /* 選項區塊：預設顯示，不套 <details> 折疊 */
-      '.pjs-card{background:#fff;border:2px solid var(--pink-soft,#FFE3F1);border-radius:20px;overflow:hidden;margin-bottom:14px;transition:.25s}',
-      '.pjs-card:hover{box-shadow:0 20px 44px -20px rgba(184,0,95,.22)}',
-      '.pjs-head{display:flex;align-items:flex-start;gap:12px;padding:16px 20px 12px}',
-      '.pjs-num{flex-shrink:0;width:32px;height:32px;border-radius:50%;background:var(--pink,#E60D85);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700}',
-      '.pjs-body{flex:1;min-width:0}',
-      '.pjs-badge{display:inline-block;font-size:.72rem;color:var(--ink-mute,#A593A0);background:var(--bg-2,#FFF6FB);border-radius:4px;padding:1px 6px;margin-bottom:5px}',
-      '.pjs-q{display:block;font-weight:600;font-size:.92rem;line-height:1.55;color:var(--ink,#241019)}',
-      '.pjs-toggle{flex-shrink:0;width:30px;height:30px;border-radius:50%;border:none;background:var(--pink-soft,#FFE3F1);color:var(--pink,#E60D85);font-size:1.25rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;margin-top:2px}',
-      '.pjs-toggle:hover{background:var(--pink,#E60D85);color:#fff}',
-      '.pjs-toggle[aria-expanded="true"]{background:var(--pink,#E60D85);color:#fff;transform:rotate(45deg)}',
-      /* 選項：永遠顯示 */
-      '.pjs-opts{padding:0 20px 14px;display:flex;flex-direction:column;gap:6px}',
-      '.pjs-opt{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;border:1.5px solid var(--line,#F2D9E7);background:var(--bg-2,#FFF6FB);font-size:.875rem}',
-      '.pjs-opt.correct{border-color:#22c55e;background:rgba(34,197,94,.08)}',
-      '.pjs-letter{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--line,#F2D9E7);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700}',
-      '.pjs-opt.correct .pjs-letter{background:#22c55e;color:#fff}',
-      '.pjs-badge-ans{margin-left:auto;font-size:.72rem;font-weight:700;color:#22c55e}',
-      /* 解析：預設隱藏，toggle 展開 */
-      '.pjs-exp{padding:0 20px 16px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line,#F2D9E7)}',
-      '.pjs-seg{padding:10px 14px;border-radius:10px;font-size:.85rem;line-height:1.6}',
-      '.pjs-seg.ok{background:rgba(34,197,94,.07)}.pjs-seg.ok .pjs-st{color:#16a34a}',
-      '.pjs-seg.err{background:rgba(239,68,68,.07)}.pjs-seg.err .pjs-st{color:#dc2626}',
-      '.pjs-seg.tip{background:rgba(234,179,8,.08)}.pjs-seg.tip .pjs-st{color:#a16207}',
-      '.pjs-st{font-size:.72rem;font-weight:700;display:block;margin-bottom:3px}',
-      '.pjs-sx{color:var(--ink-soft,#6A5560)}'
-    ].join('');
-    (document.head || document.documentElement).appendChild(s);
-  }
-
-  /* ── 建立一張題目卡片 ── */
-  function buildCard(q, n) {
-    var labels  = ['A','B','C','D'];
-    var optRows = (q.options || []).map(function(o, i) {
-      var lbl     = labels[i] || String(i + 1);
-      var correct = (lbl === q.answer);
-      return '<div class="pjs-opt' + (correct ? ' correct' : '') + '">'
-        + '<span class="pjs-letter">' + lbl + '</span>'
-        + '<span>' + esc(o) + '</span>'
-        + (correct ? '<span class="pjs-badge-ans">✓ 正解</span>' : '')
-        + '</div>';
-    }).join('');
-
-    var badge = esc(q.grade) + ' · ' + esc(q.subject) + (q.type ? ' · ' + esc(q.type) : '');
-    var expId  = 'pjs-exp-' + n;
-
-    return '<div class="pjs-card">'
-      /* 標頭：題號、標籤、題目、toggle 按鈕 */
-      + '<div class="pjs-head">'
-        + '<span class="pjs-num">' + n + '</span>'
-        + '<div class="pjs-body">'
-          + '<span class="pjs-badge">' + badge + '</span>'
-          + '<span class="pjs-q">' + esc(q.question) + '</span>'
-        + '</div>'
-        + '<button class="pjs-toggle" aria-expanded="false" aria-controls="' + expId + '" aria-label="展開解析">+</button>'
-      + '</div>'
-      /* 選項：永遠可見 */
-      + '<div class="pjs-opts">' + optRows + '</div>'
-      /* 解析：預設隱藏 */
-      + '<div class="pjs-exp" id="' + expId + '" hidden>'
-        + '<div class="pjs-seg ok"><span class="pjs-st">✓ 正確觀念</span><span class="pjs-sx">' + esc(q.explanation.concept) + '</span></div>'
-        + '<div class="pjs-seg err"><span class="pjs-st">✕ 常見錯誤</span><span class="pjs-sx">' + esc(q.explanation.commonMistake) + '</span></div>'
-        + '<div class="pjs-seg tip"><span class="pjs-st">★ 記憶提示</span><span class="pjs-sx">' + esc(q.explanation.memoryTip) + '</span></div>'
-      + '</div>'
-    + '</div>';
-  }
-
-  /* ── 題目清單容器 ── */
   function getContainer() {
     return document.getElementById('qcards')
-      || document.getElementById('question-list')
-      || document.querySelector('.question-list');
   }
 
-  /* ── 呼叫題庫 API ── */
-  function fetchQuestions(isMore) {
-    var container = getContainer();
-    if (!container) return;
-
-    if (!isMore) {
-      page = 1; loaded = 0;
-      container.innerHTML = '';
+  function getFilters() {
+    var gEl = document.querySelector('.grade.active')
+    var sEl = document.querySelector('.tab.active')
+    var tEl = document.querySelector('.chip.active')
+    return {
+      grade:   gEl ? (GRADE_MAP[gEl.dataset.g]   || gEl.dataset.g   || '') : '',
+      subject: sEl ? (SUBJ_MAP[sEl.dataset.subj] || sEl.dataset.subj || '') : '',
+      type:    tEl ? (tEl.dataset.chip || '') : ''
     }
+  }
 
-    var f = getFilters();
-    var p = { page: isMore ? page + 1 : 1, limit: LIMIT };
-    if (f.grade)   p.grade   = f.grade;
-    if (f.subject) p.subject = f.subject;
-    if (f.type)    p.type    = f.type;
+  /* Inject CSS for the option rows and explanation sections */
+  function ensureStyles() {
+    if (document.getElementById('pjs-styles')) return
+    var s = document.createElement('style')
+    s.id = 'pjs-styles'
+    s.textContent = [
+      '.qcard summary{align-items:flex-start!important;}',
+      '.q-sum-body{flex:1;display:flex;flex-direction:column;gap:4px;}',
+      '.q-meta{font-size:12px;color:var(--pink,#E8007D);font-weight:500;}',
+      '.q-title{font-size:16px;font-weight:700;margin:4px 0 8px;}',
+      '.q-opts{display:flex;flex-direction:column;gap:5px;margin-top:4px;}',
+      '.q-opt{display:flex;align-items:center;gap:10px;padding:7px 14px;border-radius:10px;border:1.5px solid var(--pink-soft,#FFE3F1);background:var(--bg-2,#FFF6FB);font-size:14px;}',
+      '.q-opt.correct{border-color:#22c55e;background:rgba(34,197,94,.08);}',
+      '.q-opt-lbl{font-weight:700;min-width:18px;color:#bbb;}',
+      '.q-opt.correct .q-opt-lbl{color:#16A34A;}',
+      '.q-correct-tag{margin-left:auto;font-size:12px;color:#16A34A;font-weight:600;}',
+    ].join('')
+    ;(document.head || document.documentElement).appendChild(s)
+  }
 
-    /* skeleton */
+  /* Build one question card using the bundler template's .qcard (details) structure */
+  function appendCard(q, n) {
+    var container = getContainer()
+    if (!container) return
+
+    var optHtml = ['A','B','C','D'].map(function(lbl, i) {
+      var ok = (lbl === q.answer)
+      return '<div class="q-opt' + (ok ? ' correct' : '') + '">'
+        + '<span class="q-opt-lbl">' + lbl + '</span>'
+        + '<span>' + esc(q.options[i] != null ? q.options[i] : '') + '</span>'
+        + (ok ? '<span class="q-correct-tag">&#10003; 正解</span>' : '')
+        + '</div>'
+    }).join('')
+
+    var exp = q.explanation || {}
+    var card = document.createElement('details')
+    card.className = 'qcard'
+    card.innerHTML =
+      '<summary>'
+        + '<span class="qnum">' + n + '</span>'
+        + '<div class="q-sum-body">'
+          + '<span class="q-meta">' + esc(q.grade) + ' &middot; ' + esc(q.subject) + (q.type ? ' &middot; ' + esc(q.type) : '') + '</span>'
+          + '<span class="q-title">' + esc(q.question) + '</span>'
+          + '<div class="q-opts">' + optHtml + '</div>'
+        + '</div>'
+        + '<span class="plus">+</span>'
+      + '</summary>'
+      + '<div class="qbody">'
+        + '<div class="qseg ok"><span class="st">&#10003; 正確觀念</span><span class="sx">' + esc(exp.concept || '') + '</span></div>'
+        + '<div class="qseg err"><span class="st">&#10007; 常見錯誤</span><span class="sx">' + esc(exp.commonMistake || '') + '</span></div>'
+        + '<div class="qseg tip"><span class="st">&#9733; 記憶提示</span><span class="sx">' + esc(exp.memoryTip || '') + '</span></div>'
+      + '</div>'
+
+    container.appendChild(card)
+  }
+
+  function clearList() {
+    var c = getContainer()
+    if (c) c.innerHTML = ''
+  }
+
+  function fetchQuestions(isMore) {
+    if (!isMore) { page = 1; loaded = 0; clearList() }
+    var f = getFilters()
+    var reqPage = isMore ? page + 1 : 1
+    var params = 'page=' + reqPage + '&limit=' + LIMIT
+    if (f.grade)   params += '&grade='   + encodeURIComponent(f.grade)
+    if (f.subject) params += '&subject=' + encodeURIComponent(f.subject)
+    if (f.type)    params += '&type='    + encodeURIComponent(f.type)
+
+    /* skeleton while loading */
     if (!isMore) {
-      container.innerHTML = [1,2,3].map(function() {
-        return '<div style="height:80px;background:var(--bg-2,#FFF6FB);border-radius:14px;margin-bottom:12px;animation:pjsPulse 1.5s infinite"></div>';
-      }).join('');
-      if (!document.getElementById('pjs-pulse')) {
-        var ks = document.createElement('style');
-        ks.id = 'pjs-pulse';
-        ks.textContent = '@keyframes pjsPulse{0%,100%{opacity:1}50%{opacity:.45}}';
-        document.head && document.head.appendChild(ks);
+      clearList()
+      var container = getContainer()
+      if (container) {
+        container.innerHTML = [1,2,3].map(function() {
+          return '<div style="height:80px;background:var(--bg-2,#FFF6FB);border-radius:14px;margin-bottom:12px;animation:pjsPulse 1.5s infinite"></div>'
+        }).join('')
+        if (!document.getElementById('pjs-pulse')) {
+          var ks = document.createElement('style')
+          ks.id = 'pjs-pulse'
+          ks.textContent = '@keyframes pjsPulse{0%,100%{opacity:1}50%{opacity:.45}}'
+          ;(document.head || document.documentElement).appendChild(ks)
+        }
       }
     }
 
-    fetch(API_BASE + '/practice?' + new URLSearchParams(p))
-      .then(function(r) { return r.json(); })
+    fetch(API_BASE + '/practice?' + params)
+      .then(function(r) { return r.json() })
       .then(function(json) {
-        if (!isMore) container.innerHTML = '';
+        if (!isMore) clearList()
         if (!json.ok) {
-          container.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:30px">載入失敗，請稍後再試。</p>';
-          return;
+          var c = getContainer()
+          if (c) c.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:30px">載入失敗，請稍後再試。</p>'
+          return
         }
-        var qs = json.data.questions || [];
+        var qs = json.data.questions || []
         if (!isMore && !qs.length) {
-          container.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:30px">目前沒有符合條件的題目 😊</p>';
-          return;
+          var c = getContainer()
+          if (c) c.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:30px">目前沒有符合條件的題目 &#128522;</p>'
+          return
         }
-        qs.forEach(function(q, i) {
-          container.insertAdjacentHTML('beforeend', buildCard(q, loaded + i + 1));
-        });
+        qs.forEach(function(q, i) { appendCard(q, loaded + i + 1) })
+        loaded += qs.length
+        page = json.data.page
 
-        /* 綁定 toggle 按鈕 */
-        container.querySelectorAll('.pjs-toggle').forEach(function(btn) {
-          if (btn.dataset.bound) return;
-          btn.dataset.bound = '1';
-          btn.addEventListener('click', function() {
-            var open   = btn.getAttribute('aria-expanded') === 'true';
-            var target = document.getElementById(btn.getAttribute('aria-controls') || '');
-            btn.setAttribute('aria-expanded', String(!open));
-            if (target) target.hidden = open;
-          });
-        });
+        var dateEl = document.querySelector('.last-updated,[data-last-updated]')
+        if (dateEl && json.data.lastUpdated)
+          dateEl.textContent = '最後更新：' + json.data.lastUpdated.slice(0,10).replace(/-/g,'/')
 
-        loaded += qs.length;
-        page = json.data.page;
-
-        /* 最後更新日期 */
-        if (json.data.lastUpdated) {
-          var el = document.querySelector('.last-updated,[data-last-updated],[id="last-updated"]');
-          if (el) el.textContent = '最後更新：' + json.data.lastUpdated.slice(0,10).replace(/-/g,'/');
-        }
-
-        /* 載入更多 / Archive CTA */
-        var moreBtn    = document.getElementById('load-more-btn') || document.querySelector('[data-load-more]');
-        var archiveCta = document.getElementById('archive-cta')   || document.querySelector('[data-archive-cta]');
+        var moreBtn    = document.getElementById('load-more-btn')    || document.querySelector('[data-load-more]')
+        var archiveCta = document.getElementById('archive-cta')      || document.querySelector('[data-archive-cta]')
         if (!json.data.hasMore || loaded >= MAX) {
-          if (moreBtn)    moreBtn.style.display    = 'none';
-          if (loaded >= MAX && archiveCta) archiveCta.style.display = '';
+          if (moreBtn) moreBtn.style.display = 'none'
+          if (loaded >= MAX && archiveCta) archiveCta.style.display = ''
         } else {
-          if (moreBtn) moreBtn.style.display = '';
+          if (moreBtn) moreBtn.style.display = ''
         }
       })
       .catch(function(e) {
-        console.error('fetchQuestions:', e);
-        container.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:30px">載入失敗，請稍後再試。</p>';
-      });
+        console.error('fetchQuestions:', e)
+        var c = getContainer()
+        if (c) c.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:30px">載入失敗，請稍後再試。</p>'
+      })
   }
 
-  /* ── 考前複習 ── */
   function loadExamReview(grade) {
     fetch(API_BASE + '/practice/exam-review?grade=' + encodeURIComponent(grade))
-      .then(function(r) { return r.json(); })
+      .then(function(r) { return r.json() })
       .then(function(json) {
-        if (!json.ok) return;
-        var inactive = document.getElementById('exam-inactive-msg') || document.querySelector('[data-exam-inactive]');
-        var list     = document.getElementById('exam-subject-list') || document.querySelector('[data-exam-subjects]');
-        var wrap     = document.getElementById('exam-result-wrap');
-        if (wrap) wrap.style.display = 'block';
+        if (!json.ok) return
+        var gradeSection = document.getElementById('exam-grade-section')
+        var inactiveMsg  = document.getElementById('exam-inactive-msg')
+        var subjectList  = document.getElementById('exam-subject-list')
+        if (gradeSection) gradeSection.style.display = 'none'
         if (!json.data.active) {
-          if (inactive) inactive.style.display = 'block';
-          return;
+          if (inactiveMsg) {
+            inactiveMsg.style.display = 'block'
+            inactiveMsg.textContent = '現在還不是考試季，先好好休息一下吧！😴 考前複習卷會在段考前一週的週六中午開放，到時候再來找我喔～🌟'
+          }
+          return
         }
-        if (!list) return;
-        list.innerHTML = '';
-        (json.data.items || []).forEach(function(item) {
-          list.insertAdjacentHTML('beforeend',
-            '<button class="exam-subj-btn" onclick="window.open(\'' + esc(item.pdfUrl) + '\',\'_blank\')">'
-            + '<span class="exam-subj-icon">📄</span><span>' + esc(item.subject) + '</span>'
-            + '<span class="exam-subj-dl">下載 PDF</span></button>');
-        });
+        if (!subjectList) return
+        subjectList.style.display = 'flex'
+        subjectList.innerHTML = ''
+        ;(json.data.items || []).forEach(function(item) {
+          var btn = document.createElement('button')
+          btn.textContent = item.subject
+          btn.className = 'exam-subject-btn'
+          btn.addEventListener('click', function() { window.open(item.pdfUrl, '_blank') })
+          subjectList.appendChild(btn)
+        })
       })
-      .catch(function(e) { console.error('loadExamReview:', e); });
+      .catch(function(e) { console.error('loadExamReview:', e) })
   }
 
-  /* ── 綁定所有互動元素 ── */
+  /* Create exam grade picker panel dynamically (not in bundler template) */
+  function ensureExamPanel() {
+    var existing = document.getElementById('exam-grade-section')
+    if (existing) return existing
+
+    var panel = document.createElement('div')
+    panel.id = 'exam-grade-section'
+    panel.style.cssText = 'display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;'
+    panel.innerHTML =
+      '<div style="background:#fff;border-radius:24px;padding:32px 28px;max-width:400px;width:90%;text-align:center;box-shadow:0 24px 60px -16px rgba(0,0,0,.3);">'
+        + '<h3 style="margin:0 0 8px;font-size:1.25rem;color:var(--ink,#241019);">選擇年級</h3>'
+        + '<p style="margin:0 0 20px;font-size:.9rem;color:var(--ink-mute,#A593A0);">複習卷於段考前週六中午開放</p>'
+        + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">'
+          + ['小一','小二','小三','小四','小五','小六'].map(function(g) {
+              return '<button data-exam-grade="' + g + '" style="padding:12px 0;border-radius:12px;border:2px solid var(--pink-soft,#FFE3F1);background:#fff;font-size:.95rem;font-weight:700;cursor:pointer;transition:.2s;">' + g + '</button>'
+            }).join('')
+        + '</div>'
+        + '<div id="exam-inactive-msg" style="display:none;padding:14px;border-radius:12px;background:var(--bg-2,#FFF6FB);font-size:.88rem;color:var(--ink-soft,#6A5560);margin-bottom:16px;"></div>'
+        + '<div id="exam-subject-list" style="display:none;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:16px;"></div>'
+        + '<button id="exam-panel-close" style="padding:10px 24px;border-radius:30px;border:none;background:var(--pink-soft,#FFE3F1);color:var(--pink,#E60D85);font-weight:700;cursor:pointer;">關閉</button>'
+      + '</div>'
+
+    document.body.appendChild(panel)
+
+    panel.querySelector('#exam-panel-close').addEventListener('click', function() {
+      panel.style.display = 'none'
+    })
+    panel.addEventListener('click', function(e) {
+      if (e.target === panel) panel.style.display = 'none'
+    })
+    panel.querySelectorAll('[data-exam-grade]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        panel.querySelectorAll('[data-exam-grade]').forEach(function(b) { b.style.background = '#fff' })
+        btn.style.background = 'var(--pink-soft,#FFE3F1)'
+        loadExamReview(btn.dataset.examGrade)
+      })
+    })
+
+    return panel
+  }
+
   function bindAll() {
-    /* 年級：.grade[data-g] — toggle（再點取消） */
+    /* 年級 .grade[data-g] — toggle deselect */
     document.querySelectorAll('.grade').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        var was = btn.classList.contains('active');
-        document.querySelectorAll('.grade').forEach(function(b) { b.classList.remove('active'); });
-        if (!was) btn.classList.add('active');
-        fetchQuestions(false);
-      });
-    });
+        var was = btn.classList.contains('active')
+        document.querySelectorAll('.grade').forEach(function(b) { b.classList.remove('active') })
+        if (!was) btn.classList.add('active')
+        fetchQuestions(false)
+      })
+    })
 
-    /* 科目：.tab[data-subj] — 互斥 */
+    /* 科目 .tab[data-subj] — 互斥 */
     document.querySelectorAll('.tab').forEach(function(tab) {
       tab.addEventListener('click', function() {
-        document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-        tab.classList.add('active');
-        fetchQuestions(false);
-      });
-    });
+        document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active') })
+        tab.classList.add('active')
+        fetchQuestions(false)
+      })
+    })
 
-    /* 題型：.chip[data-chip] — toggle */
+    /* 題型 .chip[data-chip] — toggle deselect */
     document.querySelectorAll('.chip').forEach(function(chip) {
       chip.addEventListener('click', function() {
-        var was = chip.classList.contains('active');
-        document.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('active'); });
-        if (!was) chip.classList.add('active');
-        fetchQuestions(false);
-      });
-    });
+        var was = chip.classList.contains('active')
+        document.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('active') })
+        if (!was) chip.classList.add('active')
+        fetchQuestions(false)
+      })
+    })
 
-    /* 考前複習 — 年級按鈕 */
-    document.querySelectorAll('.exam-grade-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.exam-grade-btn').forEach(function(b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        loadExamReview(btn.dataset.grade || btn.textContent.trim());
-      });
-    });
+    /* 考前複習 banner — 開啟年級選擇面板 */
+    var examBanner = document.querySelector('.qbanner.b-review')
+    if (examBanner) {
+      examBanner.addEventListener('click', function(e) {
+        e.preventDefault()
+        e.stopImmediatePropagation()
+        var panel = ensureExamPanel()
+        panel.style.display = 'flex'
+        /* reset inactive/subject state */
+        var inactiveMsg = panel.querySelector('#exam-inactive-msg')
+        var subjectList = panel.querySelector('#exam-subject-list')
+        if (inactiveMsg) inactiveMsg.style.display = 'none'
+        if (subjectList) { subjectList.style.display = 'none'; subjectList.innerHTML = '' }
+        panel.querySelectorAll('[data-exam-grade]').forEach(function(b) { b.style.background = '#fff' })
+      })
+    } else {
+      console.warn('practice.js: .qbanner.b-review not found')
+    }
 
-    /* 考前複習 — 入口按鈕 */
-    var entryBtn = document.getElementById('exam-entry-btn');
-    if (entryBtn) {
-      entryBtn.addEventListener('click', function() {
-        var sec = document.getElementById('exam-review-section');
-        if (sec) { sec.style.display = 'block'; sec.scrollIntoView({ behavior:'smooth', block:'start' }); }
-        entryBtn.style.display = 'none';
-      });
+    /* Mina 小幫手 btn-w — 開啟 widget */
+    var widgetBtn = document.querySelector('.btn-w')
+    if (widgetBtn) {
+      widgetBtn.addEventListener('click', function(e) {
+        e.preventDefault()
+        e.stopImmediatePropagation()
+        if (window.minaWidget && window.minaWidget.openToNode) {
+          window.minaWidget.openToNode('root')
+        } else if (window.minaWidget && window.minaWidget.open) {
+          window.minaWidget.open()
+        } else {
+          console.warn('practice.js: window.minaWidget not available')
+        }
+      })
+    } else {
+      console.warn('practice.js: .btn-w not found')
     }
 
     /* 載入更多 */
-    var moreBtn = document.getElementById('load-more-btn') || document.querySelector('[data-load-more]');
+    var moreBtn = document.getElementById('load-more-btn') || document.querySelector('[data-load-more]')
     if (moreBtn) {
-      moreBtn.addEventListener('click', function() { fetchQuestions(true); });
+      moreBtn.addEventListener('click', function() { fetchQuestions(true) })
     }
 
-    /* Archive CTA */
-    var archBtn = document.getElementById('open-archive-btn') || document.querySelector('[data-open-archive]');
-    if (archBtn) {
-      archBtn.addEventListener('click', function() {
+    /* Archive CTA → widget archive 流程 */
+    var archiveBtn = document.getElementById('open-archive-btn') || document.querySelector('[data-open-archive]')
+    if (archiveBtn) {
+      archiveBtn.addEventListener('click', function(e) {
+        e.preventDefault()
         if (window.minaWidget && window.minaWidget.openToNode) {
-          window.minaWidget.openToNode('archive_welcome');
+          window.minaWidget.openToNode('archive_welcome')
         }
-      });
+      })
     }
   }
 
-  /* ── 初始化（確保只執行一次）── */
   function init() {
-    if (initialized) return;
-    if (!getContainer()) return;
-    initialized = true;
-    ensureStyles();
-    bindAll();
-    fetchQuestions(false);
+    if (initialized) return
+    if (!getContainer()) return
+    initialized = true
+    ensureStyles()
+    bindAll()
+    fetchQuestions(false)
   }
 
-  /* ── 啟動策略 ──
-   * 打包版 bundler 用 document.open/write/close 替換整份文件
-   * 替換後 DOMContentLoaded 不會再次觸發，需以 MutationObserver + setInterval 偵測
-   */
+  /* Bundler detection:
+   * The bundler uses document.open()/write()/close() to replace the entire document.
+   * After that, DOMContentLoaded does NOT re-fire for scripts from the old document.
+   * Solution: MutationObserver + setInterval polling for #qcards to appear. */
   if (getContainer()) {
-    /* 非 bundler 情境：直接等 DOMContentLoaded */
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
+      document.addEventListener('DOMContentLoaded', init)
     } else {
-      init();
+      init()
     }
   } else {
-    /* Bundler 情境：等待 #qcards 出現 */
     var obs = new MutationObserver(function() {
-      if (getContainer()) { obs.disconnect(); clearInterval(timer); init(); }
-    });
-    obs.observe(document.documentElement, { childList: true, subtree: true });
-
-    /* 輔助 polling（部分瀏覽器 document.write 後 MutationObserver target 失效） */
+      if (getContainer()) { obs.disconnect(); clearInterval(timer); init() }
+    })
+    obs.observe(document.documentElement, { childList: true, subtree: true })
     var timer = setInterval(function() {
-      if (getContainer()) { clearInterval(timer); obs.disconnect(); init(); }
-    }, 300);
-
-    /* 安全截止：30 秒後停止 polling */
-    setTimeout(function() { clearInterval(timer); obs.disconnect(); }, 30000);
+      if (getContainer()) { clearInterval(timer); obs.disconnect(); init() }
+    }, 300)
+    setTimeout(function() { clearInterval(timer); obs.disconnect() }, 30000)
   }
-
-})();
+})()
