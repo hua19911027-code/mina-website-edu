@@ -52,23 +52,13 @@
     {category:'營隊與特色課程',question:'不知道要選哪個課程怎麼辦？🤔',answer:'直接找我們聊聊！老師最擅長幫家長一起分析孩子需求 ❤️'},
   ];
 
-  var API_BASE = 'https://mina-api.hua19911027.workers.dev';
   var allFaqs = [];
   var curCat = '全部';
 
-  /* ── FAQ fetch and render ── */
+  /* ── FAQ load — V1 uses local data directly ── */
   function loadFaq() {
-    fetch(API_BASE + '/api/v1/faq')
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        var faqs = (data.data && data.data.faqs) || [];
-        allFaqs = faqs.length ? faqs : FAQ_LOCAL;
-        renderFAQ();
-      })
-      .catch(function () {
-        allFaqs = FAQ_LOCAL;
-        renderFAQ();
-      });
+    allFaqs = FAQ_LOCAL;
+    renderFAQ();
   }
 
   function renderFAQ() {
