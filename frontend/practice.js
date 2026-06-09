@@ -166,7 +166,8 @@
         var gradeSection = document.getElementById('exam-grade-section')
         var inactiveMsg  = document.getElementById('exam-inactive-msg')
         var subjectList  = document.getElementById('exam-subject-list')
-        if (gradeSection) gradeSection.style.display = 'none'
+        var gradeGrid = document.getElementById('exam-grade-grid')
+        if (gradeGrid) gradeGrid.style.display = 'none'
         if (!json.data.active) {
           if (inactiveMsg) {
             inactiveMsg.style.display = 'block'
@@ -195,12 +196,12 @@
 
     var panel = document.createElement('div')
     panel.id = 'exam-grade-section'
-    panel.style.cssText = 'display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;'
+    panel.style.cssText = 'display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.45);align-items:center;justify-content:center;'
     panel.innerHTML =
       '<div style="background:#fff;border-radius:24px;padding:32px 28px;max-width:400px;width:90%;text-align:center;box-shadow:0 24px 60px -16px rgba(0,0,0,.3);">'
         + '<h3 style="margin:0 0 8px;font-size:1.25rem;color:var(--ink,#241019);">選擇年級</h3>'
         + '<p style="margin:0 0 20px;font-size:.9rem;color:var(--ink-mute,#A593A0);">複習卷於段考前週六中午開放</p>'
-        + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">'
+        + '<div id="exam-grade-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">'
           + ['小一','小二','小三','小四','小五','小六'].map(function(g) {
               return '<button data-exam-grade="' + g + '" style="padding:12px 0;border-radius:12px;border:2px solid var(--pink-soft,#FFE3F1);background:#fff;font-size:.95rem;font-weight:700;cursor:pointer;transition:.2s;">' + g + '</button>'
             }).join('')
@@ -276,6 +277,24 @@
       })
     } else {
       console.warn('practice.js: .qbanner.b-review not found')
+    }
+
+    /* 歷屆題庫 banner — 開啟 widget 切到 archive 流程 */
+    var pastBanner = document.querySelector('.qbanner.b-past')
+    if (pastBanner) {
+      pastBanner.addEventListener('click', function(e) {
+        e.preventDefault()
+        e.stopImmediatePropagation()
+        if (window.minaWidget && window.minaWidget.openToNode) {
+          window.minaWidget.openToNode('archive_welcome')
+        } else if (window.minaWidget && window.minaWidget.open) {
+          window.minaWidget.open()
+        } else {
+          console.warn('practice.js: window.minaWidget not available')
+        }
+      })
+    } else {
+      console.warn('practice.js: .qbanner.b-past not found')
     }
 
     /* Mina 小幫手 btn-w — 開啟 widget */
