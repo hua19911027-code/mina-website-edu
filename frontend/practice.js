@@ -7,7 +7,7 @@
   var MAX_QUESTIONS = 36;
 
   var state = {
-    subject: '',
+    subject: '英文',
     grade: '',
     type: '',
     page: 1,
@@ -158,29 +158,39 @@
 
   /* ── Filter UI ── */
   function initFilters() {
-    document.querySelectorAll('.subj-tab').forEach(function (tab) {
+    document.querySelectorAll('.tab').forEach(function (tab) {
       tab.addEventListener('click', function () {
-        document.querySelectorAll('.subj-tab').forEach(function (t) { t.classList.remove('active'); });
+        document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
         tab.classList.add('active');
         state.subject = tab.dataset.val;
         loadQuestions(false);
       });
     });
 
-    document.querySelectorAll('.grade-chip').forEach(function (chip) {
+    document.querySelectorAll('.grade').forEach(function (chip) {
       chip.addEventListener('click', function () {
-        document.querySelectorAll('.grade-chip').forEach(function (c) { c.classList.remove('active'); });
-        chip.classList.add('active');
-        state.grade = chip.dataset.val;
+        var wasActive = chip.classList.contains('active');
+        document.querySelectorAll('.grade').forEach(function (c) { c.classList.remove('active'); });
+        if (!wasActive) {
+          chip.classList.add('active');
+          state.grade = chip.dataset.val;
+        } else {
+          state.grade = '';
+        }
         loadQuestions(false);
       });
     });
 
-    document.querySelectorAll('.type-chip').forEach(function (chip) {
+    document.querySelectorAll('.chip').forEach(function (chip) {
       chip.addEventListener('click', function () {
-        document.querySelectorAll('.type-chip').forEach(function (c) { c.classList.remove('active'); });
-        chip.classList.add('active');
-        state.type = chip.dataset.val;
+        var wasActive = chip.classList.contains('active');
+        document.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('active'); });
+        if (!wasActive) {
+          chip.classList.add('active');
+          state.type = chip.dataset.val;
+        } else {
+          state.type = '';
+        }
         loadQuestions(false);
       });
     });

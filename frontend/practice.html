@@ -14,28 +14,43 @@
 <meta name="theme-color" content="#E60D85">
 <link rel="stylesheet" href="components/mina-widget.css"/>
 <style>
-/* ── Filter Tabs & Chips ── */
-.subj-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
-.subj-tab {
-  padding:8px 20px; border-radius:var(--r-pill); border:2px solid var(--border);
-  background:var(--bg-card); color:var(--ink-mute); font-weight:600; cursor:pointer;
-  transition:all .2s;
+/* ── Question Panel ── */
+.qpanel {
+  max-width:680px; margin:0 auto 34px; background:#fff;
+  border:2px solid var(--pink-soft); border-radius:28px;
+  padding:0 22px 24px; box-shadow:0 22px 48px -26px rgba(230,13,133,.42);
 }
-.subj-tab.active, .subj-tab:hover {
-  background:var(--brand); color:#fff; border-color:var(--brand);
+.qp-head { display:flex; justify-content:center; transform:translateY(-50%); margin-bottom:-6px; }
+.weekly-badge {
+  display:inline-flex; align-items:center; gap:9px;
+  background:var(--pink); color:#fff; font-weight:900;
+  font-size:14px; letter-spacing:.5px; padding:9px 22px;
+  border-radius:30px; box-shadow:0 12px 22px -10px rgba(230,13,133,.7);
+  border:3px solid #fff;
 }
-.chip-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
-.grade-chip, .type-chip {
-  padding:5px 14px; border-radius:var(--r-pill); border:1.5px solid var(--border);
-  background:var(--bg-2); color:var(--ink-mute); font-size:.85rem; font-weight:500; cursor:pointer;
-  transition:all .2s;
+.weekly-badge .wb-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--yellow); animation:wbpulse 1.8s infinite;
 }
-.grade-chip.active, .type-chip.active,
-.grade-chip:hover, .type-chip:hover {
-  background:var(--brand-soft); color:var(--brand); border-color:var(--brand);
+@keyframes wbpulse {
+  0%   { box-shadow:0 0 0 0 rgba(251,213,38,.7); }
+  70%  { box-shadow:0 0 0 8px rgba(251,213,38,0); }
+  100% { box-shadow:0 0 0 0 rgba(251,213,38,0); }
 }
-/* ── Filter labels ── */
-.filter-label { font-size:.78rem; color:var(--ink-mute); margin-bottom:4px; font-weight:600; letter-spacing:.04em; }
+.grades {
+  display:grid; grid-template-columns:repeat(6,1fr); gap:5px;
+  background:var(--yellow-soft); border-radius:16px; padding:5px; margin-bottom:16px;
+}
+.grade {
+  padding:11px 0; border-radius:12px; font-size:15px; font-weight:700;
+  color:var(--ink-soft); background:none; border:none; cursor:pointer;
+  font-family:var(--sans); transition:.2s; text-align:center;
+}
+.grade.active { background:var(--orange); color:#fff; box-shadow:0 7px 14px -6px rgba(238,119,0,.6); }
+.grade:hover:not(.active) { background:#fff; }
+.qp-filters { display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:4px; }
+.qp-filters .tabs { margin:0; }
+.qp-filters .chips { margin:0; }
 
 /* ── Last updated ── */
 #last-updated { font-size:.8rem; color:var(--ink-mute); margin-bottom:20px; }
@@ -202,29 +217,28 @@
     <div class="wrap">
 
       <!-- Filters -->
-      <div style="margin-bottom:24px;">
-        <p class="filter-label">科目</p>
-        <div class="subj-tabs">
-          <button class="subj-tab active" data-val="">全科</button>
-          <button class="subj-tab" data-val="英文">英文</button>
-          <button class="subj-tab" data-val="數學">數學</button>
+      <div class="qpanel">
+        <div class="qp-head">
+          <div class="weekly-badge"><span class="wb-dot"></span>每週六換新題庫</div>
         </div>
-        <p class="filter-label">年級</p>
-        <div class="chip-row">
-          <button class="grade-chip active" data-val="">全年級</button>
-          <button class="grade-chip" data-val="小一">小一</button>
-          <button class="grade-chip" data-val="小二">小二</button>
-          <button class="grade-chip" data-val="小三">小三</button>
-          <button class="grade-chip" data-val="小四">小四</button>
-          <button class="grade-chip" data-val="小五">小五</button>
-          <button class="grade-chip" data-val="小六">小六</button>
+        <div class="grades" id="gradeRow">
+          <button class="grade" data-val="小一">小一</button>
+          <button class="grade" data-val="小二">小二</button>
+          <button class="grade" data-val="小三">小三</button>
+          <button class="grade" data-val="小四">小四</button>
+          <button class="grade" data-val="小五">小五</button>
+          <button class="grade" data-val="小六">小六</button>
         </div>
-        <p class="filter-label">題型</p>
-        <div class="chip-row">
-          <button class="type-chip active" data-val="">全部題型</button>
-          <button class="type-chip" data-val="標準題型">標準題型</button>
-          <button class="type-chip" data-val="觀念拆解">觀念拆解</button>
-          <button class="type-chip" data-val="錯題診斷">錯題診斷</button>
+        <div class="qp-filters">
+          <div class="tabs" id="tabs">
+            <button class="tab active" data-val="英文">英文</button>
+            <button class="tab" data-val="數學">數學</button>
+          </div>
+          <div class="chips" id="chips">
+            <span class="chip" data-val="標準題型">標準題型</span>
+            <span class="chip" data-val="觀念拆解">觀念拆解</span>
+            <span class="chip" data-val="錯題診斷">錯題診斷</span>
+          </div>
         </div>
       </div>
 
