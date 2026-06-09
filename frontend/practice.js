@@ -371,9 +371,7 @@
     initialized = true
     ensureStyles()
     bindAll()
-    /* 不自動載入題目，等使用者點選年級或科目後再觸發 */
-    var c = getContainer()
-    if (c) c.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:40px 20px;font-size:.95rem;">請選擇上方年級與科目，開始練習 😊</p>'
+    fetchQuestions(false)
   }
 
   /* Bundler detection:
