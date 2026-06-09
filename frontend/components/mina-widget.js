@@ -186,12 +186,10 @@
         "id": "faq_welcome", "type": "options",
         "text": "嗨！我是 Mina 😊\n有什麼問題，我幫你找答案！",
         "options": [
-          { "label": "📚 課程相關",     "next": "course_welcome" },
-          { "label": "🗓️ 試聽 / 報名", "next": "faq_trial" },
-          { "label": "📍 地點交通",     "next": "faq_location" },
-          { "label": "🏠 安親生活",     "next": "ans_afterschool" },
-          { "label": "💰 課程規劃與費用","next": "global_pricing" },
-          { "label": "❓ 其他問題",     "next": "global_contact" }
+          { "label": "怎麼預約試聽？😊",    "next": "home_trial" },
+          { "label": "孩子適合哪個班？📚",  "next": "home_find_course" },
+          { "label": "有安親班嗎？🎒",      "next": "ans_afterschool" },
+          { "label": "離旭光國小遠嗎？🚶",  "next": "faq_location" }
         ]
       },
       "faq_trial": {
