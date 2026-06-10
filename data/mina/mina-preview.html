@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Mina 小幫手 互動預覽</title>
+<style>
+:root {
+  --pink: #E60D85;
+  --pink-d: #b8005f;
+  --pink-bg: #fff0f8;
+  --yellow: #FBD526;
+  --green: #00B900;
+  --blue: #4285F4;
+  --text: #1a1a1a;
+  --text2: #555;
+  --border: #e8e8e8;
+  --bg: #f4f4f6;
+  --white: #fff;
+  --r: 16px;
+  --shadow: 0 4px 32px rgba(0,0,0,0.09);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'PingFang TC', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  padding: 24px 16px 40px;
+}
+
+/* ── TOP BAR ── */
+.top-bar {
+  max-width: 520px;
+  margin: 0 auto 20px;
+}
+.top-bar h1 {
+  font-size: 14px;
+  color: var(--text2);
+  margin-bottom: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.page-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.page-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 2px solid var(--border);
+  background: var(--white);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  transition: all .18s;
+}
+.page-pill:hover { border-color: var(--pink); color: var(--pink); }
+.page-pill.active {
+  border-color: var(--pink);
+  background: var(--pink-bg);
+  color: var(--pink);
+}
+
+/* ── WIDGET ── */
+.widget {
+  max-width: 520px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* header */
+.w-head {
+  background: var(--pink);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.w-av {
+  width: 38px; height: 38px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.w-info { color: #fff; }
+.w-name { font-size: 15px; font-weight: 700; }
+.w-status { font-size: 12px; opacity: .85; display: flex; align-items: center; gap: 5px; }
+.dot { width: 7px; height: 7px; background: #a8ffb8; border-radius: 50%; display: inline-block; }
+
+/* chat body */
+.w-chat {
+  padding: 20px 18px 8px;
+  min-height: 120px;
+  max-height: 420px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+/* bubble */
+.bubble-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  animation: fadeUp .25s ease;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.b-av {
+  width: 30px; height: 30px;
+  background: var(--pink);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff;
+  flex-shrink: 0; margin-top: 2px;
+}
+.b-text {
+  background: var(--pink-bg);
+  border-radius: 4px 14px 14px 14px;
+  padding: 11px 15px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+  max-width: 380px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* user choice bubble */
+.user-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  animation: fadeUp .2s ease;
+}
+.u-text {
+  background: var(--pink);
+  color: #fff;
+  border-radius: 14px 4px 14px 14px;
+  padding: 9px 14px;
+  font-size: 13px;
+  max-width: 280px;
+}
+
+/* options */
+.w-options {
+  padding: 6px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.opt-btn {
+  width: 100%;
+  text-align: left;
+  padding: 10px 15px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--white);
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text);
+  transition: all .15s;
+  font-family: inherit;
+}
+.opt-btn:hover {
+  border-color: var(--pink);
+  color: var(--pink);
+  background: var(--pink-bg);
+  transform: translateX(2px);
+}
+
+/* CTA */
+.w-cta {
+  padding: 0 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cta-btn {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  text-decoration: none;
+  transition: opacity .15s, transform .15s;
+}
+.cta-btn:hover { opacity: .88; transform: translateY(-1px); }
+.cta-trial { background: var(--pink); color: #fff; }
+.cta-line  { background: var(--green); color: #fff; }
+.cta-phone { background: var(--white); color: var(--text); border: 1.5px solid var(--border); }
+.cta-map   { background: var(--white); color: var(--blue); border: 1.5px solid var(--blue); }
+
+/* Article links */
+.w-articles {
+  padding: 0 18px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.art-lbl {
+  font-size: 11px;
+  color: var(--text2);
+  margin-bottom: 2px;
+  padding-left: 2px;
+}
+.art-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all .15s;
+}
+.art-link:hover { border-color: var(--pink); color: var(--pink); }
+
+/* divider */
+.w-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 18px 12px;
+}
+
+/* quiz result tag */
+.quiz-tag {
+  display: inline-block;
+  background: var(--yellow);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin: 0 18px 10px;
+}
+
+/* restart */
+.w-foot {
+  padding: 4px 18px 14px;
+  text-align: center;
+}
+.restart-btn {
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: inherit;
+}
+
+/* node path debug */
+.debug {
+  max-width: 520px;
+  margin: 10px auto 0;
+  font-size: 11px;
+  color: #aaa;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <h1>Mina 小幫手 ── 互動預覽（點選頁面切換入口）</h1>
+  <div class="page-pills" id="pagePills"></div>
+</div>
+
+<div class="widget" id="widget">
+  <div class="w-head">
+    <div class="w-av">M</div>
+    <div class="w-info">
+      <div class="w-name">Mina 小幫手</div>
+      <div class="w-status"><span class="dot"></span> 在線上</div>
+    </div>
+  </div>
+  <div class="w-chat" id="chat"></div>
+  <div id="interactive"></div>
+  <div class="w-foot">
+    <button class="restart-btn" onclick="restart()">↺ 重新開始</button>
+  </div>
+</div>
+
+<div class="debug" id="debug"></div>
+
+<script>
+const TREE = {
+  "meta": {
+    "version": "1.0.0",
+    "name": "mina-advisor-tree",
+    "updatedAt": "2026-06-07",
+    "rules": {
+      "maxDepth": 4,
+      "allowFreeInput": false,
+      "maxOptionsPerNode": 6
+    }
+  },
+  "global": {
+    "cta": {
+      "trial": {
+        "type": "trial",
+        "label": "📅 預約免費試聽",
+        "url": "/reservation"
+      },
+      "line": {
+        "type": "line",
+        "label": "💬 加 LINE 詢問",
+        "url": "#LINE_URL"
+      },
+      "phone": {
+        "type": "phone",
+        "label": "📞 直接電話聯絡",
+        "url": "tel:04-2336-6868"
+      },
+      "map": {
+        "type": "map",
+        "label": "📍 Google Maps 導航",
+        "url": "https://maps.app.goo.gl/aPqkAwvC9KkYAcSN9"
+      }
+    },
+    "articles": {
+      "english": {
+        "label": "📖 了解徐薇英文",
+        "url": "https://mina-website-edu.pages.dev/news-single?slug=hsuwei-english-education-concept"
+      },
+      "math": {
+        "label": "🔢 了解偉智數學",
+        "url": "https://mina-website-edu.pages.dev/news-single?slug=wisemath-thinking-learning"
+      },
+      "afterschool": {
+        "label": "🏠 了解安親班",
+        "url": "https://mina-website-edu.pages.dev/news-single?slug=excellent-after-school-care"
+      },
+      "camp": {
+        "label": "☀️ 查看夏令營課程",
+        "url": "https://mina-website-edu.pages.dev/news-single?slug=summer-camp-2026"
+      }
+    }
+  },
+  "flows": {
+    "homepage": "home_welcome",
+    "course": "course_welcome",
+    "about": "about_welcome",
+    "news": "news_welcome",
+    "faq": "faq_welcome",
+    "quiz": "quiz_welcome"
+  },
+  "nodes": {
+    "home_welcome": {
+      "id": "home_welcome",
+      "type": "options",
+      "text": "嗨～我是 Mina 😊
+先別急著找答案（誤 🤭）
+讓我用 30 秒幫你找到最適合孩子的方向！",
+      "options": [
+        {
+          "label": "找適合孩子的課程",
+          "next": "home_find_course"
+        },
+        {
+          "label": "課程規劃與費用",
+          "next": "global_pricing"
+        },
+        {
+          "label": "預約免費試聽",
+          "next": "home_trial"
+        },
+        {
+          "label": "安親服務",
+          "next": "ans_afterschool"
+        },
+        {
+          "label": "認識我們",
+          "next": "about_welcome"
+        },
+        {
+          "label": "聯絡老師",
+          "next": "global_contact"
+        }
+      ]
+    },
+    "home_find_course": {
+      "id": "home_find_course",
+      "type": "options",
+      "text": "孩子目前就讀？",
+      "options": [
+        {
+          "label": "🎒 國小 1–2 年級",
+          "next": "home_sub_e12"
+        },
+        {
+          "label": "📚 國小 3–4 年級",
+          "next": "home_sub_e34"
+        },
+        {
+          "label": "✏️ 國小 5–6 年級",
+          "next": "home_sub_e56"
+        },
+        {
+          "label": "🎯 國中",
+          "next": "home_sub_jh"
+        },
+        {
+          "label": "🌱 要升小一（暑假正音班）",
+          "next": "ans_zhengyin"
+        }
+      ]
+    },
+    "home_sub_e12": {
+      "id": "home_sub_e12",
+      "type": "options",
+      "text": "孩子最需要哪位神隊友？😊",
+      "options": [
+        {
+          "label": "📖 英文 UP學",
+          "next": "ans_en_e12"
+        },
+        {
+          "label": "🔢 數學 WISE",
+          "next": "ans_ma_e12"
+        },
+        {
+          "label": "🎒 安親服務",
+          "next": "ans_afterschool"
+        },
+        {
+          "label": "🤔 我也不確定，想聽建議",
+          "next": "unsure_concern_e12"
+        }
+      ]
+    },
+    "home_sub_e34": {
+      "id": "home_sub_e34",
+      "type": "options",
+      "text": "孩子最需要哪位神隊友？😊",
+      "options": [
+        {
+          "label": "📖 英文 UP學",
+          "next": "ans_en_e34"
+        },
+        {
+          "label": "🔢 數學 WISE",
+          "next": "ans_ma_e34"
+        },
+        {
+          "label": "🎒 安親服務",
+          "next": "ans_afterschool"
+        },
+        {
+          "label": "🤔 我也不確定，想聽建議",
+          "next": "unsure_concern_e34"
+        }
+      ]
+    },
+    "home_sub_e56": {
+      "id": "home_sub_e56",
+      "type": "options",
+      "text": "孩子最需要哪位神隊友？😊",
+      "options": [
+        {
+          "label": "📖 英文 UP學",
+          "next": "ans_en_e56"
+        },
+        {
+          "label": "🔢 數學 WISE",
+          "next": "ans_ma_e56"
+        },
+        {
+          "label": "🎒 安親服務",
+          "next": "ans_afterschool"
+        },
+        {
+          "label": "🤔 我也不確定，想聽建議",
+          "next": "unsure_concern_e56"
+        }
+      ]
+    },
+    "home_sub_jh": {
+      "id": "home_sub_jh",
+      "type": "options",
+      "text": "國中階段，孩子目前最需要加強？",
+      "options": [
+        {
+          "label": "📖 英文（有開設）",
+          "next": "ans_en_jh"
+        },
+        {
+          "label": "🔢 數學（想了解）",
+          "next": "ans_ma_jh"
+        },
+        {
+          "label": "🤔 我也不確定，想聽建議",
+          "next": "unsure_concern_jh"
+        }
+      ]
+    },
+    "home_trial": {
+      "id": "home_trial",
+      "type": "answer",
+      "text": "太好了！✨
+
+預約試聽，讓老師親自了解孩子——
+這是最準確的方式 😊
+
+可以直接填下方預約表單，
+習慣用 LINE 的話也可以直接找我們！
+
+🕐 LINE 回覆時間提醒：
+平日 13:30–19:30 回覆最快，
+其他時間也會看，但可能稍慢一點 😄",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ]
+    },
+    "course_welcome": {
+      "id": "course_welcome",
+      "type": "options",
+      "text": "嗨！看課程介紹，有什麼想多了解的？😊",
+      "options": [
+        {
+          "label": "📖 英文 UP學",
+          "next": "course_grade_en"
+        },
+        {
+          "label": "🔢 數學 WISE",
+          "next": "course_grade_ma"
+        },
+        {
+          "label": "🎒 安親課後",
+          "next": "ans_afterschool"
+        },
+        {
+          "label": "☀️ 暑假 / 正音課程",
+          "next": "global_camp_zhengyin"
+        },
+        {
+          "label": "🤔 我也不確定，想聽建議",
+          "next": "unsure_grade"
+        }
+      ]
+    },
+    "course_grade_en": {
+      "id": "course_grade_en",
+      "type": "options",
+      "text": "孩子目前幾年級呢？📚",
+      "options": [
+        {
+          "label": "🎒 國小 1–2 年級",
+          "next": "ans_en_e12"
+        },
+        {
+          "label": "📚 國小 3–4 年級",
+          "next": "ans_en_e34"
+        },
+        {
+          "label": "✏️ 國小 5–6 年級",
+          "next": "ans_en_e56"
+        },
+        {
+          "label": "🎯 國中",
+          "next": "ans_en_jh"
+        }
+      ]
+    },
+    "course_grade_ma": {
+      "id": "course_grade_ma",
+      "type": "options",
+      "text": "孩子目前幾年級呢？📐",
+      "options": [
+        {
+          "label": "🎒 國小 1–2 年級",
+          "next": "ans_ma_e12"
+        },
+        {
+          "label": "📚 國小 3–4 年級",
+          "next": "ans_ma_e34"
+        },
+        {
+          "label": "✏️ 國小 5–6 年級",
+          "next": "ans_ma_e56"
+        },
+        {
+          "label": "🎯 國中（想了解）",
+          "next": "ans_ma_jh"
+        }
+      ]
+    },
+    "about_welcome": {
+      "id": "about_welcome",
+      "type": "options",
+      "text": "嗨！你好 👋
+
+這頁的家長通常都在想一個問題：
+「這間補習班⋯⋯可以信任嗎？」
+
+很合理！選擇補習班本來就要謹慎 😊
+
+想了解哪個部分呢？",
+      "options": [
+        {
+          "label": "📖 教學理念",
+          "next": "about_philosophy"
+        },
+        {
+          "label": "👨‍🏫 師資介紹",
+          "next": "about_teacher"
+        },
+        {
+          "label": "🏫 上課環境",
+          "next": "about_environment"
+        },
+        {
+          "label": "⭐ 家長評價",
+          "next": "about_reviews"
+        },
+        {
+          "label": "📅 預約來看看",
+          "next": "about_visit"
+        }
+      ]
+    },
+    "about_philosophy": {
+      "id": "about_philosophy",
+      "type": "answer",
+      "text": "我們的理念很簡單——
+
+不追求「塞最多」，
+而是追求「孩子真的懂」。
+
+讓孩子在學習中找到成就感，
+他自己就會想學 😊
+
+這不是廣告詞，是真的——
+很多孩子試聽完就開始期待上課了！",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "english",
+        "math"
+      ]
+    },
+    "about_teacher": {
+      "id": "about_teacher",
+      "type": "answer",
+      "text": "師資這件事，我很驕傲可以說——
+
+我們的老師都是全職老師，不是臨時兼差的 😊
+
+每位老師都長期跟著同一批孩子，
+知道每個孩子的狀況、個性、弱點，
+不是每天換面孔的那種。
+
+家長最常說的是：
+「老師真的很了解我的孩子。」
+
+想見見老師嗎？來試聽就可以囉！",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ]
+    },
+    "about_environment": {
+      "id": "about_environment",
+      "type": "answer",
+      "text": "上課環境的話——
+
+小班制，每班不多，
+老師可以真的注意到每一個孩子 😊
+
+有固定的學習空間，孩子可以專心，
+不像大班課那樣容易分心。
+
+有機會的話，歡迎直接來看看！
+（百聞不如一見，對補習班也適用 🤭）",
+      "cta": [
+        "trial",
+        "map",
+        "line"
+      ]
+    },
+    "about_reviews": {
+      "id": "about_reviews",
+      "type": "answer",
+      "text": "家長評價的話——
+
+說幾個真實的狀況：
+
+「孩子本來很抗拒補習，
+ 現在自己說要來上課」
+
+「成績進步了，但更重要的是
+ 他開始不怕數學了」
+
+「老師很有耐心，對孩子很用心」
+
+這些我們都真的聽到過 😊
+
+每個孩子的狀況不同——
+最好的方式還是先來試聽，
+讓老師直接了解你的孩子！",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ]
+    },
+    "about_visit": {
+      "id": "about_visit",
+      "type": "answer",
+      "text": "歡迎直接來看看！😊
+
+來試聽就是最好的參觀——
+孩子可以感受上課氛圍，
+家長也可以跟老師聊聊孩子的狀況。
+
+我們在烏日區，旭光國小旁邊，很好找！",
+      "cta": [
+        "trial",
+        "map",
+        "line"
+      ]
+    },
+    "news_welcome": {
+      "id": "news_welcome",
+      "type": "options",
+      "text": "這篇內容有幫助到你嗎？😊",
+      "options": [
+        {
+          "label": "👍 有幫助，謝謝！",
+          "next": "news_helpful"
+        },
+        {
+          "label": "🤔 還想了解更多",
+          "next": "home_find_course"
+        },
+        {
+          "label": "📅 想預約試聽",
+          "next": "home_trial"
+        },
+        {
+          "label": "💬 想直接問老師",
+          "next": "global_contact"
+        }
+      ]
+    },
+    "news_helpful": {
+      "id": "news_helpful",
+      "type": "answer",
+      "text": "太好了！😊
+
+如果之後有問題，隨時都可以找 Mina！
+
+也歡迎認識我們的課程——
+說不定有適合孩子的方案 😊",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "english",
+        "math",
+        "afterschool"
+      ]
+    },
+    "faq_welcome": {
+      "id": "faq_welcome",
+      "type": "options",
+      "text": "嗨！我是 Mina 😊
+有什麼問題，我幫你找答案！",
+      "options": [
+        {
+          "label": "📚 課程相關",
+          "next": "course_welcome"
+        },
+        {
+          "label": "🗓️ 試聽 / 報名",
+          "next": "faq_trial"
+        },
+        {
+          "label": "📍 地點交通",
+          "next": "faq_location"
+        },
+        {
+          "label": "🏠 安親生活",
+          "next": "ans_afterschool"
+        },
+        {
+          "label": "💰 課程規劃與費用",
+          "next": "global_pricing"
+        },
+        {
+          "label": "❓ 其他問題",
+          "next": "global_contact"
+        }
+      ]
+    },
+    "faq_trial": {
+      "id": "faq_trial",
+      "type": "options",
+      "text": "關於試聽，你想了解什麼？",
+      "options": [
+        {
+          "label": "試聽怎麼進行？",
+          "next": "faq_trial_how"
+        },
+        {
+          "label": "試聽有費用嗎？",
+          "next": "faq_trial_free"
+        },
+        {
+          "label": "試聽後需要立刻決定嗎？",
+          "next": "faq_trial_decision"
+        },
+        {
+          "label": "怎麼預約試聽？",
+          "next": "home_trial"
+        }
+      ]
+    },
+    "faq_trial_how": {
+      "id": "faq_trial_how",
+      "type": "answer",
+      "text": "試聽大約 40–50 分鐘，流程大概是這樣：
+
+1️⃣ 老師先跟你聊聊孩子目前的狀況
+2️⃣ 上一堂正式課的內容，讓孩子實際感受
+3️⃣ 試聽結束後，老師分析孩子的程度，
+   告訴你適合的課程安排
+
+全程沒有業務感，
+就是真的讓你了解我們怎麼教 😊
+
+（沒有「今天就要決定！名額有限！」的壓力——
+那種事我們不做 😂）",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ]
+    },
+    "faq_trial_free": {
+      "id": "faq_trial_free",
+      "type": "answer",
+      "text": "試聽完全免費！😊
+
+不用任何費用，
+老師就會幫你完整評估孩子的狀況，
+說明課程規劃和費用。
+
+所以說，
+不來試聽好像說不過去對吧 🤭",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ]
+    },
+    "faq_trial_decision": {
+      "id": "faq_trial_decision",
+      "type": "answer",
+      "text": "完全不需要！😄
+
+試聽完可以帶孩子回去討論，感受一下，
+想清楚再決定。
+
+我們這裡沒有人會盯著你說
+「今天就決定！名額有限！」
+那種事我們不做 😂
+
+放心來，沒壓力的！",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ]
+    },
+    "faq_location": {
+      "id": "faq_location",
+      "type": "answer",
+      "text": "我們在台中市烏日區，旭光國小旁邊！😊
+
+📍 烏日區健行北路 96 號
+
+另外，安親班有到學校集合接孩子的服務！
+放學時老師會到學校，把孩子一起帶回來 🚶
+不用擔心孩子自己在路邊等 😊",
+      "cta": [
+        "map",
+        "trial",
+        "line",
+        "phone"
+      ]
+    },
+    "quiz_welcome": {
+      "id": "quiz_welcome",
+      "type": "options",
+      "text": "找題庫嗎？我來幫你！😊
+
+想找哪個科目的題目？",
+      "options": [
+        {
+          "label": "📖 英文",
+          "next": "quiz_grade_en"
+        },
+        {
+          "label": "🔢 數學",
+          "next": "quiz_grade_ma"
+        }
+      ]
+    },
+    "quiz_grade_en": {
+      "id": "quiz_grade_en",
+      "type": "options",
+      "text": "幾年級的英文題庫？",
+      "options": [
+        {
+          "label": "🎒 國小 1–2 年級",
+          "next": "quiz_result_en_e12"
+        },
+        {
+          "label": "📚 國小 3–4 年級",
+          "next": "quiz_result_en_e34"
+        },
+        {
+          "label": "✏️ 國小 5–6 年級",
+          "next": "quiz_result_en_e56"
+        }
+      ]
+    },
+    "quiz_grade_ma": {
+      "id": "quiz_grade_ma",
+      "type": "options",
+      "text": "幾年級的數學題庫？",
+      "options": [
+        {
+          "label": "🎒 國小 1–2 年級",
+          "next": "quiz_result_ma_e12"
+        },
+        {
+          "label": "📚 國小 3–4 年級",
+          "next": "quiz_result_ma_e34"
+        },
+        {
+          "label": "✏️ 國小 5–6 年級",
+          "next": "quiz_result_ma_e56"
+        }
+      ]
+    },
+    "quiz_result_en_e12": {
+      "id": "quiz_result_en_e12",
+      "type": "quiz_result",
+      "filter": {
+        "subject": "en",
+        "grade": "elementary_1_2"
+      },
+      "text": "已幫你篩選「國小 1–2 年級 / 英文」題庫 📖
+上面有符合的題目嗎？😊",
+      "options": [
+        {
+          "label": "換個年級",
+          "next": "quiz_grade_en"
+        },
+        {
+          "label": "換數學題庫",
+          "next": "quiz_grade_ma"
+        },
+        {
+          "label": "找不到我要的",
+          "next": "quiz_not_found"
+        }
+      ]
+    },
+    "quiz_result_en_e34": {
+      "id": "quiz_result_en_e34",
+      "type": "quiz_result",
+      "filter": {
+        "subject": "en",
+        "grade": "elementary_3_4"
+      },
+      "text": "已幫你篩選「國小 3–4 年級 / 英文」題庫 📖
+上面有符合的題目嗎？😊",
+      "options": [
+        {
+          "label": "換個年級",
+          "next": "quiz_grade_en"
+        },
+        {
+          "label": "換數學題庫",
+          "next": "quiz_grade_ma"
+        },
+        {
+          "label": "找不到我要的",
+          "next": "quiz_not_found"
+        }
+      ]
+    },
+    "quiz_result_en_e56": {
+      "id": "quiz_result_en_e56",
+      "type": "quiz_result",
+      "filter": {
+        "subject": "en",
+        "grade": "elementary_5_6"
+      },
+      "text": "已幫你篩選「國小 5–6 年級 / 英文」題庫 📖
+上面有符合的題目嗎？😊",
+      "options": [
+        {
+          "label": "換個年級",
+          "next": "quiz_grade_en"
+        },
+        {
+          "label": "換數學題庫",
+          "next": "quiz_grade_ma"
+        },
+        {
+          "label": "找不到我要的",
+          "next": "quiz_not_found"
+        }
+      ]
+    },
+    "quiz_result_ma_e12": {
+      "id": "quiz_result_ma_e12",
+      "type": "quiz_result",
+      "filter": {
+        "subject": "ma",
+        "grade": "elementary_1_2"
+      },
+      "text": "已幫你篩選「國小 1–2 年級 / 數學」題庫 🔢
+上面有符合的題目嗎？😊",
+      "options": [
+        {
+          "label": "換個年級",
+          "next": "quiz_grade_ma"
+        },
+        {
+          "label": "換英文題庫",
+          "next": "quiz_grade_en"
+        },
+        {
+          "label": "找不到我要的",
+          "next": "quiz_not_found"
+        }
+      ]
+    },
+    "quiz_result_ma_e34": {
+      "id": "quiz_result_ma_e34",
+      "type": "quiz_result",
+      "filter": {
+        "subject": "ma",
+        "grade": "elementary_3_4"
+      },
+      "text": "已幫你篩選「國小 3–4 年級 / 數學」題庫 🔢
+上面有符合的題目嗎？😊",
+      "options": [
+        {
+          "label": "換個年級",
+          "next": "quiz_grade_ma"
+        },
+        {
+          "label": "換英文題庫",
+          "next": "quiz_grade_en"
+        },
+        {
+          "label": "找不到我要的",
+          "next": "quiz_not_found"
+        }
+      ]
+    },
+    "quiz_result_ma_e56": {
+      "id": "quiz_result_ma_e56",
+      "type": "quiz_result",
+      "filter": {
+        "subject": "ma",
+        "grade": "elementary_5_6"
+      },
+      "text": "已幫你篩選「國小 5–6 年級 / 數學」題庫 🔢
+上面有符合的題目嗎？😊",
+      "options": [
+        {
+          "label": "換個年級",
+          "next": "quiz_grade_ma"
+        },
+        {
+          "label": "換英文題庫",
+          "next": "quiz_grade_en"
+        },
+        {
+          "label": "找不到我要的",
+          "next": "quiz_not_found"
+        }
+      ]
+    },
+    "quiz_not_found": {
+      "id": "quiz_not_found",
+      "type": "answer",
+      "text": "😱 Mina 暫時翻不到這份題庫耶～
+
+題庫我們一直在更新！
+如果找不到你要的章節或題型，
+加 LINE 告訴老師，我們會幫你準備 😊",
+      "cta": [
+        "line",
+        "phone",
+        "trial"
+      ]
+    },
+    "ans_en_e12": {
+      "id": "ans_en_e12",
+      "type": "answer",
+      "text": "小一小二的英文，從這裡起步最剛好！🌱
+
+我們不急著塞單字給孩子背——
+而是先讓他「不怕開口說英文」。
+
+從聽說入手，帶入自然發音，
+讓英文從一開始就是有趣的事 🎉
+
+很多一開始說「英文好可怕」的孩子，
+試聽完都說「好想再來！」
+（真的不是廣告詞 😄）",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "english"
+      ]
+    },
+    "ans_en_e34": {
+      "id": "ans_en_e34",
+      "type": "answer",
+      "text": "中年級是打英文底子的黃金期！✨
+
+這個階段我們特別重視兩件事：
+📖 閱讀理解——不只是背單字，要真的讀懂句子
+📝 文法觀念——讓孩子開始理解英文的邏輯
+
+很多孩子來之前對英文沒什麼感覺，
+試聽完之後就開始期待上課了——
+老師到底用了什麼魔法我也不清楚 🤭",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "english"
+      ]
+    },
+    "ans_en_e56": {
+      "id": "ans_en_e56",
+      "type": "answer",
+      "text": "高年級英文，說實話——開始有壓力了 😤
+
+但壓力不是壞事！壓力代表孩子準備要跳躍了！
+
+我們這個階段主要做兩件事：
+📝 段考成績——先讓孩子建立「英文我也行！」的自信
+🚀 升國中準備——提早把底子打穩，升上去不慌張
+
+小班制、老師盯得近
+（溫柔地盯，不是兇那種 😂）",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "english"
+      ]
+    },
+    "ans_en_jh": {
+      "id": "ans_en_jh",
+      "type": "answer",
+      "text": "國中英文的挑戰是真的不小 😅
+
+文法、大量單字、閱讀、寫作... 一口氣全來！
+
+我們依程度小班分組，
+讓孩子和程度相近的同學一起學，
+進步速度通常快很多。
+
+老師也很懂「考試這件事」——
+哪裡會考、怎麼拿分，這種實戰感很重要 😏",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "english"
+      ]
+    },
+    "ans_ma_e12": {
+      "id": "ans_ma_e12",
+      "type": "answer",
+      "text": "從小把數學觀念弄清楚，以後真的省很多力氣！😊
+
+低年級數學，我們的方法是讓孩子「真的懂」，
+而不是死背步驟和公式。
+
+老師有辦法用孩子聽得懂的方式解釋，
+讓他們覺得「數學其實還好嘛！」——
+然後回家跟爸媽說「今天數學好好玩」😄
+（這種事真的有發生過）",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "math"
+      ]
+    },
+    "ans_ma_e34": {
+      "id": "ans_ma_e34",
+      "type": "answer",
+      "text": "中年級數學開始有點複雜了！📐
+
+分數、小數點、應用題——
+很多孩子卡關就卡在這裡。
+
+我們的做法是先拆解觀念，再練題目，
+讓孩子搞懂「為什麼這樣算」，不只是套公式。
+
+真正理解了，考試遇到變化題也不怕 💪",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "math"
+      ]
+    },
+    "ans_ma_e56": {
+      "id": "ans_ma_e56",
+      "type": "answer",
+      "text": "高年級數學，說實在話——是有點硬！😤
+
+面積、體積、比例... 觀念一個接一個，
+還沒搞懂前面就來後面，
+當然越積越多問號。
+
+我們這個階段主要做兩件事：
+🧩 把卡住的觀念逐一補起來
+🎯 針對段考重點加強，先讓成績穩住
+
+小班制的好處就是老師知道每個孩子卡在哪，
+直接針對那個點幫他解開！",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "math"
+      ]
+    },
+    "ans_ma_jh": {
+      "id": "ans_ma_jh",
+      "type": "answer",
+      "text": "🧮 國中數學嗎？
+
+哎呀～這題 Mina 差點答錯 😆
+
+目前我們有：
+✅ 徐薇英文（國小～國中）
+✅ 偉智數學（國小）
+
+國中數學目前還沒有開課喔～
+
+但別急著把考卷藏起來 🤭
+
+如果孩子是國中生，
+英文課程還是可以幫到會考、文法、閱讀理解喔 📚
+
+如果很多家長都敲碗，
+說不定哪天國中數學就真的出現了 👀",
+      "cta": [
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "english"
+      ]
+    },
+    "ans_afterschool": {
+      "id": "ans_afterschool",
+      "type": "answer",
+      "text": "安親班的日常是這樣的 😊
+
+🏫 放學集合：老師到學校把孩子一起帶回來
+   （不用擔心孩子自己在路邊等）
+🍱 點心時間：補充體力，準備念書
+📚 寫作業時段：固定時間，老師在旁邊顧著
+❓ 課業問題：直接問老師，不用等回家傷腦筋
+
+孩子放學後這段時間被顧好，
+家長上班也比較放心 😊
+
+目前安親服務適合國小 1–6 年級喔！",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "afterschool"
+      ]
+    },
+    "ans_zhengyin": {
+      "id": "ans_zhengyin",
+      "type": "answer",
+      "text": "正音班是為要升小一的孩子準備的！🌱
+
+每年八月開設，
+幫孩子在進小學前先熟悉注音、練習說話，
+讓第一天上課不怕不知所措 😊
+
+具體時間和報名資訊，
+建議直接加 LINE 或打電話給老師確認！
+（每年梯次可能稍有不同）",
+      "cta": [
+        "line",
+        "phone",
+        "trial"
+      ]
+    },
+    "global_pricing": {
+      "id": "global_pricing",
+      "type": "answer",
+      "text": "💰 想了解費用嗎？
+
+嘿嘿～
+老實說，這大概是 Mina 被問最多次的問題第一名 🏆
+
+如果我直接報一個數字給你，
+老師等一下可能會追著我跑 🤣
+
+因為課程費用會依：
+📚 年級
+📚 科目
+📚 上課頻率
+📚 是否搭配安親
+...而有所不同。
+
+━━━━━━━━━━━━━━
+
+不過你放心 😊
+
+老師說明課程時，一定也會一起說明：
+✅ 課程規劃
+✅ 收費方式
+✅ 目前優惠方案
+✅ 適合孩子的班別
+
+不會有神秘價格，也不會有突然冒出來的費用 👌
+
+而且，我們是一般補習班的收費模式，
+不是什麼神秘高價家教課程 🤭
+
+想用哪種方式了解呢？",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ]
+    },
+    "global_contact": {
+      "id": "global_contact",
+      "type": "answer",
+      "text": "這個問題讓老師直接回答你最準確！😊
+
+老師很好說話的，
+不會有被催報名的壓力 😄
+
+選一個你最方便的方式：",
+      "cta": [
+        "line",
+        "phone",
+        "trial"
+      ]
+    },
+    "global_camp_zhengyin": {
+      "id": "global_camp_zhengyin",
+      "type": "answer",
+      "text": "暑假 / 正音課程——
+
+☀️ 夏令營課程詳細資訊都在這裡！
+進去看完應該就清楚了 😊
+
+🌱 要升小一的孩子：
+每年八月我們會開設正音班，
+幫孩子在升小學前打好注音和說話的底子。
+
+詳細梯次和內容，
+進去看或直接問老師都可以！",
+      "cta": [
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "camp"
+      ]
+    },
+    "global_other_subject": {
+      "id": "global_other_subject",
+      "type": "options",
+      "text": "哇！你這題有點超出 Mina 的考試範圍了 😂
+
+目前我們主要提供：
+📖 英文課程　🔢 數學課程　🎒 安親服務
+
+至於其他科目，目前還沒有開課喔 🙈
+
+不過老師很常研究新課程，
+誰知道哪天會不會突然冒出來呢 🤫
+
+你最希望我們開什麼課呢？
+（告訴老師，說不定你就是促成新課程的關鍵人物 👀）",
+      "options": [
+        {
+          "label": "🌿 自然",
+          "next": "other_collected"
+        },
+        {
+          "label": "🗺️ 社會",
+          "next": "other_collected"
+        },
+        {
+          "label": "📝 國文",
+          "next": "other_collected"
+        },
+        {
+          "label": "🔮 其他",
+          "next": "other_collected"
+        }
+      ]
+    },
+    "other_collected": {
+      "id": "other_collected",
+      "type": "answer",
+      "text": "記下來了！😄
+
+我會偷偷轉告老師「有家長在敲碗」
+（希望有一天能讓你等到 🤞）
+
+在那之前，可以先看看我們目前有的課程：",
+      "cta": [
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "english",
+        "math",
+        "afterschool"
+      ]
+    },
+    "unsure_grade": {
+      "id": "unsure_grade",
+      "type": "options",
+      "text": "沒關係！這其實是最常見的狀況 😄
+
+「就是覺得孩子需要補，但不確定補什麼！」
+
+讓我先了解一下孩子的情形——
+他目前幾年級？",
+      "options": [
+        {
+          "label": "🎒 國小 1–2 年級",
+          "next": "unsure_concern_e12"
+        },
+        {
+          "label": "📚 國小 3–4 年級",
+          "next": "unsure_concern_e34"
+        },
+        {
+          "label": "✏️ 國小 5–6 年級",
+          "next": "unsure_concern_e56"
+        },
+        {
+          "label": "🎯 國中",
+          "next": "unsure_concern_jh"
+        }
+      ]
+    },
+    "unsure_concern_e12": {
+      "id": "unsure_concern_e12",
+      "type": "answer",
+      "text": "不確定很正常！讓我給你個建議 😊
+
+對國小 1–2 年級的孩子來說：
+
+如果孩子放學後沒地方去，
+先考慮安親——穩定的學習環境很重要 🎒
+
+如果想加強科目，英文是最適合從小開始的，
+低年級打好底子，以後輕鬆很多 📖
+
+最準確的還是來試聽，讓老師直接評估！",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "english",
+        "afterschool"
+      ]
+    },
+    "unsure_concern_e34": {
+      "id": "unsure_concern_e34",
+      "type": "answer",
+      "text": "不確定很正常！😊
+
+中年級是個很重要的過渡期——
+英文和數學都開始有點難度，
+很多孩子就在這裡開始覺得「跟不上了」。
+
+我的建議：先來試聽，
+讓老師評估孩子哪裡最需要加強，
+再針對性地補——不用全部一起補，會太累 😅",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "english",
+        "math"
+      ]
+    },
+    "unsure_concern_e56": {
+      "id": "unsure_concern_e56",
+      "type": "answer",
+      "text": "不確定很正常！😊
+
+高年級是升國中前的關鍵衝刺期——
+英文和數學的觀念都在快速累積，
+有一科沒跟上，後面壓力就大了。
+
+我的建議：先來試聽，
+讓老師評估哪科最需要加強，
+有針對性地補，成效最好！",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "english",
+        "math"
+      ]
+    },
+    "unsure_concern_jh": {
+      "id": "unsure_concern_jh",
+      "type": "answer",
+      "text": "不確定很正常！😊
+
+國中階段，目前我們主要開設英文課程喔！
+
+國中英文對會考影響很大，
+文法、閱讀、寫作——老師都有幫孩子準備。
+
+要不要先來試聽，讓老師評估孩子的狀況？",
+      "cta": [
+        "trial",
+        "line",
+        "phone"
+      ],
+      "articles": [
+        "english"
+      ]
+    }
+  }
+};
+  pills.appendChild(btn);
+});
+
+function restart() {
+  chat.innerHTML = '';
+  interactive.innerHTML = '';
+  history = [];
+  const startNode = nodes[flows[currentFlow]];
+  renderNode(startNode);
+}
+
+function renderNode(node) {
+  history.push(node.id);
+  debugEl.textContent = 'path: ' + history.join(' → ');
+
+  // Mina bubble
+  addMinaBubble(node.text);
+
+  // Quiz result tag
+  if (node.type === 'quiz_result') {
+    const tag = document.createElement('div');
+    tag.className = 'quiz-tag';
+    tag.textContent = '🔍 題庫篩選觸發 filter: ' + JSON.stringify(node.filter);
+    interactive.appendChild(tag);
+  }
+
+  // Clear interactive area
+  const oldInter = document.getElementById('interactive');
+  oldInter.innerHTML = '';
+  if (node.type === 'quiz_result') {
+    const tag2 = document.createElement('div');
+    tag2.className = 'quiz-tag';
+    tag2.textContent = '🔍 前端篩選題庫 → subject:' + node.filter.subject + ' grade:' + node.filter.grade;
+    oldInter.appendChild(tag2);
+  }
+
+  if (node.type === 'options' || node.type === 'quiz_result') {
+    // Show option buttons
+    const opts = document.createElement('div');
+    opts.className = 'w-options';
+    node.options.forEach(o => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.textContent = o.label;
+      btn.onclick = () => {
+        addUserBubble(o.label);
+        opts.style.display = 'none';
+        const next = nodes[o.next];
+        if (next) renderNode(next);
+      };
+      opts.appendChild(btn);
+    });
+    oldInter.appendChild(opts);
+  }
+
+  if (node.type === 'answer' || node.type === 'quiz_result') {
+    if (node.cta && node.cta.length > 0) {
+      if (node.type === 'answer') {
+        const div = document.createElement('div');
+        div.className = 'w-divider';
+        oldInter.appendChild(div);
+      }
+      const ctaDiv = document.createElement('div');
+      ctaDiv.className = 'w-cta';
+      node.cta.forEach(key => {
+        const c = globalCta[key];
+        if (!c) return;
+        const btn = document.createElement('a');
+        btn.className = 'cta-btn cta-' + key;
+        btn.textContent = c.label;
+        btn.href = c.url;
+        btn.target = '_blank';
+        ctaDiv.appendChild(btn);
+      });
+      oldInter.appendChild(ctaDiv);
+    }
+
+    if (node.articles && node.articles.length > 0) {
+      const artDiv = document.createElement('div');
+      artDiv.className = 'w-articles';
+      const lbl = document.createElement('div');
+      lbl.className = 'art-lbl';
+      lbl.textContent = '相關課程介紹';
+      artDiv.appendChild(lbl);
+      node.articles.forEach(key => {
+        const a = globalArticles[key];
+        if (!a) return;
+        const link = document.createElement('a');
+        link.className = 'art-link';
+        link.textContent = a.label;
+        link.href = a.url;
+        link.target = '_blank';
+        artDiv.appendChild(link);
+      });
+      oldInter.appendChild(artDiv);
+    }
+  }
+
+  // scroll to bottom
+  setTimeout(() => chat.scrollTop = chat.scrollHeight, 100);
+}
+
+function addMinaBubble(text) {
+  const row = document.createElement('div');
+  row.className = 'bubble-row';
+  row.innerHTML = `<div class="b-av">M</div><div class="b-text">${escHtml(text)}</div>`;
+  chat.appendChild(row);
+  setTimeout(() => chat.scrollTop = chat.scrollHeight, 50);
+}
+
+function addUserBubble(text) {
+  const row = document.createElement('div');
+  row.className = 'user-row';
+  row.innerHTML = `<div class="u-text">${escHtml(text)}</div>`;
+  chat.appendChild(row);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+// Init
+restart();
+</script>
+</body>
+</html>
