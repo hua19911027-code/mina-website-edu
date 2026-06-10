@@ -1,0 +1,347 @@
+{
+  "updatedAt": "2026-06-10T15:54:27.282Z",
+  "createdAt": "2026-06-10T15:04:03.636Z",
+  "id": "b4zTdWd34T3Abiai",
+  "name": "Flow 1 — 新預約通知 (Mina)",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "f1-n1-webhook",
+      "name": "Webhook — 收到預約",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mina-booking",
+        "responseMode": "onReceived",
+        "responseData": "allEntries",
+        "options": {}
+      },
+      "webhookId": "f5505c9e-39b5-44fe-9518-4140811ff842"
+    },
+    {
+      "id": "f1-n2-code",
+      "name": "格式化通知內容",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const b = $input.first().json.body ?? $input.first().json;\nconst courses = Array.isArray(b.courses) ? b.courses.join('、') : (b.courses || '未填');\nconst now = new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });\n\nconst lineMsg = [\n  '【新試聽預約通知】',\n  `家長：${b.parentName || '未知'}`,\n  `電話：${b.phone || '未填'}`,\n  `學生：${b.studentName || '未填'}`,\n  `年級：${b.grade || '未填'}`,\n  `科目：${courses}`,\n  `時段：${b.preferredTime || '不限'}`,\n  `備注：${(b.note || '').trim() || '無'}`,\n  `時間：${now}`\n].join('\\n');\n\nconst emailBody = [\n  '【新試聽預約通知】',\n  '',\n  `家長姓名：${b.parentName || '未知'}`,\n  `聯絡電話：${b.phone || '未填'}`,\n  `學生姓名：${b.studentName || '未填'}`,\n  `年級：${b.grade || '未填'}`,\n  `有興趣課程：${courses}`,\n  `希望時段：${b.preferredTime || '不限'}`,\n  `備注：${(b.note || '').trim() || '無'}`,\n  '',\n  `預約時間：${now}`,\n  '',\n  '─────────────────────',\n  '此信由 Mina n8n 自動發送'\n].join('\\n');\n\nreturn [{ json: {\n  lineMsg,\n  emailBody,\n  emailSubject: `【新試聽預約】${b.parentName || '?'} / ${b.grade || '?'} / ${b.phone || '?'}`\n}}];"
+      }
+    },
+    {
+      "id": "f1-n3-line",
+      "name": "發送 LINE Notify",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        520,
+        160
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/broadcast",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer LINE_CHANNEL_ACCESS_TOKEN_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"messages\": [{\"type\": \"text\", \"text\": {{ JSON.stringify($json.lineMsg) }}}]}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "f1-n4-email",
+      "name": "發送 Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        440
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "BdOVsK33NdWdJUob",
+          "name": "Gmail SMTP (Mina)"
+        }
+      },
+      "parameters": {
+        "fromEmail": "hua19911027@gmail.com",
+        "toEmail": "monina1051208@gmail.com",
+        "subject": "={{ $json.emailSubject }}",
+        "emailType": "text",
+        "message": "={{ $json.emailBody }}",
+        "options": {}
+      },
+      "webhookId": "12f1d595-cc67-4d1a-b92d-13c312b7e5db"
+    },
+    {
+      "id": "f1-n5-note",
+      "name": "⚙️ 設定說明",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        100
+      ],
+      "parameters": {
+        "content": "## Flow 1 — 新預約通知\n\n**觸發**：網站預約表單送出（Cloudflare Worker 呼叫）\n\n邏輯：\n1. 收到 webhook → 格式化訊息\n2. 同時發送 LINE Notify + Gmail\n\n**必須設定：**\n\n**1. LINE Notify Token**\n在「發送 LINE Notify」節點的 Authorization header 中\n取代 ⬛TODO_LINE_NOTIFY_TOKEN\n\n**2. Gmail App Password**\nn8n → Credentials → Gmail SMTP (Mina)\n填入 Gmail 應用程式密碼（16碼）",
+        "height": 340,
+        "width": 380,
+        "color": 4
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — 收到預約": {
+      "main": [
+        [
+          {
+            "node": "格式化通知內容",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "格式化通知內容": {
+      "main": [
+        [
+          {
+            "node": "發送 LINE Notify",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "發送 Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "59314a63-14ad-4e78-a61b-87f31f88e765",
+  "activeVersionId": "59314a63-14ad-4e78-a61b-87f31f88e765",
+  "versionCounter": 18,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-06-10T15:04:03.641Z",
+      "createdAt": "2026-06-10T15:04:03.641Z",
+      "role": "workflow:owner",
+      "workflowId": "b4zTdWd34T3Abiai",
+      "projectId": "TR9S4ARFHuw7aPNS",
+      "project": {
+        "updatedAt": "2026-05-22T09:02:15.852Z",
+        "createdAt": "2026-05-22T08:49:59.173Z",
+        "id": "TR9S4ARFHuw7aPNS",
+        "name": "hua chen <hua19911027@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "48a45a60-09e1-47ba-9adf-54d7134b64e5"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-06-10T15:54:27.282Z",
+    "createdAt": "2026-06-10T15:54:27.282Z",
+    "versionId": "59314a63-14ad-4e78-a61b-87f31f88e765",
+    "workflowId": "b4zTdWd34T3Abiai",
+    "nodes": [
+      {
+        "id": "f1-n1-webhook",
+        "name": "Webhook — 收到預約",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          0,
+          300
+        ],
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "mina-booking",
+          "responseMode": "onReceived",
+          "responseData": "allEntries",
+          "options": {}
+        },
+        "webhookId": "f5505c9e-39b5-44fe-9518-4140811ff842"
+      },
+      {
+        "id": "f1-n2-code",
+        "name": "格式化通知內容",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          260,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const b = $input.first().json.body ?? $input.first().json;\nconst courses = Array.isArray(b.courses) ? b.courses.join('、') : (b.courses || '未填');\nconst now = new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });\n\nconst lineMsg = [\n  '【新試聽預約通知】',\n  `家長：${b.parentName || '未知'}`,\n  `電話：${b.phone || '未填'}`,\n  `學生：${b.studentName || '未填'}`,\n  `年級：${b.grade || '未填'}`,\n  `科目：${courses}`,\n  `時段：${b.preferredTime || '不限'}`,\n  `備注：${(b.note || '').trim() || '無'}`,\n  `時間：${now}`\n].join('\\n');\n\nconst emailBody = [\n  '【新試聽預約通知】',\n  '',\n  `家長姓名：${b.parentName || '未知'}`,\n  `聯絡電話：${b.phone || '未填'}`,\n  `學生姓名：${b.studentName || '未填'}`,\n  `年級：${b.grade || '未填'}`,\n  `有興趣課程：${courses}`,\n  `希望時段：${b.preferredTime || '不限'}`,\n  `備注：${(b.note || '').trim() || '無'}`,\n  '',\n  `預約時間：${now}`,\n  '',\n  '─────────────────────',\n  '此信由 Mina n8n 自動發送'\n].join('\\n');\n\nreturn [{ json: {\n  lineMsg,\n  emailBody,\n  emailSubject: `【新試聽預約】${b.parentName || '?'} / ${b.grade || '?'} / ${b.phone || '?'}`\n}}];"
+        }
+      },
+      {
+        "id": "f1-n3-line",
+        "name": "發送 LINE Notify",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          520,
+          160
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.line.me/v2/bot/message/broadcast",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer LINE_CHANNEL_ACCESS_TOKEN_PLACEHOLDER"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\"messages\": [{\"type\": \"text\", \"text\": {{ JSON.stringify($json.lineMsg) }}}]}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "f1-n4-email",
+        "name": "發送 Email",
+        "type": "n8n-nodes-base.emailSend",
+        "typeVersion": 2.1,
+        "position": [
+          520,
+          440
+        ],
+        "credentials": {
+          "smtp": {
+            "id": "BdOVsK33NdWdJUob",
+            "name": "Gmail SMTP (Mina)"
+          }
+        },
+        "parameters": {
+          "fromEmail": "hua19911027@gmail.com",
+          "toEmail": "monina1051208@gmail.com",
+          "subject": "={{ $json.emailSubject }}",
+          "emailType": "text",
+          "message": "={{ $json.emailBody }}",
+          "options": {}
+        },
+        "webhookId": "12f1d595-cc67-4d1a-b92d-13c312b7e5db"
+      },
+      {
+        "id": "f1-n5-note",
+        "name": "⚙️ 設定說明",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -340,
+          100
+        ],
+        "parameters": {
+          "content": "## Flow 1 — 新預約通知\n\n**觸發**：網站預約表單送出（Cloudflare Worker 呼叫）\n\n邏輯：\n1. 收到 webhook → 格式化訊息\n2. 同時發送 LINE Notify + Gmail\n\n**必須設定：**\n\n**1. LINE Notify Token**\n在「發送 LINE Notify」節點的 Authorization header 中\n取代 ⬛TODO_LINE_NOTIFY_TOKEN\n\n**2. Gmail App Password**\nn8n → Credentials → Gmail SMTP (Mina)\n填入 Gmail 應用程式密碼（16碼）",
+          "height": 340,
+          "width": 380,
+          "color": 4
+        }
+      }
+    ],
+    "connections": {
+      "Webhook — 收到預約": {
+        "main": [
+          [
+            {
+              "node": "格式化通知內容",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "格式化通知內容": {
+        "main": [
+          [
+            {
+              "node": "發送 LINE Notify",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "發送 Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "hua chen",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-06-10T15:54:27.344Z",
+        "id": 20,
+        "workflowId": "b4zTdWd34T3Abiai",
+        "versionId": "59314a63-14ad-4e78-a61b-87f31f88e765",
+        "event": "activated",
+        "userId": "48a45a60-09e1-47ba-9adf-54d7134b64e5"
+      },
+      {
+        "createdAt": "2026-06-10T15:54:27.317Z",
+        "id": 19,
+        "workflowId": "b4zTdWd34T3Abiai",
+        "versionId": "59314a63-14ad-4e78-a61b-87f31f88e765",
+        "event": "deactivated",
+        "userId": "48a45a60-09e1-47ba-9adf-54d7134b64e5"
+      }
+    ]
+  }
+}
