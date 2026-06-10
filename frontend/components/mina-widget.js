@@ -10,7 +10,7 @@
     "global": {
       "cta": {
         "trial": { "type": "trial", "label": "📅 預約免費試聽", "url": "/booking.html#bookForm" },
-        "line":  { "type": "line",  "label": "💬 加 LINE 詢問", "url": "#LINE_URL" },
+        "line":  { "type": "line",  "label": "💬 加 LINE 詢問", "url": "https://lin.ee/xEQXMdw" },
         "phone": { "type": "phone", "label": "📞 直接電話聯絡", "url": "tel:04-2336-6868" },
         "map":   { "type": "map",   "label": "📍 Google Maps 導航", "url": "https://maps.app.goo.gl/aPqkAwvC9KkYAcSN9" }
       },
