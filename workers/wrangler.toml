@@ -11,6 +11,7 @@ keep_vars = true
 # wrangler secret put NOTION_PRACTICE_DB_ID
 # wrangler secret put NOTION_EXAM_REVIEW_DB_ID
 # wrangler secret put LINE_OFFICIAL_URL
+# wrangler secret put N8N_BOOKING_WEBHOOK
 # wrangler secret put ADMIN_SECRET
 # wrangler secret put CORS_ORIGIN
 

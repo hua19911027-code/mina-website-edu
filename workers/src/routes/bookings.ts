@@ -120,6 +120,16 @@ route.post('/', async (c) => {
     }, 500);
   }
 
+  if (c.env.N8N_BOOKING_WEBHOOK) {
+    c.executionCtx.waitUntil(
+      fetch(c.env.N8N_BOOKING_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }).catch(() => {}),
+    );
+  }
+
   return c.json({
     ok: true,
     data: {
