@@ -209,24 +209,12 @@
           .filter(function (a) { return a.slug !== currentSlug; })
           .slice(0, 3);
         if (!items.length) return;
-        wrap.innerHTML = items.map(function (a) {
-          var catCls = CAT_CLASS[a.category] || '';
-          var emoji  = CAT_EMOJI[a.category] || '📰';
-          return '<a class="ncard reveal in" href="news-single.html?slug=' + encodeURIComponent(a.slug) + '">' +
-            '<div class="nc-cover ' + catCls + '">' +
-              (a.coverImage
-                ? '<img src="' + a.coverImage + '" alt="' + a.title + '" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display=\'none\'">'
-                : '<span class="nc-ico">' + emoji + '</span>') +
-            '</div>' +
-            '<div class="nc-body">' +
-              '<div class="nc-meta"><span class="nc-cat ' + catCls + '">' + a.category + '</span>' +
-              '<span class="nc-date">' + formatDate(a.publishedAt) + '</span></div>' +
-              '<h3>' + a.title + '</h3>' +
-              '<p class="nc-excerpt">' + truncate(a.excerpt, 60) + '</p>' +
-              '<span class="nc-more">閱讀更多 →</span>' +
-            '</div>' +
-            '</a>';
-        }).join('');
+        wrap.innerHTML = '';
+        items.forEach(function (a) {
+          var card = buildCard(a);
+          card.classList.add('in');
+          wrap.appendChild(card);
+        });
       })
       .catch(function () { /* 保留原靜態佔位不動 */ });
   }
@@ -368,9 +356,10 @@
       return;
     }
 
+    var slides = track.querySelectorAll('.carousel-slide');
+    var dots = dotsEl ? dotsEl.querySelectorAll('.dot') : [];
+
     function goTo(n) {
-      var slides = track.querySelectorAll('.carousel-slide');
-      var dots = dotsEl ? dotsEl.querySelectorAll('.dot') : [];
       slides[current].classList.remove('on');
       if (dots[current]) dots[current].classList.remove('on');
       current = (n + items.length) % items.length;
