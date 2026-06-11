@@ -252,7 +252,7 @@
       },
       "parameters": {
         "fromEmail": "hua19911027@gmail.com",
-        "toEmail": "hua19911027@gmail.com",
+        "toEmail": "hua19911027@gmail.com, monina1051208@gmail.com",
         "subject": "={{ $json.emailSubject }}",
         "emailType": "text",
         "message": "={{ $json.emailBody }}",
