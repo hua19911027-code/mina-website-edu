@@ -59,7 +59,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"anthropic/claude-haiku-4-5\",\n  \"messages\": [{\n    \"role\": \"user\",\n    \"content\": \"請為台灣國小{{ $json.grade }}學生出 {{ $json.count }} 道{{ $json.subject }}選擇題，教材版本：{{ $json.curriculum }}，題型：{{ $json.qType }}。\\n\\n每道題必須包含：\\n- chapter（單元名稱）\\n- question（題目）\\n- optionA, optionB, optionC, optionD（選項）\\n- answer（A/B/C/D）\\n- concept（正確觀念，2-3句）\\n- mistake（常見錯誤，1句）\\n- hint（記憶提示，1句）\\n\\n以 JSON 陣列格式輸出，不要多餘說明：\\n[{\\\"chapter\\\":\\\"...\\\", \\\"question\\\":\\\"...\\\", \\\"optionA\\\":\\\"...\\\", \\\"optionB\\\":\\\"...\\\", \\\"optionC\\\":\\\"...\\\", \\\"optionD\\\":\\\"...\\\", \\\"answer\\\":\\\"A\\\", \\\"concept\\\":\\\"...\\\", \\\"mistake\\\":\\\"...\\\", \\\"hint\\\":\\\"...\\\"}]\"\n  }]\n}",
+        "jsonBody": "={\n  \"models\": [\"google/gemini-2.5-flash\", \"google/gemini-2.5-pro\", \"google/gemini-2.5-flash-lite\"],\n  \"route\": \"fallback\",\n  \"messages\": [{\n    \"role\": \"user\",\n    \"content\": \"請為台灣國小{{ $json.grade }}學生出 {{ $json.count }} 道{{ $json.subject }}選擇題，教材版本：{{ $json.curriculum }}，題型：{{ $json.qType }}。\\n\\n每道題必須包含：\\n- chapter（單元名稱）\\n- question（題目）\\n- optionA, optionB, optionC, optionD（選項）\\n- answer（A/B/C/D）\\n- concept（正確觀念，2-3句）\\n- mistake（常見錯誤，1句）\\n- hint（記憶提示，1句）\\n\\n以 JSON 陣列格式輸出，不要多餘說明：\\n[{\\\"chapter\\\":\\\"...\\\", \\\"question\\\":\\\"...\\\", \\\"optionA\\\":\\\"...\\\", \\\"optionB\\\":\\\"...\\\", \\\"optionC\\\":\\\"...\\\", \\\"optionD\\\":\\\"...\\\", \\\"answer\\\":\\\"A\\\", \\\"concept\\\":\\\"...\\\", \\\"mistake\\\":\\\"...\\\", \\\"hint\\\":\\\"...\\\"}]\"\n  }]\n}",
         "options": {}
       },
       "id": "f2-n3-ai",
