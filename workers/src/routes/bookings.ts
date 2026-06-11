@@ -23,9 +23,9 @@ async function writeToNotion(
       parent: { database_id: env.NOTION_BOOKING_DB_ID },
       properties: {
         'Name': { title: [{ text: { content: body.parentName.trim() } }] },
-        '姓名': { rich_text: [{ text: { content: body.studentName.trim() } }] },
+        '姓名': { rich_text: [{ text: { content: body.studentName?.trim() || '' } }] },
         '電話': { phone_number: body.phone.trim() },
-        '服務項目': { rich_text: [{ text: { content: body.courses.join('、') } }] },
+        '服務項目': { rich_text: [{ text: { content: (body.courses ?? []).join('、') } }] },
         '備註': { rich_text: [{ text: { content: [
           `年級：${body.grade}`,
           `希望時段：${body.preferredTime || '不限'}`,
@@ -57,18 +57,16 @@ route.post('/', async (c) => {
   if (!body.phone?.trim()) {
     return c.json({ ok: false, error: { code: 'VALIDATION', message: '聯絡電話為必填' } }, 422);
   }
-  if (!body.studentName?.trim()) {
-    return c.json({ ok: false, error: { code: 'VALIDATION', message: '學生姓名為必填' } }, 422);
-  }
   if (!body.grade) {
     return c.json({ ok: false, error: { code: 'VALIDATION', message: '年級為必填' } }, 422);
   }
-  if (!body.courses || body.courses.length === 0) {
+  const courses = body.courses?.length ? body.courses : (body.subjects ?? []);
+  if (courses.length === 0) {
     return c.json({ ok: false, error: { code: 'VALIDATION', message: '請選擇至少一個課程' } }, 422);
   }
 
   const submittedAt = new Date();
-  const notionPage = await writeToNotion(body, c.env, submittedAt);
+  const notionPage = await writeToNotion({ ...body, courses }, c.env, submittedAt);
 
   if (!notionPage) {
     return c.json({

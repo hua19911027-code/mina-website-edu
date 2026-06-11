@@ -36,9 +36,10 @@ export type ApiResponse<T> = ApiOk<T> | ApiError;
 export interface BookingPayload {
   parentName: string;
   phone: string;
-  studentName: string;
+  studentName?: string;
   grade: string;
-  courses: string[];
+  courses?: string[];
+  subjects?: string[];
   preferredTime?: string;
   note?: string;
 }
