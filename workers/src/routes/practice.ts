@@ -1,5 +1,5 @@
-/* GET /api/v1/practice              — 近三個月題庫
-   GET /api/v1/practice/archive      — 三個月以前（上限 36 題）
+/* GET /api/v1/practice              — 已發布題庫（is_published=true, not archived）
+   GET /api/v1/practice/archive      — 已封存題目（上限 36 題）
    GET /api/v1/practice/exam-review  — 考前複習 */
 
 import { Hono } from 'hono';
@@ -23,26 +23,21 @@ const route = new Hono<{ Bindings: Bindings }>();
 
 function now(): Date { return new Date(); }
 
-function ninetyDaysAgo(): Date {
-  const d = now();
-  d.setTime(d.getTime() - 90 * 24 * 60 * 60 * 1000);
-  return d;
-}
-
-function buildBaseFilter(
-  afterDate: string,
-  beforeDate: string | null,
-  grade?: string,
-  subject?: string,
-  type?: string
-): unknown {
+function buildPublishedFilter(grade?: string, subject?: string, type?: string): unknown {
   const and: unknown[] = [
     { property: '是否發布', checkbox: { equals: true } },
-    { property: '發布日期', date: { on_or_after: afterDate } },
+    { property: '已封存', checkbox: { equals: false } },
   ];
-  if (beforeDate) {
-    and.push({ property: '發布日期', date: { on_or_before: beforeDate } });
-  }
+  if (grade) and.push({ property: '年級', select: { equals: grade } });
+  if (subject) and.push({ property: '科目', select: { equals: subject } });
+  if (type) and.push({ property: '題型', select: { equals: type } });
+  return { and };
+}
+
+function buildArchivedFilter(grade?: string, subject?: string, type?: string): unknown {
+  const and: unknown[] = [
+    { property: '已封存', checkbox: { equals: true } },
+  ];
   if (grade) and.push({ property: '年級', select: { equals: grade } });
   if (subject) and.push({ property: '科目', select: { equals: subject } });
   if (type) and.push({ property: '題型', select: { equals: type } });
@@ -155,8 +150,7 @@ route.get('/', async (c) => {
 
   try {
     const n = now();
-    const ago = ninetyDaysAgo();
-    const filter = buildBaseFilter(ago.toISOString(), n.toISOString(), grade, subject, type);
+    const filter = buildPublishedFilter(grade, subject, type);
     const total_page_size = page * PAGE_SIZE + 1;
     const result = await notion.queryDatabase(c.env.NOTION_API_KEY, c.env.NOTION_PRACTICE_DB_ID, {
       filter,
@@ -225,9 +219,7 @@ route.get('/archive', async (c) => {
   }
 
   try {
-    const ago = ninetyDaysAgo();
-    const farPast = new Date('2020-01-01').toISOString();
-    const filter = buildBaseFilter(farPast, ago.toISOString(), grade, subject, type);
+    const filter = buildArchivedFilter(grade, subject, type);
     const fetchSize = ARCHIVE_HARD_LIMIT + 1;
     const result = await notion.queryDatabase(c.env.NOTION_API_KEY, c.env.NOTION_PRACTICE_DB_ID, {
       filter,

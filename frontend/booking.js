@@ -26,17 +26,18 @@
     });
 
     var payload = {
-      parentName:    (form.elements['name']  ? form.elements['name'].value.trim()  : ''),
-      phone:         (form.elements['phone'] ? form.elements['phone'].value.trim() : ''),
-      grade:         (form.elements['grade'] ? form.elements['grade'].value        : ''),
+      parentName:    (form.elements['name']        ? form.elements['name'].value.trim()        : ''),
+      studentName:   (form.elements['studentName'] ? form.elements['studentName'].value.trim() : ''),
+      phone:         (form.elements['phone']       ? form.elements['phone'].value.trim()       : ''),
+      grade:         (form.elements['grade']       ? form.elements['grade'].value              : ''),
       subjects:      subjects,
-      preferredTime: (form.elements['time']  ? form.elements['time'].value         : ''),
-      note:          (form.elements['note']  ? form.elements['note'].value.trim()  : '')
+      preferredTime: (form.elements['time']        ? form.elements['time'].value               : ''),
+      note:          (form.elements['note']        ? form.elements['note'].value.trim()        : '')
     };
 
-    if (!payload.parentName || !payload.phone) {
+    if (!payload.parentName || !payload.studentName || !payload.phone) {
       if (btn) { btn.disabled = false; btn.textContent = '送出預約 · Mina 盡快回覆您 →'; }
-      alert('請填寫姓名與聯絡電話。');
+      alert('請填寫家長姓名、學生姓名與聯絡電話。');
       return;
     }
 
