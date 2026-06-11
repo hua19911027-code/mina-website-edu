@@ -22,15 +22,17 @@ async function writeToNotion(
     body: JSON.stringify({
       parent: { database_id: env.NOTION_BOOKING_DB_ID },
       properties: {
-        '家長姓名': { title: [{ text: { content: body.parentName.trim() } }] },
-        '聯絡電話': { phone_number: body.phone.trim() },
-        '學生姓名': { rich_text: [{ text: { content: body.studentName.trim() } }] },
-        '年級': { select: { name: body.grade } },
-        '有興趣課程': { multi_select: body.courses.map((name) => ({ name })) },
-        '希望時段': { rich_text: [{ text: { content: body.preferredTime || '不限' } }] },
-        '備注': { rich_text: [{ text: { content: body.note?.trim() || '' } }] },
-        '狀態': { select: { name: '待聯繫' } },
-        '預約時間': { date: { start: submittedAt.toISOString() } },
+        'Name': { title: [{ text: { content: body.parentName.trim() } }] },
+        '姓名': { rich_text: [{ text: { content: body.studentName.trim() } }] },
+        '電話': { phone_number: body.phone.trim() },
+        '服務項目': { rich_text: [{ text: { content: body.courses.join('、') } }] },
+        '備註': { rich_text: [{ text: { content: [
+          `年級：${body.grade}`,
+          `希望時段：${body.preferredTime || '不限'}`,
+          body.note?.trim() ? `備注：${body.note.trim()}` : '',
+        ].filter(Boolean).join('\n') } }] },
+        '狀態': { select: { name: '待確認' } },
+        '預約日期': { date: { start: submittedAt.toISOString() } },
       },
     }),
   });

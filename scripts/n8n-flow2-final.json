@@ -161,10 +161,12 @@
               "textContent": "={{ $json.hint }}"
             },
             {
-              "key": "發布日期|date"
+              "key": "發布日期|date",
+              "dateValue": "={{ $json.publishDate }}"
             },
             {
-              "key": "是否發布|checkbox"
+              "key": "是否發布|checkbox",
+              "checkboxValue": false
             }
           ]
         },
