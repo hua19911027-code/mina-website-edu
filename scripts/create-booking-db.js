@@ -6,9 +6,9 @@
 //   → 「新增連線」 → 選「mina-website」整合
 //
 // 執行方式：
-//   NOTION_API_KEY=NOTION_API_KEY_PLACEHOLDER node scripts/create-booking-db.js
+//   NOTION_API_KEY=<your_notion_api_key> node scripts/create-booking-db.js
 
-const NOTION_KEY = process.env.NOTION_API_KEY || 'NOTION_API_KEY_PLACEHOLDER';
+const NOTION_KEY = process.env.NOTION_API_KEY;
 const PARENT_PAGE_ID = '374b8ee1-06b4-80ea-a0f9-dccaae830e8a';
 
 async function main() {
