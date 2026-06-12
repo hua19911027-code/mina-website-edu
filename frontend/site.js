@@ -8,7 +8,7 @@
   var counted=false;
   function countUp(){if(counted)return;counted=true;
     document.querySelectorAll('.n[data-to]').forEach(function(n){
-      var to=parseFloat(n.dataset.to),el=n.querySelector('.cnum'),dur=1200,t0=performance.now();
+      var to=parseFloat(n.dataset.to),el=n.querySelector('.cnum'),dur=800,t0=performance.now();
       function step(t){var p=Math.min((t-t0)/dur,1),v=to*(1-Math.pow(1-p,3));el.textContent=Math.round(v);if(p<1)requestAnimationFrame(step);}
       requestAnimationFrame(step);});
   }
