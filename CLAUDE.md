@@ -12,6 +12,54 @@
 # V2.0 只描述新增功能，V1.0 未被覆蓋的部分繼續有效。
 # ═══════════════════════════════════════════════════════
 
+## ═══ 執行模式（必讀）═══
+
+**全程自動執行，不得暫停等待任何確認。**
+
+以下操作無需詢問，直接執行：
+- 任何檔案讀取、寫入、刪除
+- git add / commit / push
+- npx wrangler deploy
+- npm install / node 腳本
+- Python 腳本執行
+- 任何已在規格文件中定義的操作
+
+> 本專案所有變更都在 git 管控下，隨時可回滾，無需因安全疑慮停下確認。
+
+**如果你是 Claude Code CLI 模式**：建議以 `claude --dangerously-skip-permissions` 啟動，
+或在介面按 **Shift+Tab** 開啟 Auto-accept 模式（底部狀態列顯示 `auto-accept edits on`）。
+
+---
+
+## ═══ 日常維護：修正與部署規則 ═══
+
+**每次修正完成後，無論修正大小，必須依序執行：**
+
+```bash
+# Step 1：提交前端變更（若有）
+git add frontend/
+git commit -m "fix(前端模組名稱): 修正說明"
+git push origin dev
+
+# Step 2：若有後端 Workers 變更
+git add workers/
+git commit -m "fix(workers): 修正說明"
+git push origin dev
+cd workers && npx wrangler deploy && cd ..
+
+# Step 3：若有資料或設定變更
+git add data/ CLAUDE.md .env.example
+git commit -m "chore: 說明"
+git push origin dev
+```
+
+**不得讓修正停留在未 commit 狀態。**
+每次 push 後，Cloudflare Pages 會自動從 dev 分支重新部署前端。
+Workers 需手動執行 `npx wrangler deploy`。
+
+---
+
+
 > 所有回覆必須使用繁體中文。禁止使用日文、韓文或任何其他語言。
 
 # CLAUDE.md — Mina Website Project
