@@ -207,11 +207,6 @@
             <button class="hp-btn hp-subj active" data-subj="英文">英文</button>
             <button class="hp-btn hp-subj" data-subj="數學">數學</button>
           </div>
-          <div class="hp-prac-row">
-            <button class="hp-btn hp-type active" data-type="">標準題型</button>
-            <button class="hp-btn hp-type" data-type="觀念拆解">觀念拆解</button>
-            <button class="hp-btn hp-type" data-type="錯題診斷">錯題診斷</button>
-          </div>
         </div>
         <div class="qcards" id="hp-qcard"></div>
         <p class="practice-note">看更多請到 <b><a href="practice.html" style="color:var(--pink);border-bottom:2px solid var(--pink);">完整題庫練習 →</a></b></p>
@@ -323,7 +318,7 @@
         var gl=s.grade;
         var sl=s.subj;
         wrap.innerHTML='<details class="qcard" style="max-width:760px;margin:0 auto">'
-          +'<summary><span class="qnum">1</span><span style="flex:1"><span class="q-meta">'+gl+' &middot; '+sl+(q.type?' &middot; '+esc(q.type):'')+'</span><br>'+esc(q.question)+'</span><span class="plus">+</span></summary>'
+          +'<summary><span class="qnum">1</span><span style="flex:1"><span class="q-meta">'+esc(q.type||'標準題型')+'</span><br>'+esc(q.question)+'</span><span class="plus">+</span></summary>'
           +'<div style="padding:0 24px 20px"><div class="q-opts">'+opts+'</div>'
           +'<div class="qbody"><div class="qseg ok"><span class="st">&#10003; 正確觀念</span>'
           +'<div class="q-ans-inline"><span class="q-ans-badge">'+esc(q.answer)+'</span><span class="q-ans-val">'+esc(av)+'</span></div>'
@@ -345,7 +340,7 @@
       });
     });
   }
-  bind('hp-grade','grade'); bind('hp-subj','subj'); bind('hp-type','type');
+  bind('hp-grade','grade'); bind('hp-subj','subj');
   function deferLoad(){
     if('requestIdleCallback' in window){
       requestIdleCallback(function(){load();},{timeout:2000});
