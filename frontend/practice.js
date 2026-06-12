@@ -117,7 +117,7 @@
       '<summary>'
         + '<span class="qnum">' + n + '</span>'
         + '<div class="q-sum-body">'
-          + '<span class="q-meta">錯題診斷</span>'
+          + '<span class="q-meta">' + esc({'標準題型':'標準題型','觀念':'觀念拆解','錯題':'錯題診斷'}[q.type] || q.type || '標準題型') + '</span>'
           + '<span class="q-title">' + esc(q.question) + '</span>'
           + '<div class="q-opts">' + optHtml + '</div>'
         + '</div>'
