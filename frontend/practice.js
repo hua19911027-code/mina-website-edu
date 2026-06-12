@@ -24,11 +24,10 @@
   function getFilters() {
     var gEl = document.querySelector('.grade.active')
     var sEl = document.querySelector('.tab.active')
-    var tEl = document.querySelector('.chip.active')
     return {
       grade:   gEl ? (GRADE_MAP[gEl.dataset.g]   || gEl.dataset.g   || '') : '',
       subject: sEl ? (SUBJ_MAP[sEl.dataset.subj] || sEl.dataset.subj || '') : '',
-      type:    tEl ? (tEl.dataset.chip || '') : ''
+      type:    ''
     }
   }
 
@@ -85,6 +84,8 @@
       '.exam-subj-btn.s-sci{background:linear-gradient(145deg,#E8F5E9,#A5D6A7);color:#1B5E20;}',
       '.exam-subj-btn.s-soc{background:linear-gradient(145deg,#F3E8FF,#D5B3FF);color:#4A1080;}',
       '.exam-subj-btn.s-other{background:linear-gradient(145deg,#FFF9E6,#FFEEA0);color:#5A4500;}',
+      /* hide chip filter buttons */
+      '.chips{display:none!important;}',
     ].join('')
     ;(document.head || document.documentElement).appendChild(s)
   }
@@ -116,7 +117,7 @@
       '<summary>'
         + '<span class="qnum">' + n + '</span>'
         + '<div class="q-sum-body">'
-          + '<span class="q-meta">' + esc(q.grade) + ' &middot; ' + esc(q.subject) + (q.type ? ' &middot; ' + esc(q.type) : '') + '</span>'
+          + '<span class="q-meta">錯題診斷</span>'
           + '<span class="q-title">' + esc(q.question) + '</span>'
           + '<div class="q-opts">' + optHtml + '</div>'
         + '</div>'
@@ -184,6 +185,12 @@
           if (c) c.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:30px">目前沒有符合條件的題目 &#128522;</p>'
           return
         }
+        var TYPE_ORDER = { '標準題型': 0, '觀念': 1, '錯題': 2 }
+        qs.sort(function(a, b) {
+          var ao = TYPE_ORDER[a.type] != null ? TYPE_ORDER[a.type] : 99
+          var bo = TYPE_ORDER[b.type] != null ? TYPE_ORDER[b.type] : 99
+          return ao - bo
+        })
         qs.forEach(function(q, i) { appendCard(q, loaded + i + 1) })
         loaded += qs.length
         page = json.data.page
@@ -336,16 +343,6 @@
       tab.addEventListener('click', function() {
         document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active') })
         tab.classList.add('active')
-        fetchQuestions(false)
-      })
-    })
-
-    /* 題型 .chip[data-chip] — toggle deselect */
-    document.querySelectorAll('.chip').forEach(function(chip) {
-      chip.addEventListener('click', function() {
-        var was = chip.classList.contains('active')
-        document.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('active') })
-        if (!was) chip.classList.add('active')
         fetchQuestions(false)
       })
     })
