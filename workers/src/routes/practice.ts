@@ -1,5 +1,5 @@
-/* GET /api/v1/practice              — 已發布題庫（is_published=true, not archived）
-   GET /api/v1/practice/archive      — 已封存題目（上限 36 題）
+/* GET /api/v1/practice              — 本週已發布題庫（最近 7 天）
+   GET /api/v1/practice/archive      — 近 90 天但 7 天前的題目（上限 36 題）
    GET /api/v1/practice/exam-review  — 考前複習 */
 
 import { Hono } from 'hono';
@@ -23,10 +23,18 @@ const route = new Hono<{ Bindings: Bindings }>();
 
 function now(): Date { return new Date(); }
 
-function buildPublishedFilter(grade?: string, subject?: string, type?: string): unknown {
+function daysAgo(d: Date, n: number): Date {
+  return new Date(d.getTime() - n * 24 * 60 * 60 * 1000);
+}
+
+/** 本週題目：發布日期 >= 7天前 AND <= 今天 */
+function buildCurrentWeekFilter(grade?: string, subject?: string, type?: string): unknown {
+  const n = now();
   const and: unknown[] = [
     { property: '是否發布', checkbox: { equals: true } },
     { property: '已封存', checkbox: { equals: false } },
+    { property: '發布日期', date: { on_or_after: daysAgo(n, 7).toISOString() } },
+    { property: '發布日期', date: { on_or_before: n.toISOString() } },
   ];
   if (grade) and.push({ property: '年級', select: { equals: grade } });
   if (subject) and.push({ property: '科目', select: { equals: subject } });
@@ -34,9 +42,14 @@ function buildPublishedFilter(grade?: string, subject?: string, type?: string): 
   return { and };
 }
 
-function buildArchivedFilter(grade?: string, subject?: string, type?: string): unknown {
+/** 歷屆題目：發布日期 >= 90天前 AND < 7天前 */
+function buildOlderFilter(grade?: string, subject?: string, type?: string): unknown {
+  const n = now();
   const and: unknown[] = [
-    { property: '已封存', checkbox: { equals: true } },
+    { property: '是否發布', checkbox: { equals: true } },
+    { property: '已封存', checkbox: { equals: false } },
+    { property: '發布日期', date: { on_or_after: daysAgo(n, 90).toISOString() } },
+    { property: '發布日期', date: { before: daysAgo(n, 7).toISOString() } },
   ];
   if (grade) and.push({ property: '年級', select: { equals: grade } });
   if (subject) and.push({ property: '科目', select: { equals: subject } });
@@ -150,7 +163,7 @@ route.get('/', async (c) => {
 
   try {
     const n = now();
-    const filter = buildPublishedFilter(grade, subject, type);
+    const filter = buildCurrentWeekFilter(grade, subject, type);
     const total_page_size = page * PAGE_SIZE + 1;
     const result = await notion.queryDatabase(c.env.NOTION_API_KEY, c.env.NOTION_PRACTICE_DB_ID, {
       filter,
@@ -219,7 +232,7 @@ route.get('/archive', async (c) => {
   }
 
   try {
-    const filter = buildArchivedFilter(grade, subject, type);
+    const filter = buildOlderFilter(grade, subject, type);
     const fetchSize = ARCHIVE_HARD_LIMIT + 1;
     const result = await notion.queryDatabase(c.env.NOTION_API_KEY, c.env.NOTION_PRACTICE_DB_ID, {
       filter,
@@ -264,11 +277,13 @@ route.get('/exam-review', async (c) => {
 
   try {
     const n = now();
-    // 只過濾啟用狀態和年級；時間比對在 JS 端用「展示時間」欄位的 start/end 進行
+    // Notion 端直接過濾時間範圍，減少傳輸量
     const filter = {
       and: [
         { property: '是否啟用', checkbox: { equals: true } },
         { property: '年級', select: { equals: grade } },
+        { property: '開始時間', date: { on_or_before: n.toISOString() } },
+        { property: '結束時間', date: { on_or_after: n.toISOString() } },
       ],
     };
 
@@ -303,14 +318,13 @@ route.get('/exam-review', async (c) => {
 
         if (!pdfUrl) return null;
 
-        // 時間比對：「展示時間」欄位（Date 型別，開啟結束日期）
-        // 若欄位不存在（schema 尚未更新）則不做時間過濾，保持向下相容
-        const displayTimeProp = (props['展示時間'] as Record<string, unknown>) || {};
-        const dateRange = displayTimeProp['date'] as { start?: string; end?: string } | null | undefined;
-        if (dateRange?.start && dateRange?.end) {
-          const displayStart = new Date(dateRange.start);
-          const displayEnd   = new Date(dateRange.end);
-          if (n < displayStart || n > displayEnd) return null;
+        // 時間比對：獨立的「開始時間」與「結束時間」Date 欄位
+        const startProp = (props['開始時間'] as Record<string, unknown>) || {};
+        const endProp   = (props['結束時間'] as Record<string, unknown>) || {};
+        const startDate = (startProp['date'] as { start?: string } | null | undefined)?.start || '';
+        const endDate   = (endProp['date'] as { start?: string } | null | undefined)?.start || '';
+        if (startDate && endDate) {
+          if (n < new Date(startDate) || n > new Date(endDate)) return null;
         }
 
         return {
@@ -319,6 +333,8 @@ route.get('/exam-review', async (c) => {
           subject: getSelect('科目'),
           grade: getSelect('年級'),
           pdfUrl,
+          startAt: startDate,
+          endAt: endDate,
         };
       })
       .filter((item): item is NonNullable<typeof item> => item !== null);
