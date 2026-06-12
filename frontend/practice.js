@@ -457,11 +457,18 @@
    * The bundler uses document.open()/write()/close() to replace the entire document.
    * After that, DOMContentLoaded does NOT re-fire for scripts from the old document.
    * Solution: MutationObserver + setInterval polling for #qcards to appear. */
+  function deferInit() {
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(function() { init() }, { timeout: 2000 })
+    } else {
+      setTimeout(init, 200)
+    }
+  }
   if (getContainer()) {
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init)
+      document.addEventListener('DOMContentLoaded', deferInit)
     } else {
-      init()
+      deferInit()
     }
   } else {
     var obs = new MutationObserver(function() {

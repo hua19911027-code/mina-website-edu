@@ -7,8 +7,11 @@
 <meta name="description" content="預約一堂免費試聽。填表或來電 04-2336-6868。台中市烏日區健行北路96號，旭光國小旁。"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="styles.css"/>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
+<noscript><link rel="preload" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap"/></noscript></noscript>
+<link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
+<noscript><link rel="stylesheet" href="styles.css"/></noscript>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/svg+xml" href="/assets/logo/zhuoyue-logo.svg">
 <meta name="theme-color" content="#E60D85">
@@ -18,7 +21,7 @@
 <header class="nav">
   <div class="nav-in">
     <a class="brand" href="index.html">
-      <img src="assets/logo/zhuoyue-logo.svg" alt="卓越國際文理"/>
+      <img src="assets/logo/zhuoyue-logo.svg" alt="卓越國際文理"/ width="48" height="48">
       <span class="bt"><b>徐薇英文 × 偉智數學</b><span>RUBY × WISE</span></span>
     </a>
     <nav class="nav-links">
@@ -147,13 +150,13 @@
   <div class="wrap">
     <div class="ft-grid">
       <div class="ft-brand">
-        <img src="assets/logo/zhuoyue-logo.svg" alt="卓越國際文理補習班"/>
+        <img src="assets/logo/zhuoyue-logo.svg" alt="卓越國際文理補習班"/ width="48" height="48">
         <div class="fb-name"><span class="reg">立案登記</span>臺中市私立卓越國際文理短期補習班</div>
         <div class="fb-brands">徐薇英文 UP學<span class="x">×</span>偉智數學 WISE</div>
         <div class="fb-loc">台中市烏日區・旭光國小旁</div>
       </div>
       <div class="ft-col">
-        <h4>網站導覽</h4>
+        <h3>網站導覽</h3>
         <a href="about.html">關於我們</a>
         <a href="courses.html">課程介紹</a>
         <a href="news.html">最新消息</a>
@@ -161,7 +164,7 @@
         <a href="faq.html">常見問題</a>
       </div>
       <div class="ft-col">
-        <h4>聯絡我們</h4>
+        <h3>聯絡我們</h3>
         <a href="tel:0423366868">電話：04-2336-6868</a>
         <a href="https://www.google.com/maps/search/?api=1&query=%E5%8F%B0%E4%B8%AD%E5%B8%82%E7%83%8F%E6%97%A5%E5%8D%80%E5%81%A5%E8%A1%8C%E5%8C%97%E8%B7%AF96%E8%99%9F" target="_blank" rel="noopener">地址：台中市烏日區健行北路96號</a>
         <a href="booking.html">預約免費試聽</a>
@@ -181,9 +184,9 @@
   </div>
 </footer>
 
-<script src="booking.js"></script>
-<script src="site.js"></script>
-<link rel="stylesheet" href="components/mina-widget.css">
+<script src="booking.js" defer></script>
+<script src="site.js" defer></script>
+<link rel="stylesheet" href="components/mina-widget.css"/>
 <script src="components/mina-widget.js"></script>
 </body>
 </html>

@@ -26,7 +26,7 @@ header.nav{position:sticky;top:0;z-index:120;background:var(--pink);border-botto
 .brand:hover img{transform:rotate(-12deg) scale(1.08);}
 .brand .bt{line-height:1.1;}
 .brand .bt b{font-weight:900;font-size:17px;color:#fff;display:block;}
-.brand .bt span{font-family:var(--fred);font-weight:600;font-size:11px;color:var(--yellow);letter-spacing:1px;}
+.brand .bt span{font-family:var(--fred);font-weight:600;font-size:11px;color:#fff;letter-spacing:1px;}
 .nav-links{display:flex;gap:2px;margin-left:auto;}
 .nav-links a{font-size:14px;font-weight:700;color:rgba(255,255,255,.92);padding:9px 14px;border-radius:30px;transition:.2s;}
 .nav-links a:hover{color:var(--pink);background:#fff;}
@@ -189,8 +189,9 @@ h1.hero-h .hl{background:var(--yellow);color:var(--ink);padding:0 10px;border-ra
 .linecta::after{content:'';position:absolute;width:150px;height:150px;border-radius:50%;background:rgba(255,233,77,.18);bottom:-70px;left:30%;}
 .lc-left{position:relative;z-index:2;}
 .lc-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.4);padding:6px 16px;border-radius:30px;font-size:13px;font-weight:700;margin-bottom:18px;}
-.lc-badge .pulse{width:9px;height:9px;border-radius:50%;background:#7CF29B;box-shadow:0 0 0 0 rgba(124,242,155,.8);animation:pulse 1.8s infinite;}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,242,155,.7)}70%{box-shadow:0 0 0 10px rgba(124,242,155,0)}100%{box-shadow:0 0 0 0 rgba(124,242,155,0)}}
+.lc-badge .pulse{width:9px;height:9px;border-radius:50%;background:#7CF29B;position:relative;will-change:transform;}
+.lc-badge .pulse::after{content:'';position:absolute;inset:0;border-radius:50%;background:#7CF29B;animation:pulse 1.8s infinite;will-change:transform,opacity;}
+@keyframes pulse{0%{transform:scale(1);opacity:.8}70%{transform:scale(2.4);opacity:0}100%{transform:scale(1);opacity:0}}
 .linecta h3{font-size:clamp(30px,4.2vw,46px);margin-bottom:14px;line-height:1.1;}
 .linecta h3 .wig{display:inline-block;animation:wiggle 2.4s ease-in-out infinite;transform-origin:70% 70%;}
 @keyframes wiggle{0%,88%,100%{transform:rotate(0)}90%{transform:rotate(16deg)}94%{transform:rotate(-12deg)}98%{transform:rotate(8deg)}}
@@ -232,7 +233,7 @@ footer{background:var(--pink-deep);color:rgba(255,255,255,.7);padding:56px 0 30p
 .ft-brand .fb-name .reg{display:block;font-size:11px;font-weight:700;color:var(--yellow);letter-spacing:1px;margin-bottom:4px;}
 .ft-brand .fb-brands{font-size:15px;font-weight:700;color:#fff;margin-bottom:8px;}
 .ft-brand .fb-brands .x{color:var(--yellow);margin:0 4px;font-weight:900;}
-.ft-brand .fb-loc{font-size:13px;color:rgba(255,255,255,.65);font-weight:500;display:flex;align-items:center;gap:7px;}
+.ft-brand .fb-loc{font-size:13px;color:rgba(255,255,255,.8);font-weight:500;display:flex;align-items:center;gap:7px;}
 .ft-brand .fb-loc::before{content:'◉';color:var(--yellow);}
 .ft-col h4{color:#fff;font-size:15px;margin-bottom:14px;font-weight:900;}
 .ft-col a{display:block;font-size:14px;padding:5px 0;transition:color .2s;}
