@@ -8,8 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=optional" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
-<noscript><link rel="preload" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=optional" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=optional"/></noscript></noscript>
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=optional"/></noscript>
 <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
 <noscript><link rel="stylesheet" href="styles.css"/></noscript>
 <link rel="manifest" href="/manifest.json">
@@ -58,7 +57,7 @@
 .hp-prac{max-width:640px;margin:0 auto 28px;}
 .hp-prac-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;}
 .hp-prac-row:first-child{margin-bottom:10px;}
-.hp-btn{padding:8px 20px;border-radius:30px;font-size:14px;font-weight:700;color:var(--ink-soft,#6B546A);background:#fff;border:2px solid var(--pink-soft,#FFE3F1);cursor:pointer;transition:.18s;font-family:var(--sans);}
+.hp-btn{padding:8px 20px;border-radius:30px;font-size:14px;font-weight:700;color:var(--ink-soft,#6B546A);background:#fff;border:2px solid var(--pink-soft,#FFE3F1);cursor:pointer;transition:background-color .18s,transform .18s;font-family:var(--sans);}
 .hp-btn.active{background:var(--pink,#E8007D);color:#fff;border-color:var(--pink,#E8007D);}
 .hp-btn:hover:not(.active){border-color:var(--pink,#E8007D);color:var(--pink,#E8007D);}
 /* q-opt (needed since practice.js not loaded here) */
@@ -342,11 +341,12 @@
   }
   bind('hp-grade','grade'); bind('hp-subj','subj');
   function deferLoad(){
-    if('requestIdleCallback' in window){
-      requestIdleCallback(function(){load();},{timeout:2000});
-    } else {
-      setTimeout(load,200);
-    }
+    var section=document.getElementById('practice');
+    if(!section||!('IntersectionObserver' in window)){load();return;}
+    var io=new IntersectionObserver(function(entries){
+      if(entries[0].isIntersecting){io.disconnect();load();}
+    },{rootMargin:'400px'});
+    io.observe(section);
   }
   if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',deferLoad);}else{deferLoad();}
 })();
