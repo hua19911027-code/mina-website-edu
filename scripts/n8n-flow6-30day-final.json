@@ -1,0 +1,226 @@
+{
+  "name": "Flow 6 — 審核截止最終提醒 30日 (Mina)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 30 * *"
+            }
+          ]
+        }
+      },
+      "id": "f6-n1-sched",
+      "name": "每月30日 09:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [-496, 304]
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "2502b420-9049-4621-a4b9-99a299a9b922",
+          "mode": "id"
+        },
+        "filterType": "manual",
+        "options": {},
+        "filterJson": "{\"and\": [{\"property\": \"是否發布\", \"checkbox\": {\"equals\": false}}, {\"property\": \"已封存\", \"checkbox\": {\"equals\": false}}]}"
+      },
+      "id": "f6-n2-notion",
+      "name": "查詢待審核題目",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [-256, 304],
+      "credentials": {
+        "notionApi": {
+          "id": "AzXLvJt1dpTqr9fB",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "check-count",
+              "leftValue": "={{ $input.all().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f6-n3-check",
+      "name": "有待審核題目？",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [0, 304]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst count = items.length;\nconst now = new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });\n\n// 找出各年級/科目的待審核數量\nconst breakdown = {};\nfor (const item of items) {\n  const props = item.json.properties || {};\n  const grade = props['年級']?.select?.name || '未知年級';\n  const subject = props['科目']?.select?.name || '未知科目';\n  const key = `${grade} ${subject}`;\n  breakdown[key] = (breakdown[key] || 0) + 1;\n}\nconst details = Object.entries(breakdown).map(([k, v]) => `  ${k}：${v} 題`).join('\\n');\n\nconst lineMsg = [\n  '【🚨 Mina 題庫最終審核提醒】',\n  `明日截止！還有 ${count} 道題目尚未審核！`,\n  '',\n  '⚠️ 今天是最後機會，明日 01:00 後不審核就不會出現在練習頁面！',\n  '',\n  '分布：',\n  details,\n  '',\n  '請立即登入 Notion 確認題目並勾選「是否發布」！',\n  `提醒時間：${now}`\n].join('\\n');\n\nconst emailBody = [\n  '【🚨 Mina 題庫最終審核提醒 — 明日截止】',\n  '',\n  `⚠️ 目前仍有 ${count} 道題目狀態為「未發布」。`,\n  '今天（每月30日）是最後審核機會，',\n  '明天（31日）01:00 後若仍未審核，這批題目將不會出現在練習頁面。',\n  '',\n  '各年級/科目分布：',\n  details,\n  '',\n  '➡️ 請立即至 Notion 題庫 Database 確認並勾選「是否發布」',\n  '',\n  `提醒時間：${now}`\n].join('\\n');\n\nreturn [{ json: {\n  count,\n  lineMsg,\n  emailSubject: `【🚨 Mina 題庫】明日截止！${count} 道題目仍未審核，請立即處理！`,\n  emailBody\n}}];"
+      },
+      "id": "f6-n4-format",
+      "name": "格式化最終提醒訊息",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [272, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/broadcast",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer LINE_CHANNEL_ACCESS_TOKEN_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"messages\": [{\"type\": \"text\", \"text\": {{ JSON.stringify($json.lineMsg) }}}]}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "f6-n5-line",
+      "name": "LINE 最終提醒管理員",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [528, 0]
+    },
+    {
+      "parameters": {
+        "fromEmail": "hua19911027@gmail.com",
+        "toEmail": "hua19911027@gmail.com, manko94134@gmail.com",
+        "subject": "={{ $json.emailSubject }}",
+        "options": {}
+      },
+      "id": "f6-n6-email",
+      "name": "Email 最終提醒管理員",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [528, 272],
+      "credentials": {
+        "smtp": {
+          "id": "BdOVsK33NdWdJUob",
+          "name": "Gmail SMTP (Mina)"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "f6-n7-skip",
+      "name": "無待審核 → 結束",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [272, 448]
+    },
+    {
+      "parameters": {
+        "content": "## Flow 6 — 審核截止最終提醒 30日\n\n**觸發：每月30日 09:00 (Asia/Taipei)**\n\n這是最終提醒，比 Flow 3（25日）更緊急。\n明日（31日）01:00 即為截止時間。\n\n邏輯：\n1. 查 Notion 題庫中「是否發布=false」的題目\n2. 若有 → 發送緊急 LINE + Email 提醒\n3. 若無 → 直接結束（已全部審核完畢）\n\n**必須設定（與 Flow 3 相同）：**\n\n**1. Notion Practice DB ID**\n已預填：2502b420-9049-4621-a4b9-99a299a9b922\n\n**2. LINE Channel Access Token**\n取代 LINE_CHANNEL_ACCESS_TOKEN_PLACEHOLDER",
+        "height": 340,
+        "width": 400,
+        "color": 3
+      },
+      "id": "f6-n8-note",
+      "name": "⚙️ 設定說明",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-704, 112]
+    }
+  ],
+  "connections": {
+    "每月30日 09:00": {
+      "main": [
+        [
+          {
+            "node": "查詢待審核題目",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "查詢待審核題目": {
+      "main": [
+        [
+          {
+            "node": "有待審核題目？",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "有待審核題目？": {
+      "main": [
+        [
+          {
+            "node": "格式化最終提醒訊息",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "無待審核 → 結束",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "格式化最終提醒訊息": {
+      "main": [
+        [
+          {
+            "node": "LINE 最終提醒管理員",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email 最終提醒管理員",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {}
+}
