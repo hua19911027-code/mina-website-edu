@@ -322,12 +322,11 @@
   }
 
   function bindAll() {
-    /* 年級 .grade[data-g] — toggle deselect */
+    /* 年級 .grade[data-g] — radio button behavior, always one selected */
     document.querySelectorAll('.grade').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        var was = btn.classList.contains('active')
         document.querySelectorAll('.grade').forEach(function(b) { b.classList.remove('active') })
-        if (!was) btn.classList.add('active')
+        btn.classList.add('active')
         fetchQuestions(false)
       })
     })
