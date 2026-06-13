@@ -5,6 +5,7 @@ import newsRoute from './routes/news';
 import faqRoute from './routes/faq';
 import practiceRoute from './routes/practice';
 import minaRoute from './routes/mina';
+import adminRoute from './routes/admin';
 import type { Bindings } from './types';
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -15,8 +16,8 @@ app.use('*', cors({
     'http://localhost:3000',
     'http://127.0.0.1:5500',
   ],
-  allowMethods: ['GET', 'POST', 'OPTIONS'],
-  allowHeaders: ['Content-Type'],
+  allowMethods: ['GET', 'POST', 'PUT', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'X-Admin-Secret'],
   maxAge: 86400,
 }));
 
@@ -25,6 +26,7 @@ app.route('/api/v1/news', newsRoute);
 app.route('/api/v1/faq', faqRoute);
 app.route('/api/v1/practice', practiceRoute);
 app.route('/api/v1/mina', minaRoute);
+app.route('/api/v1/admin', adminRoute);
 
 app.get('/health', (c) => c.json({ status: 'ok', env: c.env.ENVIRONMENT }));
 
