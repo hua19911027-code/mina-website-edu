@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>題庫管理後台｜Mina</title>
+<meta name="robots" content="noindex,nofollow"/>
+<link rel="preload" href="../styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
+<noscript><link rel="stylesheet" href="../styles.css"/></noscript>
+<link rel="icon" type="image/svg+xml" href="../assets/logo/zhuoyue-logo.svg">
+<style>
+:root { --adm-bg:#F7F3F6; --adm-card:#fff; --adm-border:#ECD9E8; }
+body { background:var(--adm-bg); }
+
+/* ── Layout ── */
+.adm-header { background:var(--pink-deep); color:#fff; padding:14px 28px; display:flex; align-items:center; gap:16px; position:sticky; top:0; z-index:100; }
+.adm-header h1 { font-size:18px; font-weight:800; letter-spacing:-.3px; }
+.adm-header .badge-env { background:rgba(255,255,255,.18); font-size:12px; padding:3px 12px; border-radius:20px; font-weight:600; }
+.adm-header .back-link { margin-left:auto; font-size:13px; color:rgba(255,255,255,.75); text-decoration:underline; cursor:pointer; }
+
+.adm-wrap { max-width:1100px; margin:0 auto; padding:28px 24px 60px; }
+
+/* ── Auth modal ── */
+.modal-bg { position:fixed; inset:0; background:rgba(36,16,25,.6); z-index:200; display:flex; align-items:center; justify-content:center; }
+.modal-bg.hidden { display:none; }
+.modal-box { background:#fff; border-radius:24px; padding:40px 36px; width:100%; max-width:420px; box-shadow:0 32px 60px -20px rgba(36,16,25,.4); }
+.modal-box h2 { font-size:22px; font-weight:800; margin-bottom:8px; }
+.modal-box p { font-size:14px; color:var(--ink-soft); margin-bottom:22px; }
+.modal-box input { width:100%; border:2px solid var(--adm-border); border-radius:12px; padding:12px 16px; font-size:15px; outline:none; font-family:monospace; }
+.modal-box input:focus { border-color:var(--pink); }
+.modal-box .err { font-size:13px; color:#c00; margin-top:8px; min-height:18px; }
+.modal-box button { width:100%; background:var(--pink); color:#fff; border:none; border-radius:12px; padding:14px; font-size:16px; font-weight:700; cursor:pointer; margin-top:16px; transition:background .2s; }
+.modal-box button:hover { background:var(--pink-deep); }
+
+/* ── Cards ── */
+.card { background:var(--adm-card); border:1.5px solid var(--adm-border); border-radius:20px; padding:28px 28px 24px; margin-bottom:22px; }
+.card-title { font-size:16px; font-weight:800; margin-bottom:18px; display:flex; align-items:center; gap:10px; }
+.card-title .ico { font-size:20px; }
+
+/* ── Toggle ── */
+.toggle-row { display:flex; align-items:center; gap:16px; }
+.toggle-label { font-size:15px; font-weight:600; }
+.toggle-desc { font-size:13px; color:var(--ink-soft); margin-top:4px; }
+.toggle-wrap { margin-left:auto; flex-shrink:0; }
+.toggle { position:relative; width:52px; height:28px; }
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-slider { position:absolute; inset:0; background:#D8C8D2; border-radius:30px; cursor:pointer; transition:background .2s; }
+.toggle-slider::before { content:''; position:absolute; width:22px; height:22px; background:#fff; border-radius:50%; top:3px; left:3px; transition:transform .2s; box-shadow:0 2px 6px rgba(0,0,0,.2); }
+.toggle input:checked + .toggle-slider { background:var(--pink); }
+.toggle input:checked + .toggle-slider::before { transform:translateX(24px); }
+
+.settings-row { margin-top:18px; }
+.settings-label { font-size:13px; font-weight:700; color:var(--ink-soft); margin-bottom:6px; }
+.settings-input { display:flex; gap:10px; align-items:center; }
+.settings-input input { flex:1; border:1.5px solid var(--adm-border); border-radius:10px; padding:9px 14px; font-size:14px; font-family:monospace; outline:none; }
+.settings-input input:focus { border-color:var(--pink); }
+.btn-save { background:var(--pink); color:#fff; border:none; border-radius:10px; padding:9px 20px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; transition:background .2s; }
+.btn-save:hover { background:var(--pink-deep); }
+.btn-save:disabled { background:#ccc; cursor:default; }
+.save-status { font-size:13px; margin-top:8px; min-height:18px; }
+.save-status.ok { color:#1a7a3e; }
+.save-status.err { color:#c00; }
+
+/* ── Filters ── */
+.filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; align-items:center; }
+.filter-bar select { border:1.5px solid var(--adm-border); border-radius:10px; padding:8px 12px; font-size:14px; background:#fff; cursor:pointer; outline:none; }
+.filter-bar select:focus { border-color:var(--pink); }
+.filter-bar .q-count { margin-left:auto; font-size:13px; color:var(--ink-soft); font-weight:600; }
+
+/* ── Regenerate ── */
+.regen-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.btn-regen { background:var(--orange); color:#fff; border:none; border-radius:12px; padding:12px 24px; font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px; transition:background .2s; }
+.btn-regen:hover { background:#C96500; }
+.btn-regen:disabled { background:#ccc; cursor:default; }
+.regen-note { font-size:13px; color:var(--ink-soft); }
+
+/* ── Confirm dialog ── */
+.confirm-bg { position:fixed; inset:0; background:rgba(36,16,25,.55); z-index:300; display:flex; align-items:center; justify-content:center; }
+.confirm-bg.hidden { display:none; }
+.confirm-box { background:#fff; border-radius:20px; padding:32px 28px; width:100%; max-width:380px; box-shadow:0 24px 50px -16px rgba(36,16,25,.4); }
+.confirm-box h3 { font-size:18px; font-weight:800; margin-bottom:10px; }
+.confirm-box p { font-size:14px; color:var(--ink-soft); line-height:1.7; margin-bottom:22px; }
+.confirm-actions { display:flex; gap:10px; }
+.confirm-actions button { flex:1; padding:12px; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; border:none; transition:background .2s; }
+.btn-confirm-cancel { background:var(--adm-bg); color:var(--ink); }
+.btn-confirm-cancel:hover { background:#ECD9E8; }
+.btn-confirm-ok { background:var(--orange); color:#fff; }
+.btn-confirm-ok:hover { background:#C96500; }
+
+/* ── Table ── */
+.q-table { width:100%; border-collapse:collapse; font-size:14px; }
+.q-table th { text-align:left; padding:10px 12px; color:var(--ink-soft); font-weight:700; border-bottom:2px solid var(--adm-border); white-space:nowrap; }
+.q-table td { padding:11px 12px; border-bottom:1px solid var(--adm-border); vertical-align:top; line-height:1.55; }
+.q-table tr:last-child td { border-bottom:none; }
+.q-table tr:hover td { background:#FBF5F9; }
+.tag-grade { background:var(--pink-soft); color:var(--pink-deep); font-size:12px; font-weight:700; padding:2px 8px; border-radius:10px; white-space:nowrap; }
+.tag-subj { background:var(--yellow-soft); color:#7A6000; font-size:12px; font-weight:700; padding:2px 8px; border-radius:10px; white-space:nowrap; }
+.q-status { font-size:12px; font-weight:700; padding:2px 8px; border-radius:10px; white-space:nowrap; }
+.q-status.published { background:#D4F0DF; color:#1a7a3e; }
+.q-status.review { background:var(--yellow-soft); color:#7A6000; }
+
+.empty-state { text-align:center; padding:48px 20px; color:var(--ink-mute); }
+.empty-state .e-ico { font-size:40px; margin-bottom:12px; }
+.loading-row td { text-align:center; padding:36px; color:var(--ink-mute); }
+
+/* ── Pagination ── */
+.pagination { display:flex; justify-content:center; gap:8px; margin-top:18px; }
+.pagination button { border:1.5px solid var(--adm-border); background:#fff; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
+.pagination button.active { background:var(--pink); color:#fff; border-color:var(--pink); }
+.pagination button:disabled { opacity:.4; cursor:default; }
+</style>
+</head>
+<body>
+
+<!-- Auth modal -->
+<div class="modal-bg" id="authModal">
+  <div class="modal-box">
+    <h2>🔐 後台登入</h2>
+    <p>請輸入 Admin Secret 繼續</p>
+    <input type="password" id="secretInput" placeholder="Admin Secret" autocomplete="off"/>
+    <div class="err" id="authErr"></div>
+    <button id="authBtn">進入後台</button>
+  </div>
+</div>
+
+<!-- Confirm dialog -->
+<div class="confirm-bg hidden" id="confirmDialog">
+  <div class="confirm-box">
+    <h3>⚠️ 確認重新出題？</h3>
+    <p>這將透過 n8n 觸發 AI 重新生成本週題目。<br/>現有已發布題目會被封存，新題目產生後需人工審核。<br/>此操作無法撤銷，確定繼續？</p>
+    <div class="confirm-actions">
+      <button class="btn-confirm-cancel" id="confirmCancel">取消</button>
+      <button class="btn-confirm-ok" id="confirmOk">確認重新生成</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin header -->
+<header class="adm-header">
+  <div style="font-size:22px;">📚</div>
+  <h1>Mina 題庫管理後台</h1>
+  <span class="badge-env" id="envBadge">載入中…</span>
+  <a class="back-link" href="../index.html">← 回首頁</a>
+</header>
+
+<div class="adm-wrap">
+
+  <!-- Settings card -->
+  <div class="card">
+    <div class="card-title"><span class="ico">⚙️</span>系統設定</div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">審核模式</div>
+        <div class="toggle-desc">開啟後，前台練習頁會顯示「審核中」題目供人工驗題；關閉後僅顯示已發布題目</div>
+      </div>
+      <div class="toggle-wrap">
+        <label class="toggle">
+          <input type="checkbox" id="reviewModeToggle"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-label">Notion 題庫 DB ID（留空使用 wrangler secret 預設值）</div>
+      <div class="settings-input">
+        <input type="text" id="notionDbInput" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+        <button class="btn-save" id="saveSettingsBtn">儲存設定</button>
+      </div>
+      <div class="save-status" id="saveStatus"></div>
+    </div>
+  </div>
+
+  <!-- Practice questions card -->
+  <div class="card">
+    <div class="card-title"><span class="ico">📝</span>本週題目列表</div>
+
+    <div class="filter-bar">
+      <select id="filterGrade">
+        <option value="">全部年級</option>
+        <option value="小一">小一</option>
+        <option value="小二">小二</option>
+        <option value="小三">小三</option>
+        <option value="小四">小四</option>
+        <option value="小五">小五</option>
+        <option value="小六">小六</option>
+      </select>
+      <select id="filterSubject">
+        <option value="">全部科目</option>
+        <option value="en">英文</option>
+        <option value="ma">數學</option>
+      </select>
+      <select id="filterType">
+        <option value="">全部題型</option>
+        <option value="單選題">單選題</option>
+        <option value="多選題">多選題</option>
+        <option value="填空題">填空題</option>
+      </select>
+      <button class="btn-save" id="filterBtn" style="padding:8px 16px;">篩選</button>
+      <span class="q-count" id="qCount"></span>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="q-table">
+        <thead>
+          <tr>
+            <th style="width:60px;">#</th>
+            <th style="width:72px;">年級</th>
+            <th style="width:64px;">科目</th>
+            <th style="width:80px;">題型</th>
+            <th>題目</th>
+            <th style="width:80px;">發布日期</th>
+            <th style="width:76px;">狀態</th>
+          </tr>
+        </thead>
+        <tbody id="qTableBody">
+          <tr class="loading-row"><td colspan="7">載入中…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <!-- Regenerate card -->
+  <div class="card">
+    <div class="card-title"><span class="ico">🔄</span>重新生成題目</div>
+    <div class="regen-row">
+      <button class="btn-regen" id="regenBtn">
+        <span>⚡</span> 觸發 AI 重新出題
+      </button>
+      <span class="regen-note" id="regenNote">透過 n8n Flow 5 觸發 AI 重新生成本週題目，舊題自動封存</span>
+    </div>
+    <div class="save-status" id="regenStatus" style="margin-top:12px;"></div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var API = 'https://mina-api.hua19911027.workers.dev/api/v1';
+  var secret = '';
+  var qPage = 1;
+  var qTotal = 0;
+  var LIMIT = 20;
+
+  /* ── Auth ── */
+  function getStoredSecret() { try { return sessionStorage.getItem('adm_secret') || ''; } catch(e) { return ''; } }
+  function setStoredSecret(s) { try { sessionStorage.setItem('adm_secret', s); } catch(e) {} }
+
+  function showAuthModal() {
+    document.getElementById('authModal').classList.remove('hidden');
+    document.getElementById('secretInput').focus();
+  }
+  function hideAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+
+  async function tryAuth(s) {
+    var res = await fetch(API + '/admin/settings', { headers: { 'X-Admin-Secret': s } });
+    if (res.status === 401) return false;
+    return true;
+  }
+
+  document.getElementById('authBtn').addEventListener('click', async function () {
+    var s = document.getElementById('secretInput').value.trim();
+    if (!s) { document.getElementById('authErr').textContent = '請輸入 Admin Secret'; return; }
+    this.disabled = true; this.textContent = '驗證中…';
+    var ok = await tryAuth(s).catch(function() { return false; });
+    this.disabled = false; this.textContent = '進入後台';
+    if (!ok) { document.getElementById('authErr').textContent = '密碼錯誤，請重試'; return; }
+    secret = s;
+    setStoredSecret(s);
+    hideAuthModal();
+    init();
+  });
+
+  document.getElementById('secretInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('authBtn').click();
+  });
+
+  /* ── Init ── */
+  async function init() {
+    await loadSettings();
+    await loadQuestions();
+  }
+
+  /* ── Settings ── */
+  async function loadSettings() {
+    try {
+      var res = await fetch(API + '/admin/settings', { headers: { 'X-Admin-Secret': secret } });
+      var data = await res.json();
+      if (!data.ok) return;
+      var s = data.data;
+      document.getElementById('reviewModeToggle').checked = !!s.reviewModeEnabled;
+      document.getElementById('notionDbInput').value = s.notionPracticeDbId || '';
+      document.getElementById('envBadge').textContent = 'mina-api · production';
+    } catch(e) {}
+  }
+
+  document.getElementById('reviewModeToggle').addEventListener('change', function() {
+    saveSetting({ reviewModeEnabled: this.checked });
+  });
+
+  document.getElementById('saveSettingsBtn').addEventListener('click', function() {
+    saveSetting({ notionPracticeDbId: document.getElementById('notionDbInput').value.trim() });
+  });
+
+  async function saveSetting(patch) {
+    var statusEl = document.getElementById('saveStatus');
+    statusEl.textContent = '儲存中…'; statusEl.className = 'save-status';
+    try {
+      var res = await fetch(API + '/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': secret },
+        body: JSON.stringify(patch)
+      });
+      var data = await res.json();
+      if (data.ok) {
+        statusEl.textContent = '✓ 已儲存'; statusEl.className = 'save-status ok';
+      } else {
+        statusEl.textContent = '❌ 儲存失敗：' + data.error.message; statusEl.className = 'save-status err';
+      }
+    } catch(e) {
+      statusEl.textContent = '❌ 網路錯誤'; statusEl.className = 'save-status err';
+    }
+    setTimeout(function() { statusEl.textContent = ''; }, 3000);
+  }
+
+  /* ── Practice list ── */
+  function getFilters() {
+    return {
+      grade: document.getElementById('filterGrade').value,
+      subject: document.getElementById('filterSubject').value,
+      type: document.getElementById('filterType').value
+    };
+  }
+
+  async function loadQuestions() {
+    var tbody = document.getElementById('qTableBody');
+    tbody.innerHTML = '<tr class="loading-row"><td colspan="7">載入中…</td></tr>';
+
+    var f = getFilters();
+    var params = new URLSearchParams({ page: qPage, limit: LIMIT });
+    if (f.grade) params.set('grade', f.grade);
+    if (f.subject) params.set('subject', f.subject);
+    if (f.type) params.set('type', f.type);
+
+    try {
+      var res = await fetch(API + '/practice?' + params.toString());
+      var data = await res.json();
+      if (!data.ok) { renderEmpty(); return; }
+      var list = data.data;
+      qTotal = list.total;
+      renderTable(list.questions);
+      renderPagination(list.total, list.page, list.limit);
+      document.getElementById('qCount').textContent = '共 ' + list.total + ' 題';
+    } catch(e) {
+      tbody.innerHTML = '<tr class="loading-row"><td colspan="7">載入失敗：' + esc(String(e)) + '</td></tr>';
+    }
+  }
+
+  function renderTable(qs) {
+    var tbody = document.getElementById('qTableBody');
+    if (!qs || qs.length === 0) { renderEmpty(); return; }
+    var html = '';
+    qs.forEach(function(q, i) {
+      var idx = (qPage - 1) * LIMIT + i + 1;
+      var dateStr = q.publishedAt ? q.publishedAt.slice(0, 10) : '—';
+      html += '<tr>' +
+        '<td>' + idx + '</td>' +
+        '<td><span class="tag-grade">' + esc(q.grade || '—') + '</span></td>' +
+        '<td><span class="tag-subj">' + esc(q.subject === 'en' ? '英文' : q.subject === 'ma' ? '數學' : q.subject || '—') + '</span></td>' +
+        '<td>' + esc(q.type || '—') + '</td>' +
+        '<td style="max-width:320px;">' + esc(q.question || '—') + '</td>' +
+        '<td style="white-space:nowrap;">' + esc(dateStr) + '</td>' +
+        '<td><span class="q-status published">已發布</span></td>' +
+        '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  function renderEmpty() {
+    document.getElementById('qTableBody').innerHTML =
+      '<tr><td colspan="7"><div class="empty-state"><div class="e-ico">📭</div><div>目前沒有符合條件的題目</div></div></td></tr>';
+    document.getElementById('qCount').textContent = '';
+    document.getElementById('pagination').innerHTML = '';
+  }
+
+  function renderPagination(total, page, limit) {
+    var pages = Math.ceil(total / limit);
+    var el = document.getElementById('pagination');
+    if (pages <= 1) { el.innerHTML = ''; return; }
+    var html = '';
+    html += '<button ' + (page <= 1 ? 'disabled' : '') + ' data-p="' + (page-1) + '">‹</button>';
+    for (var p = 1; p <= pages; p++) {
+      html += '<button ' + (p === page ? 'class="active"' : '') + ' data-p="' + p + '">' + p + '</button>';
+    }
+    html += '<button ' + (page >= pages ? 'disabled' : '') + ' data-p="' + (page+1) + '">›</button>';
+    el.innerHTML = html;
+    el.querySelectorAll('button[data-p]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var np = parseInt(this.dataset.p, 10);
+        if (np >= 1 && np <= pages && np !== qPage) {
+          qPage = np;
+          loadQuestions();
+        }
+      });
+    });
+  }
+
+  document.getElementById('filterBtn').addEventListener('click', function() {
+    qPage = 1; loadQuestions();
+  });
+
+  /* ── Regenerate ── */
+  document.getElementById('regenBtn').addEventListener('click', function() {
+    document.getElementById('confirmDialog').classList.remove('hidden');
+  });
+  document.getElementById('confirmCancel').addEventListener('click', function() {
+    document.getElementById('confirmDialog').classList.add('hidden');
+  });
+  document.getElementById('confirmOk').addEventListener('click', async function() {
+    document.getElementById('confirmDialog').classList.add('hidden');
+    var statusEl = document.getElementById('regenStatus');
+    var btn = document.getElementById('regenBtn');
+    btn.disabled = true;
+    statusEl.textContent = '⏳ 正在觸發 n8n workflow…'; statusEl.className = 'save-status';
+    try {
+      var res = await fetch(API + '/admin/practice/regenerate', {
+        method: 'POST',
+        headers: { 'X-Admin-Secret': secret }
+      });
+      var data = await res.json();
+      if (data.ok) {
+        statusEl.textContent = '✓ 已觸發重新出題，請稍後至 Notion 確認新題目'; statusEl.className = 'save-status ok';
+      } else if (res.status === 404) {
+        statusEl.textContent = '⚠️ 功能開發中，n8n Webhook flow 尚未設定'; statusEl.className = 'save-status err';
+      } else {
+        statusEl.textContent = '❌ ' + (data.error && data.error.message ? data.error.message : '觸發失敗'); statusEl.className = 'save-status err';
+      }
+    } catch(e) {
+      statusEl.textContent = '❌ 網路錯誤：' + String(e); statusEl.className = 'save-status err';
+    }
+    btn.disabled = false;
+  });
+
+  /* ── Escape ── */
+  function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── Bootstrap ── */
+  var stored = getStoredSecret();
+  if (stored) {
+    tryAuth(stored).then(function(ok) {
+      if (ok) { secret = stored; hideAuthModal(); init(); }
+      else { sessionStorage.removeItem('adm_secret'); showAuthModal(); }
+    }).catch(showAuthModal);
+  } else {
+    showAuthModal();
+  }
+})();
+</script>
+</body>
+</html>
