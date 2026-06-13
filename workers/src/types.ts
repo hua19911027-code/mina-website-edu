@@ -12,6 +12,7 @@ export type Bindings = {
   ADMIN_SECRET: string;
   CORS_ORIGIN: string;
   ENVIRONMENT: string;
+  KV_SETTINGS: KVNamespace;
 };
 
 /* ── API Response shapes ── */

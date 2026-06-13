@@ -15,6 +15,10 @@ keep_vars = true
 # wrangler secret put ADMIN_SECRET
 # wrangler secret put CORS_ORIGIN
 
+[[kv_namespaces]]
+binding = "KV_SETTINGS"
+id = "4aac88420d7b4561ab7738e121c83edd"
+
 [vars]
 ENVIRONMENT = "production"
 
