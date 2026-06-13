@@ -108,6 +108,20 @@ body { background:var(--adm-bg); }
 .pagination button { border:1.5px solid var(--adm-border); background:#fff; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; }
 .pagination button.active { background:var(--pink); color:#fff; border-color:var(--pink); }
 .pagination button:disabled { opacity:.4; cursor:default; }
+
+/* ── Publisher upload ── */
+.pub-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+.pub-row select { border:1.5px solid var(--adm-border); border-radius:10px; padding:9px 12px; font-size:14px; background:#fff; cursor:pointer; outline:none; }
+.pub-row select:focus { border-color:var(--pink); }
+.pub-file-wrap { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.pub-file-label { display:inline-flex; align-items:center; gap:8px; background:var(--adm-bg); border:1.5px dashed var(--adm-border); border-radius:10px; padding:10px 18px; font-size:14px; font-weight:600; cursor:pointer; transition:border-color .2s; }
+.pub-file-label:hover { border-color:var(--pink); }
+.pub-file-label input { display:none; }
+.pub-file-name { font-size:13px; color:var(--ink-soft); }
+.btn-analyze { background:var(--pink-deep); color:#fff; border:none; border-radius:12px; padding:11px 22px; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px; transition:background .2s; }
+.btn-analyze:hover { background:#6B0035; }
+.btn-analyze:disabled { background:#ccc; cursor:default; }
+.pub-desc { font-size:13px; color:var(--ink-soft); margin-bottom:16px; line-height:1.65; }
 </style>
 </head>
 <body>
@@ -220,6 +234,47 @@ body { background:var(--adm-bg); }
       </table>
     </div>
     <div class="pagination" id="pagination"></div>
+  </div>
+
+  <!-- Publisher analysis card -->
+  <div class="card">
+    <div class="card-title"><span class="ico">📖</span>出版社分析（學年設定）</div>
+    <p class="pub-desc">上傳教科書封面或目錄頁（PDF / JPG / PNG），AI 自動識別出版社與單元，寫入「出題規範」供 AI 出題參考。每個年級每個科目各上傳一份。</p>
+
+    <div class="pub-row">
+      <select id="pubYear">
+        <option value="114學年度">114學年度</option>
+        <option value="115學年度">115學年度</option>
+        <option value="116學年度">116學年度</option>
+      </select>
+      <select id="pubGrade">
+        <option value="">選擇年級</option>
+        <option value="小一">小一</option>
+        <option value="小二">小二</option>
+        <option value="小三">小三</option>
+        <option value="小四">小四</option>
+        <option value="小五">小五</option>
+        <option value="小六">小六</option>
+      </select>
+      <select id="pubSubject">
+        <option value="">選擇科目</option>
+        <option value="英文">英文</option>
+        <option value="數學">數學</option>
+      </select>
+    </div>
+
+    <div class="pub-file-wrap">
+      <label class="pub-file-label">
+        <span>📎</span> 選擇檔案
+        <input type="file" id="pubFile" accept=".pdf,.jpg,.jpeg,.png"/>
+      </label>
+      <span class="pub-file-name" id="pubFileName">尚未選擇檔案</span>
+    </div>
+
+    <button class="btn-analyze" id="pubAnalyzeBtn">
+      <span>🔬</span> AI 分析上傳
+    </button>
+    <div class="save-status" id="pubStatus" style="margin-top:12px;"></div>
   </div>
 
   <!-- Regenerate card -->
@@ -441,6 +496,59 @@ body { background:var(--adm-bg); }
       }
     } catch(e) {
       statusEl.textContent = '❌ 網路錯誤：' + String(e); statusEl.className = 'save-status err';
+    }
+    btn.disabled = false;
+  });
+
+  /* ── Publisher upload ── */
+  document.getElementById('pubFile').addEventListener('change', function() {
+    var name = this.files[0] ? this.files[0].name : '尚未選擇檔案';
+    document.getElementById('pubFileName').textContent = name;
+  });
+
+  document.getElementById('pubAnalyzeBtn').addEventListener('click', async function() {
+    var grade = document.getElementById('pubGrade').value;
+    var subject = document.getElementById('pubSubject').value;
+    var year = document.getElementById('pubYear').value;
+    var file = document.getElementById('pubFile').files[0];
+    var statusEl = document.getElementById('pubStatus');
+
+    if (!grade) { statusEl.textContent = '請選擇年級'; statusEl.className = 'save-status err'; return; }
+    if (!subject) { statusEl.textContent = '請選擇科目'; statusEl.className = 'save-status err'; return; }
+    if (!file) { statusEl.textContent = '請選擇檔案'; statusEl.className = 'save-status err'; return; }
+
+    var btn = this;
+    btn.disabled = true;
+    statusEl.textContent = '⏳ 上傳中，AI 分析需 30–60 秒…'; statusEl.className = 'save-status';
+
+    try {
+      var formData = new FormData();
+      formData.append('file', file);
+      formData.append('grade', grade);
+      formData.append('subject', subject);
+      formData.append('academicYear', year);
+
+      var res = await fetch(API + '/admin/publisher/analyze', {
+        method: 'POST',
+        headers: { 'X-Admin-Secret': secret },
+        body: formData
+      });
+      var data = await res.json();
+      if (data.ok) {
+        statusEl.textContent = '✓ 已觸發 AI 分析，請稍後至 Notion「出題規範」查看結果';
+        statusEl.className = 'save-status ok';
+        document.getElementById('pubFile').value = '';
+        document.getElementById('pubFileName').textContent = '尚未選擇檔案';
+      } else if (res.status === 503) {
+        statusEl.textContent = '⚠️ N8N_PUBLISHER_WEBHOOK 尚未設定，請先聯絡系統管理員';
+        statusEl.className = 'save-status err';
+      } else {
+        statusEl.textContent = '❌ ' + ((data.error && data.error.message) ? data.error.message : '上傳失敗');
+        statusEl.className = 'save-status err';
+      }
+    } catch(e) {
+      statusEl.textContent = '❌ 網路錯誤：' + String(e);
+      statusEl.className = 'save-status err';
     }
     btn.disabled = false;
   });

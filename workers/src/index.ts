@@ -6,6 +6,7 @@ import faqRoute from './routes/faq';
 import practiceRoute from './routes/practice';
 import minaRoute from './routes/mina';
 import adminRoute from './routes/admin';
+import publisherRoute from './routes/publisher';
 import type { Bindings } from './types';
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -27,6 +28,7 @@ app.route('/api/v1/faq', faqRoute);
 app.route('/api/v1/practice', practiceRoute);
 app.route('/api/v1/mina', minaRoute);
 app.route('/api/v1/admin', adminRoute);
+app.route('/api/v1/admin/publisher', publisherRoute);
 
 app.get('/health', (c) => c.json({ status: 'ok', env: c.env.ENVIRONMENT }));
 

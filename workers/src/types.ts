@@ -10,6 +10,7 @@ export type Bindings = {
   LINE_OFFICIAL_URL: string;
   N8N_BOOKING_WEBHOOK?: string;
   N8N_REGEN_WEBHOOK?: string;
+  N8N_PUBLISHER_WEBHOOK?: string;
   ADMIN_SECRET: string;
   CORS_ORIGIN: string;
   ENVIRONMENT: string;
