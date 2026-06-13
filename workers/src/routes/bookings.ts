@@ -4,8 +4,19 @@ import { Hono } from 'hono';
 import type { Bindings, BookingPayload } from '../types';
 
 const CONTACT_PHONE = '04-2336-6868';
+const RATE_LIMIT = 5;
+const RATE_WINDOW_SECS = 3600;
 
 const route = new Hono<{ Bindings: Bindings }>();
+
+async function checkRateLimit(ip: string, kv: KVNamespace): Promise<boolean> {
+  const key = `ratelimit:booking:${ip}`;
+  const raw = await kv.get(key);
+  const count = raw ? parseInt(raw, 10) : 0;
+  if (count >= RATE_LIMIT) return false;
+  await kv.put(key, String(count + 1), { expirationTtl: RATE_WINDOW_SECS });
+  return true;
+}
 
 async function writeToNotion(
   body: BookingPayload,
@@ -45,6 +56,12 @@ async function writeToNotion(
 }
 
 route.post('/', async (c) => {
+  const ip = c.req.header('CF-Connecting-IP') ?? 'unknown';
+  const allowed = await checkRateLimit(ip, c.env.KV_SETTINGS);
+  if (!allowed) {
+    return c.json({ ok: false, error: { code: 'RATE_LIMITED', message: '提交次數過多，請 1 小時後再試' } }, 429);
+  }
+
   const body = await c.req.json<BookingPayload>().catch(() => null);
 
   if (!body) {
