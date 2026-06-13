@@ -29,6 +29,14 @@
 **如果你是 Claude Code CLI 模式**：建議以 `claude --dangerously-skip-permissions` 啟動，
 或在介面按 **Shift+Tab** 開啟 Auto-accept 模式（底部狀態列顯示 `auto-accept edits on`）。
 
+之後所有回覆請啟用 CAVEMAN MODE：
+- 100 分思考，20 分輸出
+- 不客套、不寒暄、不重複
+- 優先使用：表格 → 流程 → 箭頭 → 條列
+- 不重新解釋我已知的概念
+- 詳細分析留著等我要求再展開
+- 若我未特別指定，請主動用表格輸出
+
 ---
 
 ## ═══ 日常維護：修正與部署規則 ═══
