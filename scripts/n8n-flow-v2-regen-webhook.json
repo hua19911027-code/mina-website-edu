@@ -1,0 +1,247 @@
+{
+  "name": "Flow V2 — 手動重新出題 Webhook (Mina)",
+  "active": false,
+  "nodes": [
+    {
+      "id": "regen-n1-webhook",
+      "name": "Webhook 觸發重新出題",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "webhookId": "practice-regenerate",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "practice-regenerate",
+        "responseMode": "onReceived",
+        "responseData": "noData",
+        "options": {}
+      }
+    },
+    {
+      "id": "regen-n2-query",
+      "name": "查詢現有已發布題目",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [260, 300],
+      "credentials": {
+        "notionApi": { "id": "AzXLvJt1dpTqr9fB", "name": "Notion account" }
+      },
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "2502b420-9049-4621-a4b9-99a299a9b922",
+          "mode": "id"
+        },
+        "filterType": "manual",
+        "filterJson": "{\"and\": [{\"property\": \"是否發布\", \"checkbox\": {\"equals\": true}}, {\"property\": \"已封存\", \"checkbox\": {\"equals\": false}}]}",
+        "returnAll": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "regen-n3-archive",
+      "name": "封存現有題目",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [520, 300],
+      "credentials": {
+        "notionApi": { "id": "AzXLvJt1dpTqr9fB", "name": "Notion account" }
+      },
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            { "key": "已封存|checkbox", "checkboxValue": true }
+          ]
+        }
+      }
+    },
+    {
+      "id": "regen-n4-tasks",
+      "name": "建立出題任務清單",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [780, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const grades = ['小一', '小二', '小三', '小四', '小五', '小六'];\nconst subjects = ['英文', '數學'];\nconst qTypes = ['標準題型', '觀念拆解', '錯題診斷'];\n\nconst gradeEnglish = {\n  '小一': '康軒Wonder World', '小二': '康軒Wonder World',\n  '小三': '康軒Wonder World', '小四': '康軒Wonder World',\n  '小五': '何嘉仁Super Fun',  '小六': '康軒Wonder World',\n};\nconst gradeMath = {\n  '小一': '康軒', '小二': '翰林', '小三': '康軒',\n  '小四': '南一', '小五': '康軒', '小六': '南一',\n};\n\nconst now = new Date();\nconst month = now.getMonth();\nconst semester = (month >= 7 || month <= 0) ? '上學期' : '下學期';\nconst acadYear = now.getFullYear() - 1911 + (month >= 7 ? 0 : -1);\nconst acadYearLabel = `${acadYear}學年度`;\n\nconst nextMonthDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);\nconst yearMonth = `${nextMonthDate.getFullYear()}${String(nextMonthDate.getMonth() + 1).padStart(2, '0')}`;\n\nfunction getAcademicWeek(satDate) {\n  const y = satDate.getFullYear();\n  const m = satDate.getMonth();\n  const acadStart = m >= 7 ? new Date(y, 7, 1) : new Date(y - 1, 7, 1);\n  const dow = acadStart.getDay();\n  const dToSat = dow === 6 ? 0 : (6 - dow);\n  const firstSat = new Date(acadStart.getTime() + dToSat * 86400000);\n  const diffDays = Math.round((satDate.getTime() - firstSat.getTime()) / 86400000);\n  return Math.floor(diffDays / 7) + 1;\n}\n\nconst saturdays = [];\nfor (let d = new Date(nextMonthDate); saturdays.length < 6; d.setDate(d.getDate() + 1)) {\n  if (d.getDay() === 6) {\n    const sat = new Date(d);\n    saturdays.push({\n      iso: sat.toISOString().slice(0, 10),\n      weekNum: getAcademicWeek(sat)\n    });\n  }\n}\n\nconst typeAbbr = { '標準題型': '標', '觀念拆解': '觀', '錯題診斷': '錯' };\nconst gradeCode = { '小一': '1', '小二': '2', '小三': '3', '小四': '4', '小五': '5', '小六': '6' };\nconst subjectCode = { '英文': 'en', '數學': 'ma' };\n\nconst tasks = [];\nfor (const grade of grades) {\n  for (const subject of subjects) {\n    for (const qType of qTypes) {\n      const curriculum = subject === '英文' ? gradeEnglish[grade] : gradeMath[grade];\n      tasks.push({ json: {\n        grade, subject, curriculum, semester, acadYear: acadYearLabel, qType,\n        typeAbbr: typeAbbr[qType], gradeCode: gradeCode[grade],\n        subjectCode: subjectCode[subject], yearMonth, saturdays, count: saturdays.length\n      }});\n    }\n  }\n}\nreturn tasks;"
+      }
+    },
+    {
+      "id": "regen-n5-ai",
+      "name": "OpenRouter 生成題目",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1040, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer OPENROUTER_API_KEY_PLACEHOLDER" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"models\": [\"google/gemini-2.5-flash\", \"google/gemini-2.5-pro\", \"google/gemini-2.5-flash-lite\"],\n  \"route\": \"fallback\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"你是一位台灣國小補習班的資深老師，有15年教學經驗，上課風格活潑有能量。出題和寫解析時，必須遵守以下規範：\\n1. 題目符合指定年級、科目、出版社版本、單元的學習範圍\\n2. 選項設計具備合理誤導性，不可太明顯\\n3. 答案在 A/B/C/D 中均勻分布，不能全集中在同一選項\\n4. 正確觀念、常見錯誤、記憶提示必須用口語說明——親切、帶能量，像在課堂上直接跟學生說話\\n5. 每個說明區塊至少放 1 個表情符號\\n6. 禁止直接引用或改寫出版社原題，須重新設計\\n7. 輸出格式必須是合法 JSON 陣列，不含其他文字\"},\n    {\"role\": \"user\", \"content\": \"請為台灣國小{{ $json.grade }}學生出 {{ $json.count }} 道{{ $json.subject }}選擇題。\\n教材版本：{{ $json.curriculum }}\\n題型：{{ $json.qType }}\\n\\n每道題輸出以下欄位（JSON 物件）：\\n- chapter：單元名稱\\n- question：題目主文\\n- optionA / optionB / optionC / optionD：四個選項\\n- answer：正確答案（A/B/C/D）\\n- concept：正確觀念（口語化，含至少1個表情符號）\\n- mistake：常見錯誤（口語化，含至少1個表情符號）\\n- hint：記憶提示（口語化，含至少1個表情符號）\\n\\n輸出格式（只輸出 JSON 陣列，不含其他說明文字）：\\n[{\\\"chapter\\\":\\\"...\\\",\\\"question\\\":\\\"...\\\",\\\"optionA\\\":\\\"...\\\",\\\"optionB\\\":\\\"...\\\",\\\"optionC\\\":\\\"...\\\",\\\"optionD\\\":\\\"...\\\",\\\"answer\\\":\\\"A\\\",\\\"concept\\\":\\\"...\\\",\\\"mistake\\\":\\\"...\\\",\\\"hint\\\":\\\"...\\\"}]\"}\n  ],\n  \"temperature\": 0.8\n}"
+      }
+    },
+    {
+      "id": "regen-n6-parse",
+      "name": "解析 AI 題目",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1300, 300],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const openrouterResp = $input.item.json;\nconst task = $('建立出題任務清單').item.json;\n\nconst { grade, subject, curriculum, semester, acadYear, qType, typeAbbr,\n        gradeCode, subjectCode, yearMonth, saturdays } = task;\n\nlet raw = (openrouterResp.choices?.[0]?.message?.content) || '';\nraw = raw.replace(/```json/g, '').replace(/```/g, '').trim();\n\nlet questions = [];\ntry {\n  const first = raw.indexOf('[');\n  const last = raw.lastIndexOf(']');\n  if (first !== -1 && last > first) {\n    questions = JSON.parse(raw.slice(first, last + 1));\n  }\n} catch (e) {\n  console.error('Parse error:', grade, subject, qType, e.message);\n  return [];\n}\n\nconst results = [];\nfor (let i = 0; i < Math.min(questions.length, saturdays.length); i++) {\n  const q = questions[i];\n  if (!q) continue;\n  const { iso: publishDate, weekNum } = saturdays[i];\n  const questionId = `${subjectCode}-${gradeCode}-${typeAbbr}-w${weekNum}-${yearMonth}-001`;\n  results.push({ json: {\n    questionId, grade, subject, curriculum, semester, acadYear, qType,\n    chapter: q.chapter || '',\n    question: q.question || '',\n    optionA: q.optionA || '',\n    optionB: q.optionB || '',\n    optionC: q.optionC || '',\n    optionD: q.optionD || '',\n    answer: q.answer || 'A',\n    concept: q.concept || '',\n    mistake: q.mistake || '',\n    hint: q.hint || '',\n    publishDate,\n    weekNum\n  }});\n}\nreturn results;"
+      }
+    },
+    {
+      "id": "regen-n7-write",
+      "name": "寫入 Notion 題庫（待審核）",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [1560, 300],
+      "credentials": {
+        "notionApi": { "id": "AzXLvJt1dpTqr9fB", "name": "Notion account" }
+      },
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "2502b420-9049-4621-a4b9-99a299a9b922",
+          "mode": "id"
+        },
+        "title": "={{ $json.questionId }}",
+        "propertiesUi": {
+          "propertyValues": [
+            { "key": "年級|select", "selectValue": "={{ $json.grade }}" },
+            { "key": "科目|select", "selectValue": "={{ $json.subject }}" },
+            { "key": "題型|select", "selectValue": "={{ $json.qType }}" },
+            { "key": "教材版本|select", "selectValue": "={{ $json.curriculum }}" },
+            { "key": "學期|select", "selectValue": "={{ $json.semester }}" },
+            { "key": "學年度|select", "selectValue": "={{ $json.acadYear }}" },
+            { "key": "單元|rich_text", "textContent": "={{ $json.chapter }}" },
+            { "key": "題目|rich_text", "textContent": "={{ $json.question }}" },
+            { "key": "選項A|rich_text", "textContent": "={{ $json.optionA }}" },
+            { "key": "選項B|rich_text", "textContent": "={{ $json.optionB }}" },
+            { "key": "選項C|rich_text", "textContent": "={{ $json.optionC }}" },
+            { "key": "選項D|rich_text", "textContent": "={{ $json.optionD }}" },
+            { "key": "答案|select", "selectValue": "={{ $json.answer }}" },
+            { "key": "正確觀念|rich_text", "textContent": "={{ $json.concept }}" },
+            { "key": "常見錯誤|rich_text", "textContent": "={{ $json.mistake }}" },
+            { "key": "記憶提示|rich_text", "textContent": "={{ $json.hint }}" },
+            { "key": "發布日期|date", "dateValue": "={{ $json.publishDate }}" },
+            { "key": "是否發布|checkbox", "checkboxValue": false },
+            { "key": "已封存|checkbox", "checkboxValue": false }
+          ]
+        }
+      }
+    },
+    {
+      "id": "regen-n8-summary",
+      "name": "彙整重新出題結果",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1820, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nconst count = items.length;\nconst now = new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });\nreturn [{ json: {\n  count,\n  lineMsg: `【Mina 手動重新出題完成 🔄】\\n本次共生成 ${count} 道新題目\\n舊題目已自動封存\\n新題目狀態：待審核（是否發布 = 未勾選）\\n\\n請登入 Notion 審核後勾選「是否發布」\\n審核完成後題目才會在網站顯示\\n時間：${now}`,\n  emailSubject: `【Mina 題庫】手動重新出題完成，${count} 道新題目待審核`,\n  emailBody: `Mina 手動觸發重新出題完成\\n\\n共生成：${count} 道新題\\n舊題目：已全數封存\\n新題狀態：待審核（需人工勾選「是否發布」）\\n\\n請登入 Notion 題庫審核每道題目後勾選「是否發布」，\\n未審核的題目不會在網站顯示。\\n\\n時間：${now}`\n}}];"
+      }
+    },
+    {
+      "id": "regen-n9-line",
+      "name": "通知老師審核 (LINE)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2080, 200],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/broadcast",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer LINE_CHANNEL_ACCESS_TOKEN_PLACEHOLDER" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"messages\": [{\"type\": \"text\", \"text\": {{ JSON.stringify($json.lineMsg) }}}]}",
+        "options": { "response": { "response": { "neverError": true } } }
+      }
+    },
+    {
+      "id": "regen-n10-email",
+      "name": "通知老師審核 (Email)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2080, 400],
+      "parameters": {
+        "toEmail": "TEACHER_EMAIL_PLACEHOLDER",
+        "subject": "={{ $json.emailSubject }}",
+        "emailType": "text",
+        "message": "={{ $json.emailBody }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "regen-note",
+      "name": "⚙️ 設定說明",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [0, 100],
+      "parameters": {
+        "content": "## Flow V2 — 手動重新出題 Webhook\n\n**觸發方式**：由後台 Admin Panel 呼叫\n`POST /api/v1/admin/practice/regenerate`\n\n**流程**：\n1. Webhook 立即回傳 202\n2. 封存所有 is_published=true, is_archived=false 的題目\n3. 重新生成下個月排程題目（AI）\n4. 寫入 Notion（is_published=false，待審核）\n5. 通知老師審核\n\n**設定前請替換**：\n- `OPENROUTER_API_KEY_PLACEHOLDER` → OpenRouter API Key\n- `LINE_CHANNEL_ACCESS_TOKEN_PLACEHOLDER` → LINE Channel Access Token\n- `TEACHER_EMAIL_PLACEHOLDER` → 老師 Email",
+        "height": 180,
+        "width": 500,
+        "color": 5
+      }
+    }
+  ],
+  "connections": {
+    "Webhook 觸發重新出題": {
+      "main": [[{ "node": "查詢現有已發布題目", "type": "main", "index": 0 }]]
+    },
+    "查詢現有已發布題目": {
+      "main": [[{ "node": "封存現有題目", "type": "main", "index": 0 }]]
+    },
+    "封存現有題目": {
+      "main": [[{ "node": "建立出題任務清單", "type": "main", "index": 0 }]]
+    },
+    "建立出題任務清單": {
+      "main": [[{ "node": "OpenRouter 生成題目", "type": "main", "index": 0 }]]
+    },
+    "OpenRouter 生成題目": {
+      "main": [[{ "node": "解析 AI 題目", "type": "main", "index": 0 }]]
+    },
+    "解析 AI 題目": {
+      "main": [[{ "node": "寫入 Notion 題庫（待審核）", "type": "main", "index": 0 }]]
+    },
+    "寫入 Notion 題庫（待審核）": {
+      "main": [[{ "node": "彙整重新出題結果", "type": "main", "index": 0 }]]
+    },
+    "彙整重新出題結果": {
+      "main": [[
+        { "node": "通知老師審核 (LINE)", "type": "main", "index": 0 },
+        { "node": "通知老師審核 (Email)", "type": "main", "index": 0 }
+      ]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}

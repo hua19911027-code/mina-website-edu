@@ -1,5 +1,6 @@
-/* GET  /api/v1/admin/settings  — 讀取 Admin 設定（從 KV）
-   PUT  /api/v1/admin/settings  — 寫入 Admin 設定（至 KV）
+/* GET  /api/v1/admin/settings              — 讀取 Admin 設定（從 KV）
+   PUT  /api/v1/admin/settings              — 寫入 Admin 設定（至 KV）
+   POST /api/v1/admin/practice/regenerate   — 觸發 n8n 重新出題 webhook
    所有路由需 X-Admin-Secret header */
 
 import { Hono } from 'hono';
@@ -54,6 +55,29 @@ route.put('/settings', async (c) => {
 
   await c.env.KV_SETTINGS.put(KV_KEY, JSON.stringify(updated));
   return c.json({ ok: true, data: updated });
+});
+
+/* POST /practice/regenerate */
+route.post('/practice/regenerate', async (c) => {
+  const webhookUrl = c.env.N8N_REGEN_WEBHOOK;
+  if (!webhookUrl) {
+    return c.json({ ok: false, error: { code: 'NOT_CONFIGURED', message: 'N8N_REGEN_WEBHOOK secret not set' } }, 503);
+  }
+
+  try {
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ triggeredAt: new Date().toISOString(), source: 'admin-panel' }),
+    });
+
+    if (res.ok || res.status === 202) {
+      return c.json({ ok: true, data: { message: 'Regeneration triggered', status: res.status } });
+    }
+    return c.json({ ok: false, error: { code: 'WEBHOOK_ERROR', message: `n8n responded with ${res.status}` } }, 502);
+  } catch (e) {
+    return c.json({ ok: false, error: { code: 'FETCH_ERROR', message: String(e) } }, 502);
+  }
 });
 
 export default route;

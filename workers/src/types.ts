@@ -9,6 +9,7 @@ export type Bindings = {
   NOTION_EXAM_REVIEW_DB_ID: string;
   LINE_OFFICIAL_URL: string;
   N8N_BOOKING_WEBHOOK?: string;
+  N8N_REGEN_WEBHOOK?: string;
   ADMIN_SECRET: string;
   CORS_ORIGIN: string;
   ENVIRONMENT: string;
