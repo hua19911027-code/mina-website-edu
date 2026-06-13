@@ -125,6 +125,8 @@
         "fromEmail": "hua19911027@gmail.com",
         "toEmail": "hua19911027@gmail.com, manko94134@gmail.com",
         "subject": "={{ $json.emailSubject }}",
+        "emailType": "text",
+        "message": "={{ $json.emailBody }}",
         "options": {}
       }
     },

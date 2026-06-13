@@ -2,6 +2,8 @@
 .env
 .env.local
 .env.*.local
+.dev.vars
+workers/.dev.vars
 
 # Node
 node_modules/
@@ -30,3 +32,4 @@ npm-debug.log*
 *.Zone.Identifier
 *:Zone.Identifier
 .bak
+.gstack/
