@@ -27,16 +27,13 @@ function daysAgo(d: Date, n: number): Date {
   return new Date(d.getTime() - n * 24 * 60 * 60 * 1000);
 }
 
-/** 已發布題目：只要「已發布 + 未封存」即顯示，無日期限制 */
-function buildCurrentWeekFilter(grade?: string, subject?: string, type?: string): unknown {
-  const and: unknown[] = [
-    { property: '是否發布', checkbox: { equals: true } },
-    { property: '已封存', checkbox: { equals: false } },
-  ];
+/** 題目篩選：年級/科目/題型（不限制日期與發布狀態，方便初期使用） */
+function buildCurrentWeekFilter(grade?: string, subject?: string, type?: string): unknown | undefined {
+  const and: unknown[] = [];
   if (grade) and.push({ property: '年級', select: { equals: grade } });
   if (subject) and.push({ property: '科目', select: { equals: subject } });
   if (type) and.push({ property: '題型', select: { equals: type } });
-  return { and };
+  return and.length > 0 ? { and } : undefined;
 }
 
 /** 歷屆題目：發布日期 >= 90天前 AND < 7天前 */
@@ -163,8 +160,8 @@ route.get('/', async (c) => {
     const filter = buildCurrentWeekFilter(grade, subject, type);
     const total_page_size = page * PAGE_SIZE + 1;
     const result = await notion.queryDatabase(c.env.NOTION_API_KEY, c.env.NOTION_PRACTICE_DB_ID, {
-      filter,
-      sorts: [{ property: '發布日期', direction: 'descending' }],
+      ...(filter ? { filter } : {}),
+      sorts: [{ timestamp: 'created_time', direction: 'descending' }],
       page_size: total_page_size,
     });
 
