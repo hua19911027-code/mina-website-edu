@@ -181,8 +181,26 @@
         }
         var qs = json.data.questions || []
         if (!isMore && !qs.length) {
+          var f2 = getFilters()
+          var label = (f2.grade || '') + (f2.subject ? ' ' + f2.subject : '')
           var c = getContainer()
-          if (c) c.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:30px">目前沒有符合條件的題目 &#128522;</p>'
+          if (c) c.innerHTML = [
+            '<div style="text-align:center;padding:40px 20px;max-width:460px;margin:0 auto">',
+            '<div style="font-size:3.2rem;margin-bottom:12px;animation:examFadeIn .4s ease">🐣</div>',
+            '<p style="font-weight:900;font-size:1.1rem;color:var(--ink,#241019);margin-bottom:8px">',
+              (label ? label + '的' : '') + '題目還在孵化中！',
+            '</p>',
+            '<p style="font-size:.88rem;color:var(--ink-mute,#A593A0);line-height:1.8;margin-bottom:22px">',
+              '我們每週六補充新題目 🌱<br>',
+              '試試下方<b style="color:var(--pink,#E60D85)">「歷屆題庫查詢」</b>，',
+              '或讓 Mina 小幫手幫你找！',
+            '</p>',
+            '<button onclick="window.minaWidget&&window.minaWidget.openToNode&&window.minaWidget.openToNode(\'quiz_welcome\')"',
+            ' style="padding:11px 28px;border-radius:30px;background:var(--pink,#E60D85);color:#fff;font-weight:700;font-size:.93rem;border:none;cursor:pointer;box-shadow:0 8px 20px -8px rgba(230,13,133,.45);">',
+            '找 Mina 查查看 →',
+            '</button>',
+            '</div>'
+          ].join('')
           return
         }
         var TYPE_ORDER = { '標準題型': 0, '觀念': 1, '錯題': 2 }
@@ -219,15 +237,14 @@
     fetch(API_BASE + '/practice/exam-review?grade=' + encodeURIComponent(grade))
       .then(function(r) { return r.json() })
       .then(function(json) {
-        if (!json.ok) return
-        var gradeSection = document.getElementById('exam-grade-section')
         var inactiveMsg  = document.getElementById('exam-inactive-msg')
         var subjectList  = document.getElementById('exam-subject-list')
         var gradeGrid = document.getElementById('exam-grade-grid')
         var backBtn   = document.getElementById('exam-back-btn')
         if (gradeGrid) gradeGrid.style.display = 'none'
         if (backBtn)   backBtn.style.display = 'inline-flex'
-        if (!json.data.active) {
+        var active = json.ok && json.data && json.data.active
+        if (!active) {
           if (inactiveMsg) {
             inactiveMsg.style.display = 'block'
             inactiveMsg.innerHTML = '😴 <b>現在不是考試季</b><br>複習卷會在段考前一週的週六中午開放<br>到時候再來找我喔～ 🌟'
@@ -255,7 +272,18 @@
           subjectList.appendChild(btn)
         })
       })
-      .catch(function(e) { console.error('loadExamReview:', e) })
+      .catch(function(e) {
+        console.error('loadExamReview:', e)
+        var inactiveMsg = document.getElementById('exam-inactive-msg')
+        var gradeGrid   = document.getElementById('exam-grade-grid')
+        var backBtn     = document.getElementById('exam-back-btn')
+        if (gradeGrid) gradeGrid.style.display = 'none'
+        if (backBtn)   backBtn.style.display = 'inline-flex'
+        if (inactiveMsg) {
+          inactiveMsg.style.display = 'block'
+          inactiveMsg.innerHTML = '😴 <b>現在不是考試季</b><br>複習卷會在段考前一週的週六中午開放<br>到時候再來找我喔～ 🌟'
+        }
+      })
   }
 
   /* Create exam grade picker panel dynamically (not in bundler template) */
