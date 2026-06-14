@@ -1,6 +1,6 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-06-13  
+**最後更新**：2026-06-15  
 **分支**：dev（自動部署至 mina-website-edu.pages.dev）  
 **Mobile PageSpeed**：91 / 100 ✅
 
@@ -42,11 +42,19 @@
 - 所有 transitions 改 composited（transform + opacity only）
 - `font-display: optional`、`defer` scripts、logo width/height
 
+### 題庫練習頁面修正（2026-06-15，全部 commit）
+- 全站 LINE 連結 → `https://lin.ee/5oH6pOc`（9 個 HTML + mina-widget.js）
+- FOUC 修正：`body{opacity:0}` + CSS onload reveal，0.15s fade
+- 考前複習 inactive 訊息修正（`active = json.ok && json.data?.active`）
+- 題目不顯示修正：移除 `是否發布/已封存` checkbox filter，改 `created_time` 排序
+- 浮動按鈕圖示還原為學校 logo SVG
+- 歷屆題庫提示改 inline 展開（`#archive-inline-msg`），避免被 widget z-index 遮住
+
 ---
 
 ## 🔄 進行中
 
-（目前無進行中項目，效能優化 2026-06-13 結案）
+（目前無進行中項目，題庫修正 2026-06-15 結案）
 
 ---
 
