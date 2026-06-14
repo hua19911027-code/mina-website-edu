@@ -27,14 +27,11 @@ function daysAgo(d: Date, n: number): Date {
   return new Date(d.getTime() - n * 24 * 60 * 60 * 1000);
 }
 
-/** 本週題目：發布日期 >= 7天前 AND <= 今天 */
+/** 已發布題目：只要「已發布 + 未封存」即顯示，無日期限制 */
 function buildCurrentWeekFilter(grade?: string, subject?: string, type?: string): unknown {
-  const n = now();
   const and: unknown[] = [
     { property: '是否發布', checkbox: { equals: true } },
     { property: '已封存', checkbox: { equals: false } },
-    { property: '發布日期', date: { on_or_after: daysAgo(n, 7).toISOString() } },
-    { property: '發布日期', date: { on_or_before: n.toISOString() } },
   ];
   if (grade) and.push({ property: '年級', select: { equals: grade } });
   if (subject) and.push({ property: '科目', select: { equals: subject } });
