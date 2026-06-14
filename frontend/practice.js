@@ -380,33 +380,31 @@
       console.warn('practice.js: .qbanner.b-review not found')
     }
 
-    /* 歷屆題庫 building — 暫時沒有歷屆題目的幽默提示 overlay */
-    function showArchiveComingSoon() {
-      var ov = document.createElement('div')
-      ov.style.cssText = 'position:fixed;inset:0;z-index:9001;background:rgba(20,8,16,.6);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px;'
-      ov.innerHTML = [
-        '<div style="background:#fff;border-radius:28px;padding:32px 28px 28px;max-width:400px;width:100%;text-align:center;box-shadow:0 40px 100px -20px rgba(0,0,0,.4);position:relative;">',
-          '<div style="font-size:2.8rem;margin-bottom:12px">🧱</div>',
-          '<h3 style="font-size:1.25rem;font-weight:900;margin:0 0 10px;color:var(--ink,#241019)">歷屆題庫蓋房子中！</h3>',
-          '<p style="font-size:.875rem;color:var(--ink-mute,#A593A0);line-height:1.85;margin-bottom:24px">',
-            'Mina 正在努力搬磚堆題目 🥹🧱<br>',
-            '每週六都有新題目入庫，請多給我一點時間！<br>',
-            '<b style="color:var(--pink,#E60D85)">先來刷本週新題目，超有感！</b>',
-          '</p>',
-          '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">',
-            '<button id="_arch-close" style="padding:11px 22px;border-radius:30px;background:var(--pink-soft,#FFE3F1);color:var(--pink,#E60D85);font-weight:700;font-size:.9rem;border:none;cursor:pointer;">先刷新題 🔥</button>',
-            '<button id="_arch-ask" style="padding:11px 22px;border-radius:30px;background:var(--pink,#E60D85);color:#fff;font-weight:700;font-size:.9rem;border:none;cursor:pointer;">還是問 Mina 看看</button>',
-          '</div>',
-        '</div>'
-      ].join('')
-      document.body.appendChild(ov)
-      ov.querySelector('#_arch-close').addEventListener('click', function() { document.body.removeChild(ov) })
-      ov.querySelector('#_arch-ask').addEventListener('click', function() {
-        document.body.removeChild(ov)
+    /* 歷屆題庫 coming soon — 顯示 inline 訊息盒（不用 overlay，避免被 widget 遮住） */
+    function showArchiveInline() {
+      var msg = document.getElementById('archive-inline-msg')
+      if (!msg) return
+      msg.style.display = 'block'
+      msg.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
+    /* inline 訊息盒的按鈕事件 */
+    var inlineClose = document.getElementById('archive-inline-close')
+    if (inlineClose) {
+      inlineClose.addEventListener('click', function() {
+        var msg = document.getElementById('archive-inline-msg')
+        if (msg) msg.style.display = 'none'
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      })
+    }
+    var inlineAsk = document.getElementById('archive-inline-ask')
+    if (inlineAsk) {
+      inlineAsk.addEventListener('click', function() {
+        var msg = document.getElementById('archive-inline-msg')
+        if (msg) msg.style.display = 'none'
         if (window.minaWidget && window.minaWidget.openToNode) window.minaWidget.openToNode('archive_welcome')
         else if (window.minaWidget && window.minaWidget.open) window.minaWidget.open()
       })
-      ov.addEventListener('click', function(e) { if (e.target === ov) document.body.removeChild(ov) })
     }
 
     /* 歷屆題庫 banner */
@@ -414,8 +412,7 @@
     if (pastBanner) {
       pastBanner.addEventListener('click', function(e) {
         e.preventDefault()
-        e.stopImmediatePropagation()
-        showArchiveComingSoon()
+        showArchiveInline()
       })
     } else {
       console.warn('practice.js: .qbanner.b-past not found')
@@ -426,8 +423,7 @@
     if (widgetBtn) {
       widgetBtn.addEventListener('click', function(e) {
         e.preventDefault()
-        e.stopImmediatePropagation()
-        showArchiveComingSoon()
+        showArchiveInline()
       })
     } else {
       console.warn('practice.js: .btn-w not found')
