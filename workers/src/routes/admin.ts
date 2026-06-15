@@ -1,6 +1,8 @@
-/* GET  /api/v1/admin/settings              — 讀取 Admin 設定（從 KV）
-   PUT  /api/v1/admin/settings              — 寫入 Admin 設定（至 KV）
-   POST /api/v1/admin/practice/regenerate   — 觸發 n8n 重新出題 webhook
+/* GET    /api/v1/admin/settings              — 讀取 Admin 設定（從 KV）
+   PUT    /api/v1/admin/settings              — 寫入 Admin 設定（至 KV）
+   POST   /api/v1/admin/practice/regenerate  — 觸發 n8n 重新出題 webhook
+   DELETE /api/v1/admin/cache                — 清除 KV_CACHE 所有快取
+   DELETE /api/v1/admin/cache/:prefix        — 清除指定前綴快取（news/practice）
    所有路由需 X-Admin-Secret header */
 
 import { Hono } from 'hono';
@@ -78,6 +80,32 @@ route.post('/practice/regenerate', async (c) => {
   } catch (e) {
     return c.json({ ok: false, error: { code: 'FETCH_ERROR', message: String(e) } }, 502);
   }
+});
+
+/* DELETE /cache                — 清除所有快取
+   DELETE /cache/:prefix        — 只清 news 或 practice */
+async function purgeKvCache(kv: KVNamespace, prefix: string): Promise<number> {
+  const kvPrefix = prefix ? `cache:${prefix}:` : 'cache:';
+  let deleted = 0;
+  let cursor: string | undefined;
+  do {
+    const list = await kv.list({ prefix: kvPrefix, cursor, limit: 1000 });
+    await Promise.all(list.keys.map((k) => kv.delete(k.name)));
+    deleted += list.keys.length;
+    cursor = list.list_complete ? undefined : list.cursor;
+  } while (cursor);
+  return deleted;
+}
+
+route.delete('/cache', async (c) => {
+  const deleted = await purgeKvCache(c.env.KV_CACHE, '');
+  return c.json({ ok: true, data: { deleted } });
+});
+
+route.delete('/cache/:prefix', async (c) => {
+  const prefix = c.req.param('prefix');
+  const deleted = await purgeKvCache(c.env.KV_CACHE, prefix);
+  return c.json({ ok: true, data: { deleted, prefix } });
 });
 
 export default route;

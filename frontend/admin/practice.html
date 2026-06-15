@@ -122,6 +122,14 @@ body { background:var(--adm-bg); }
 .btn-analyze:hover { background:#6B0035; }
 .btn-analyze:disabled { background:#ccc; cursor:default; }
 .pub-desc { font-size:13px; color:var(--ink-soft); margin-bottom:16px; line-height:1.65; }
+
+/* ── Cache ── */
+.cache-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.btn-cache { background:#fff; border:1.5px solid var(--adm-border); border-radius:10px; padding:9px 18px; font-size:14px; font-weight:700; cursor:pointer; transition:background .15s,border-color .15s; }
+.btn-cache:hover { border-color:var(--pink); background:var(--pink-soft); }
+.btn-cache.danger { border-color:#e5b0b0; }
+.btn-cache.danger:hover { border-color:#c00; background:#fff0f0; color:#c00; }
+.btn-cache:disabled { opacity:.4; cursor:default; }
 </style>
 </head>
 <body>
@@ -275,6 +283,18 @@ body { background:var(--adm-bg); }
       <span>🔬</span> AI 分析上傳
     </button>
     <div class="save-status" id="pubStatus" style="margin-top:12px;"></div>
+  </div>
+
+  <!-- Cache card -->
+  <div class="card">
+    <div class="card-title"><span class="ico">🗑️</span>快取管理</div>
+    <p style="font-size:13px;color:var(--ink-soft);margin-bottom:14px;">Notion 更新後若未即時反映，可手動清除 KV 快取（新聞 15min / 題庫 5~60min 自動失效）</p>
+    <div class="cache-row">
+      <button class="btn-cache" id="cacheClearNews">清除新聞快取</button>
+      <button class="btn-cache" id="cacheClearPractice">清除題庫快取</button>
+      <button class="btn-cache danger" id="cacheClearAll">清除全部快取</button>
+    </div>
+    <div class="save-status" id="cacheStatus" style="margin-top:10px;"></div>
   </div>
 
   <!-- Regenerate card -->
@@ -467,6 +487,37 @@ body { background:var(--adm-bg); }
   document.getElementById('filterBtn').addEventListener('click', function() {
     qPage = 1; loadQuestions();
   });
+
+  /* ── Cache ── */
+  async function clearCache(prefix) {
+    var url = prefix ? (API + '/admin/cache/' + prefix) : (API + '/admin/cache');
+    var statusEl = document.getElementById('cacheStatus');
+    statusEl.textContent = '清除中…'; statusEl.className = 'save-status';
+    ['cacheClearNews','cacheClearPractice','cacheClearAll'].forEach(function(id) {
+      document.getElementById(id).disabled = true;
+    });
+    try {
+      var res = await fetch(url, { method: 'DELETE', headers: { 'X-Admin-Secret': secret } });
+      var data = await res.json();
+      if (data.ok) {
+        statusEl.textContent = '✓ 已清除 ' + data.data.deleted + ' 筆快取';
+        statusEl.className = 'save-status ok';
+      } else {
+        statusEl.textContent = '❌ ' + (data.error && data.error.message ? data.error.message : '清除失敗');
+        statusEl.className = 'save-status err';
+      }
+    } catch(e) {
+      statusEl.textContent = '❌ 網路錯誤'; statusEl.className = 'save-status err';
+    }
+    ['cacheClearNews','cacheClearPractice','cacheClearAll'].forEach(function(id) {
+      document.getElementById(id).disabled = false;
+    });
+    setTimeout(function() { statusEl.textContent = ''; }, 3000);
+  }
+
+  document.getElementById('cacheClearNews').addEventListener('click', function() { clearCache('news'); });
+  document.getElementById('cacheClearPractice').addEventListener('click', function() { clearCache('practice'); });
+  document.getElementById('cacheClearAll').addEventListener('click', function() { clearCache(''); });
 
   /* ── Regenerate ── */
   document.getElementById('regenBtn').addEventListener('click', function() {

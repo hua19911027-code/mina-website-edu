@@ -17,7 +17,7 @@ app.use('*', cors({
     'http://localhost:3000',
     'http://127.0.0.1:5500',
   ],
-  allowMethods: ['GET', 'POST', 'PUT', 'OPTIONS'],
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'X-Admin-Secret'],
   maxAge: 86400,
 }));
