@@ -1,6 +1,6 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-06-15  
+**最後更新**：2026-06-15（KV Cache + 快取清除 + Workers deploy）  
 **分支**：dev（自動部署至 mina-website-edu.pages.dev）  
 **Mobile PageSpeed**：91 / 100 ✅
 
@@ -34,6 +34,13 @@
 - **Flow 5**：夜間整理（02:00 cron）
 - **Flow 6**：30 日審核截止最終提醒（ID：`2V4fjNzNSgQ6Jccn`）
 
+### Workers V2.0 KV + Cache（2026-06-15）
+- 三個 KV namespace 綁定：`mina-settings`、`mina-cache`、`mina-rate-limit`
+- 限流從 `KV_SETTINGS` 正確移至 `KV_RATE_LIMIT`
+- News / Practice Notion API 回應加 KV Cache（15min / 5min / 60min）
+- `DELETE /api/v1/admin/cache` + `/cache/:prefix` 快取清除 API
+- Admin Panel 加「快取管理」卡片（清除新聞 / 題庫 / 全部）
+
 ### 效能優化（三輪完成）
 - Noto Sans TC 移除 Google Fonts → 系統字型 fallback（CLS 0.095→~0）
 - IntersectionObserver 取代 requestIdleCallback（LCP 8.9s→~2s）
@@ -60,25 +67,11 @@
 
 ## ❌ 未完成（V2.0 功能）
 
-### 1. Workers KV 綁定（估時：30min）
-- 在 CF Dashboard 建立 KV namespace `mina-settings`
-- `wrangler.toml` 加 `[[kv_namespaces]]` binding
-- `workers/src/types.ts` 加 `KV_SETTINGS: KVNamespace`
+### ~~1. Workers KV 綁定~~ ✅ 完成
+### ~~2. Admin Settings API~~ ✅ 完成
+### ~~3. Admin Panel HTML~~ ✅ 完成（含快取管理）
 
-### 2. Admin Settings API（估時：1hr）
-- `GET /api/v1/admin/settings`
-- `PUT /api/v1/admin/settings`
-- 讀寫 KV 的 `REVIEW_MODE_ENABLED`、`NOTION_PRACTICE_DB_ID` 等
-- `X-Admin-Secret` header 驗證
-
-### 3. Admin Panel HTML（估時：2–3hr）
-- `/admin/practice.html`
-- 審核模式開關
-- 題目列表（依週次 / 年級 / 科目篩選）
-- 重新生成按鈕（含確認 dialog）
-- 手動觸發出題
-
-### 4. n8n 重新生成 Webhook Flow（估時：1hr）
+### 4. n8n 重新生成 Webhook Flow（等待 Cloudflare Tunnel）
 - V2 Flow 5：手動觸發再出題
 - Workers `POST /api/v1/admin/practice/regenerate` → n8n webhook → AI → Notion
 - 舊題 `已封存=true`，新題序號遞增
@@ -94,9 +87,9 @@
 
 | 項目 | 需要什麼 | 誰去做 |
 |------|---------|-------|
-| Workers KV | CF Dashboard 建立 KV namespace `mina-settings` | 用戶手動建立（Dashboard → Workers & Pages → KV） |
-| wrangler deploy | `! wrangler login`（WSL OAuth 無法自動完成） | 用戶在終端執行 |
-| n8n Webhook URL | Flow 5 重新生成 Webhook 的實際 URL | n8n 建立 Webhook node 後取得 |
+| ~~Workers KV~~ | ~~CF Dashboard 建立 KV namespace~~ | ✅ 完成 |
+| ~~wrangler deploy~~ | ~~手動登入部署~~ | ✅ 完成 |
+| n8n Webhook URL | 需 Cloudflare Tunnel（固定 URL）供 Workers 呼叫 | 買域名後設定 cloudflared |
 | LINE Official URL | `#TODO_LINE_URL` placeholder 尚未填入真實 LINE OA URL | 用戶提供 |
 | 出版社分析 R2 | Cloudflare R2 bucket 建立 + 上傳 PDF 機制確認 | 待設計決策 |
 
