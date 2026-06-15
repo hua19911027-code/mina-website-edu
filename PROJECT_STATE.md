@@ -71,27 +71,18 @@
 ### ~~2. Admin Settings API~~ ✅ 完成
 ### ~~3. Admin Panel HTML~~ ✅ 完成（含快取管理）
 
-### 4. n8n 重新生成 Webhook Flow（等待 Cloudflare Tunnel）
-- V2 Flow 5：手動觸發再出題
-- Workers `POST /api/v1/admin/practice/regenerate` → n8n webhook → AI → Notion
-- 舊題 `已封存=true`，新題序號遞增
-
-### 5. 出版社分析 Flow（估時：複雜）
-- 上傳媒介待確認（Cloudflare R2 or Notion Files）
-- AI Vision API 讀 PDF / 圖片
-- 寫入出題規範 Notion DB
+### 4. n8n Webhook 串通（等待 Cloudflare Tunnel + 域名）
+- **A2** 手動重新出題：`POST /api/v1/admin/practice/regenerate` → n8n（ZbK6nNlUAyP8l733） ✅ n8n flow 已完成，等 Tunnel
+- **A3** 出版社分析：`POST /api/v1/admin/publisher/analyze` → n8n（j5e127XhuYpXh01N） ✅ n8n flow 已完成，等 Tunnel
+- 完成後執行：`wrangler secret put N8N_REGEN_WEBHOOK` + `wrangler secret put N8N_PUBLISHER_WEBHOOK`
 
 ---
 
-## ⚠️ 缺螺絲（需外部資源才能繼續）
+## ⚠️ 唯一剩餘阻塞點
 
-| 項目 | 需要什麼 | 誰去做 |
-|------|---------|-------|
-| ~~Workers KV~~ | ~~CF Dashboard 建立 KV namespace~~ | ✅ 完成 |
-| ~~wrangler deploy~~ | ~~手動登入部署~~ | ✅ 完成 |
-| n8n Webhook URL | 需 Cloudflare Tunnel（固定 URL）供 Workers 呼叫 | 買域名後設定 cloudflared |
-| LINE Official URL | `#TODO_LINE_URL` placeholder 尚未填入真實 LINE OA URL | 用戶提供 |
-| 出版社分析 R2 | Cloudflare R2 bucket 建立 + 上傳 PDF 機制確認 | 待設計決策 |
+| 項目 | 需要 | 完成後動作 |
+|------|------|---------|
+| Cloudflare Tunnel | 買域名 → `cloudflared tunnel` 設定 | 設 2 個 wrangler secret → deploy |
 
 ---
 
@@ -102,6 +93,6 @@
 | 前端部署 | Cloudflare Pages，自動從 `dev` branch 部署 |
 | 後端部署 | `cd workers && npx wrangler deploy`（手動） |
 | n8n | `http://localhost:5678`，JWT key 在 memory `reference_n8n_api.md` |
-| n8n Flow 6 ID | `2V4fjNzNSgQ6Jccn` |
+| n8n flows | A1~D2 命名，詳見 memory/reference_n8n_api.md |
 | PageSpeed URL | `https://pagespeed.web.dev/?url=https://mina-website-edu.pages.dev` |
 | 規格文件層級 | V1.0 → V1.1 → V2.0 → V2.0 修訂摘要（後版優先） |
