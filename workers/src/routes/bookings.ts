@@ -57,7 +57,7 @@ async function writeToNotion(
 
 route.post('/', async (c) => {
   const ip = c.req.header('CF-Connecting-IP') ?? 'unknown';
-  const allowed = await checkRateLimit(ip, c.env.KV_SETTINGS);
+  const allowed = await checkRateLimit(ip, c.env.KV_RATE_LIMIT);
   if (!allowed) {
     return c.json({ ok: false, error: { code: 'RATE_LIMITED', message: '提交次數過多，請 1 小時後再試' } }, 429);
   }

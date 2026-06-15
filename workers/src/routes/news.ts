@@ -58,6 +58,10 @@ route.get('/', async (c) => {
     });
   }
 
+  const cacheKey = `cache:news:list:${category}:${page}:${limit}`;
+  const cached = await c.env.KV_CACHE.get(cacheKey);
+  if (cached) return c.json(JSON.parse(cached));
+
   try {
     const filter: Record<string, unknown> = {
       and: [
@@ -80,16 +84,9 @@ route.get('/', async (c) => {
     const start = (page - 1) * limit;
     const articles = all.slice(start, start + limit);
 
-    return c.json<{ ok: true; data: ArticleList }>({
-      ok: true,
-      data: {
-        articles,
-        total,
-        page,
-        limit,
-        hasMore: start + limit < total,
-      },
-    });
+    const payload = { ok: true, data: { articles, total, page, limit, hasMore: start + limit < total } };
+    c.executionCtx.waitUntil(c.env.KV_CACHE.put(cacheKey, JSON.stringify(payload), { expirationTtl: 900 }));
+    return c.json<{ ok: true; data: ArticleList }>(payload as { ok: true; data: ArticleList });
   } catch (e) {
     console.error('News list error:', e);
     return c.json<{ ok: true; data: ArticleList }>({
@@ -112,6 +109,10 @@ route.get('/:slug', async (c) => {
     }
     return c.json({ ok: true, data: { ...found, related: [] } });
   }
+
+  const cacheKey = `cache:news:single:${slug}`;
+  const cached = await c.env.KV_CACHE.get(cacheKey);
+  if (cached) return c.json(JSON.parse(cached));
 
   try {
     /* Query by slug */
@@ -145,7 +146,9 @@ route.get('/:slug', async (c) => {
       article.photos = notion.extractFileUrls(photoFiles).slice(0, 20);
     }
 
-    return c.json({ ok: true, data: { ...article, related: [] } });
+    const payload = { ok: true, data: { ...article, related: [] } };
+    c.executionCtx.waitUntil(c.env.KV_CACHE.put(cacheKey, JSON.stringify(payload), { expirationTtl: 1800 }));
+    return c.json(payload);
   } catch (e) {
     console.error('News single error:', e);
     return c.json({ ok: false, error: { code: 'INTERNAL_ERROR', message: '伺服器錯誤' } }, 500);

@@ -15,6 +15,8 @@ export type Bindings = {
   CORS_ORIGIN: string;
   ENVIRONMENT: string;
   KV_SETTINGS: KVNamespace;
+  KV_CACHE: KVNamespace;
+  KV_RATE_LIMIT: KVNamespace;
 };
 
 /* ── API Response shapes ── */

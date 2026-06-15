@@ -21,6 +21,14 @@ keep_vars = true
 binding = "KV_SETTINGS"
 id = "4aac88420d7b4561ab7738e121c83edd"
 
+[[kv_namespaces]]
+binding = "KV_CACHE"
+id = "a6fe2450115f44f793c0c452d18fcb78"
+
+[[kv_namespaces]]
+binding = "KV_RATE_LIMIT"
+id = "f8738779d110465584fd34031c7ecba1"
+
 [vars]
 ENVIRONMENT = "production"
 

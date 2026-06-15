@@ -155,6 +155,10 @@ route.get('/', async (c) => {
     });
   }
 
+  const cacheKey = `cache:practice:${grade}:${subject}:${type}:${page}`;
+  const cached = await c.env.KV_CACHE.get(cacheKey);
+  if (cached) return c.json(JSON.parse(cached), 200, { 'Cache-Control': 'public, max-age=300' });
+
   try {
     const n = now();
     const filter = buildCurrentWeekFilter(grade, subject, type);
@@ -179,7 +183,9 @@ route.get('/', async (c) => {
       hasMore,
       lastUpdated,
     };
-    return c.json({ ok: true, data }, 200, { 'Cache-Control': 'public, max-age=300' });
+    const payload = { ok: true, data };
+    c.executionCtx.waitUntil(c.env.KV_CACHE.put(cacheKey, JSON.stringify(payload), { expirationTtl: 300 }));
+    return c.json(payload, 200, { 'Cache-Control': 'public, max-age=300' });
   } catch (e) {
     console.error('practice / error:', e);
     return c.json({ ok: false, error: { code: 'NOTION_ERROR', message: 'Failed to fetch questions' } }, 500);
@@ -225,6 +231,10 @@ route.get('/archive', async (c) => {
     }, 200, { 'Cache-Control': 'public, max-age=3600' });
   }
 
+  const cacheKey = `cache:practice:archive:${grade}:${subject}:${type}:${page}`;
+  const cached = await c.env.KV_CACHE.get(cacheKey);
+  if (cached) return c.json(JSON.parse(cached), 200, { 'Cache-Control': 'public, max-age=3600' });
+
   try {
     const filter = buildOlderFilter(grade, subject, type);
     const fetchSize = ARCHIVE_HARD_LIMIT + 1;
@@ -248,7 +258,9 @@ route.get('/archive', async (c) => {
       reachedLimit,
       lastUpdated: slice[0]?.publishedAt || new Date().toISOString(),
     };
-    return c.json({ ok: true, data }, 200, { 'Cache-Control': 'public, max-age=3600' });
+    const payload = { ok: true, data };
+    c.executionCtx.waitUntil(c.env.KV_CACHE.put(cacheKey, JSON.stringify(payload), { expirationTtl: 3600 }));
+    return c.json(payload, 200, { 'Cache-Control': 'public, max-age=3600' });
   } catch (e) {
     console.error('practice /archive error:', e);
     return c.json({ ok: false, error: { code: 'NOTION_ERROR', message: 'Failed to fetch archive' } }, 500);
