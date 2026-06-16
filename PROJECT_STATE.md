@@ -78,12 +78,15 @@
 
 ---
 
-## ⚠️ 剩餘手動步驟（1 個）
+## ✅ 全部完成（2026-06-16）
 
-| 項目 | 狀態 | 動作 |
-|------|------|------|
-| `n8n.minaedu.tw` CNAME DNS | 待用戶新增 | Cloudflare DNS → CNAME n8n → `93b57fbb-3ae1-4cd6-a74b-7ee2f7e2b944.cfargotunnel.com` |
-| Tunnel 啟動 | 待 DNS 生效後 | `systemctl --user start cloudflared-mina` |
+| 項目 | 狀態 |
+|------|------|
+| `minaedu.tw` + `www.minaedu.tw` Pages 綁定 | ✅ |
+| `api.minaedu.tw` Workers 路由 | ✅（DNS 傳播中） |
+| `n8n.minaedu.tw` Tunnel → localhost:5678 | ✅ 10/10 穩定 |
+| N8N_REGEN_WEBHOOK + N8N_PUBLISHER_WEBHOOK | ✅ |
+| cloudflared systemd service（token 模式） | ✅ mina-tunnel-v2 |
 
 ---
 
@@ -93,8 +96,8 @@
 |------|-----|
 | 前端部署 | Cloudflare Pages，自動從 `dev` branch 部署 → `minaedu.tw` |
 | 後端部署 | `cd workers && npx wrangler deploy`（手動）→ `api.minaedu.tw` |
-| Cloudflare Tunnel | Tunnel ID: `93b57fbb`，service: `cloudflared-mina.service`（systemd user） |
-| n8n | `http://localhost:5678`，公開: `https://n8n.minaedu.tw`（Tunnel 啟動後） |
+| Cloudflare Tunnel | Tunnel ID: `dd5ef701`（mina-tunnel-v2），token 模式，service: `cloudflared-mina.service` |
+| n8n | `http://localhost:5678`，公開: `https://n8n.minaedu.tw` ✅ |
 | n8n | `http://localhost:5678`，JWT key 在 memory `reference_n8n_api.md` |
 | n8n flows | A1~D2 命名，詳見 memory/reference_n8n_api.md |
 | PageSpeed URL | `https://pagespeed.web.dev/?url=https://mina-website-edu.pages.dev` |
