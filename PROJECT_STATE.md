@@ -1,7 +1,7 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-06-15（KV Cache + 快取清除 + Workers deploy）  
-**分支**：dev（自動部署至 mina-website-edu.pages.dev）  
+**最後更新**：2026-06-16（正式域名 minaedu.tw 上線）  
+**分支**：dev（自動部署至 minaedu.tw）  
 **Mobile PageSpeed**：91 / 100 ✅
 
 ---
@@ -71,18 +71,19 @@
 ### ~~2. Admin Settings API~~ ✅ 完成
 ### ~~3. Admin Panel HTML~~ ✅ 完成（含快取管理）
 
-### 4. n8n Webhook 串通（等待 Cloudflare Tunnel + 域名）
-- **A2** 手動重新出題：`POST /api/v1/admin/practice/regenerate` → n8n（ZbK6nNlUAyP8l733） ✅ n8n flow 已完成，等 Tunnel
-- **A3** 出版社分析：`POST /api/v1/admin/publisher/analyze` → n8n（j5e127XhuYpXh01N） ✅ n8n flow 已完成，等 Tunnel
-- 完成後執行：`wrangler secret put N8N_REGEN_WEBHOOK` + `wrangler secret put N8N_PUBLISHER_WEBHOOK`
+### 4. n8n Webhook 串通 ✅ 完成（2026-06-16）
+- **A2** 手動重新出題：`POST /api/v1/admin/practice/regenerate` → `https://n8n.minaedu.tw/webhook/practice-regenerate`
+- **A3** 出版社分析：`POST /api/v1/admin/publisher/analyze` → `https://n8n.minaedu.tw/webhook/publisher-analyze`
+- N8N_REGEN_WEBHOOK + N8N_PUBLISHER_WEBHOOK secrets ✅ 已設定
 
 ---
 
-## ⚠️ 唯一剩餘阻塞點
+## ⚠️ 剩餘手動步驟（1 個）
 
-| 項目 | 需要 | 完成後動作 |
-|------|------|---------|
-| Cloudflare Tunnel | 買域名 → `cloudflared tunnel` 設定 | 設 2 個 wrangler secret → deploy |
+| 項目 | 狀態 | 動作 |
+|------|------|------|
+| `n8n.minaedu.tw` CNAME DNS | 待用戶新增 | Cloudflare DNS → CNAME n8n → `93b57fbb-3ae1-4cd6-a74b-7ee2f7e2b944.cfargotunnel.com` |
+| Tunnel 啟動 | 待 DNS 生效後 | `systemctl --user start cloudflared-mina` |
 
 ---
 
@@ -90,8 +91,10 @@
 
 | 項目 | 值 |
 |------|-----|
-| 前端部署 | Cloudflare Pages，自動從 `dev` branch 部署 |
-| 後端部署 | `cd workers && npx wrangler deploy`（手動） |
+| 前端部署 | Cloudflare Pages，自動從 `dev` branch 部署 → `minaedu.tw` |
+| 後端部署 | `cd workers && npx wrangler deploy`（手動）→ `api.minaedu.tw` |
+| Cloudflare Tunnel | Tunnel ID: `93b57fbb`，service: `cloudflared-mina.service`（systemd user） |
+| n8n | `http://localhost:5678`，公開: `https://n8n.minaedu.tw`（Tunnel 啟動後） |
 | n8n | `http://localhost:5678`，JWT key 在 memory `reference_n8n_api.md` |
 | n8n flows | A1~D2 命名，詳見 memory/reference_n8n_api.md |
 | PageSpeed URL | `https://pagespeed.web.dev/?url=https://mina-website-edu.pages.dev` |
