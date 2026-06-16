@@ -1,6 +1,6 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-06-16（正式域名 minaedu.tw 上線）  
+**最後更新**：2026-06-16（全域名上線，含 api.minaedu.tw DNS ✅）  
 **分支**：dev（自動部署至 minaedu.tw）  
 **Mobile PageSpeed**：91 / 100 ✅
 
@@ -83,7 +83,7 @@
 | 項目 | 狀態 |
 |------|------|
 | `minaedu.tw` + `www.minaedu.tw` Pages 綁定 | ✅ |
-| `api.minaedu.tw` Workers 路由 | ✅（DNS 傳播中） |
+| `api.minaedu.tw` Workers 路由 | ✅ DNS 已生效，HTTP 200 |
 | `n8n.minaedu.tw` Tunnel → localhost:5678 | ✅ 10/10 穩定 |
 | N8N_REGEN_WEBHOOK + N8N_PUBLISHER_WEBHOOK | ✅ |
 | cloudflared systemd service（token 模式） | ✅ mina-tunnel-v2 |
