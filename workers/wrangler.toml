@@ -3,6 +3,10 @@ main = "src/index.ts"
 compatibility_date = "2025-01-01"
 keep_vars = true
 
+routes = [
+  { pattern = "api.minaedu.tw/*", zone_name = "minaedu.tw" }
+]
+
 # Encrypted Secrets（透過 wrangler secret put 設定，不在此檔案出現值）
 # wrangler secret put NOTION_API_KEY
 # wrangler secret put NOTION_BOOKING_DB_ID

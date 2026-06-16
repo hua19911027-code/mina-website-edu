@@ -1,7 +1,7 @@
 ;(function () {
   'use strict'
 
-  var API_BASE = 'https://mina-api.hua19911027.workers.dev/api/v1'
+  var API_BASE = 'https://api.minaedu.tw/api/v1'
   var page = 1
   var loaded = 0
   var LIMIT = 12

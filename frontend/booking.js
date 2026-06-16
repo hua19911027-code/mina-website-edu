@@ -3,7 +3,7 @@
 (function () {
   'use strict';
 
-  var API_BASE = 'https://mina-api.hua19911027.workers.dev';
+  var API_BASE = 'https://api.minaedu.tw';
 
   /* ── Subject option toggle ── */
   document.querySelectorAll('#subjOpts .opt').forEach(function (o) {

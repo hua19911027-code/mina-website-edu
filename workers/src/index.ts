@@ -13,6 +13,8 @@ const app = new Hono<{ Bindings: Bindings }>();
 
 app.use('*', cors({
   origin: [
+    'https://minaedu.tw',
+    'https://www.minaedu.tw',
     'https://mina-website-edu.pages.dev',
     'http://localhost:3000',
     'http://127.0.0.1:5500',

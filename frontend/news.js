@@ -3,7 +3,7 @@
 (function () {
   'use strict';
 
-  var API_BASE = 'https://mina-api.hua19911027.workers.dev';
+  var API_BASE = 'https://api.minaedu.tw';
   var PAGE_SIZE = 9;
   var currentCategory = 'all';
   var currentPage = 1;
