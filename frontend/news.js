@@ -304,8 +304,8 @@
     if (body) { body.style.display = 'block'; body.classList.add('in'); }
     if (contentEl) contentEl.innerHTML = article.content || '';
 
-    /* Carousel for events with photos */
-    if (article.category === '活動' && article.photos && article.photos.length >= 1) {
+    /* Carousel — show whenever photos are present, regardless of category */
+    if (article.photos && article.photos.length >= 1) {
       var carousel = document.getElementById('photo-carousel');
       if (carousel) {
         carousel.style.display = 'block';

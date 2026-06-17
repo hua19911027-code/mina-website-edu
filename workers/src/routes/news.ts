@@ -137,14 +137,12 @@ route.get('/:slug', async (c) => {
     const blocks = await notion.getPageBlocks(c.env.NOTION_API_KEY, page.id);
     article.content = notion.blocksToHtml(blocks);
 
-    /* Fetch activity photos if applicable */
-    if (article.category === '活動') {
-      const photoFiles = notion.getPropFiles(
-        page as Parameters<typeof notion.getPropFiles>[0],
-        '活動照片'
-      );
-      article.photos = notion.extractFileUrls(photoFiles).slice(0, 20);
-    }
+    /* Fetch activity photos — show whenever present, regardless of category */
+    const photoFiles = notion.getPropFiles(
+      page as Parameters<typeof notion.getPropFiles>[0],
+      '活動照片'
+    );
+    article.photos = notion.extractFileUrls(photoFiles).slice(0, 20);
 
     const payload = { ok: true, data: { ...article, related: [] } };
     c.executionCtx.waitUntil(c.env.KV_CACHE.put(cacheKey, JSON.stringify(payload), { expirationTtl: 1800 }));
