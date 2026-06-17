@@ -104,7 +104,10 @@ function richTextToHtml(richTexts: any[]): string {
     if (rt.annotations?.italic) text = `<em>${text}</em>`;
     if (rt.annotations?.strikethrough) text = `<s>${text}</s>`;
     if (rt.annotations?.code) text = `<code>${text}</code>`;
-    if (rt.href) text = `<a href="${rt.href as string}" target="_blank" rel="noopener">${text}</a>`;
+    if (rt.href) {
+      const safeHref = /^https?:\/\//i.test(rt.href as string) ? (rt.href as string) : '#';
+      text = `<a href="${safeHref}" target="_blank" rel="noopener">${text}</a>`;
+    }
     return text;
   }).join('');
 }
