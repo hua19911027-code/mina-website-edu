@@ -12,6 +12,6 @@
       function step(t){var p=Math.min((t-t0)/dur,1),v=to*(1-Math.pow(1-p,3));el.textContent=Math.round(v);if(p<1)requestAnimationFrame(step);}
       requestAnimationFrame(step);});
   }
-  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');if(e.target.classList.contains('trust-grid'))countUp();io.unobserve(e.target);}});},{threshold:.16});
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');if(e.target.classList.contains('trust-grid'))countUp();io.unobserve(e.target);}});},{threshold:.08,rootMargin:'0px 0px 200px 0px'});
   document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
 })();

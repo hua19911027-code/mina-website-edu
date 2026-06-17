@@ -14,6 +14,16 @@
   var form = document.getElementById('bookForm');
   if (!form) return;
 
+  /* clear error on input */
+  ['inp-name', 'inp-studentName', 'inp-phone'].forEach(function (id) {
+    var inp = document.getElementById(id);
+    var err = document.getElementById('err-' + id.replace('inp-', ''));
+    if (inp) inp.addEventListener('input', function () {
+      inp.classList.remove('err');
+      if (err) err.textContent = '';
+    });
+  });
+
   form.addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -35,9 +45,25 @@
       note:          (form.elements['note']        ? form.elements['note'].value.trim()        : '')
     };
 
-    if (!payload.parentName || !payload.studentName || !payload.phone) {
+    var valid = true;
+    [
+      { id: 'inp-name',        errId: 'err-name',        val: payload.parentName,   msg: '請填寫家長姓名' },
+      { id: 'inp-studentName', errId: 'err-studentName', val: payload.studentName,  msg: '請填寫學生姓名' },
+      { id: 'inp-phone',       errId: 'err-phone',       val: payload.phone,        msg: '請填寫聯絡電話' }
+    ].forEach(function (f) {
+      var inp = document.getElementById(f.id);
+      var err = document.getElementById(f.errId);
+      if (!f.val) {
+        valid = false;
+        if (inp) inp.classList.add('err');
+        if (err) err.textContent = f.msg;
+      } else {
+        if (inp) inp.classList.remove('err');
+        if (err) err.textContent = '';
+      }
+    });
+    if (!valid) {
       if (btn) { btn.disabled = false; btn.textContent = '送出預約 · Mina 盡快回覆您 →'; }
-      alert('請填寫家長姓名、學生姓名與聯絡電話。');
       return;
     }
 
