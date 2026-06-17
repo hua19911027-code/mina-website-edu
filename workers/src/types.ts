@@ -12,7 +12,6 @@ export type Bindings = {
   N8N_REGEN_WEBHOOK?: string;
   N8N_PUBLISHER_WEBHOOK?: string;
   ADMIN_SECRET: string;
-  CORS_ORIGIN: string;
   ENVIRONMENT: string;
   KV_SETTINGS: KVNamespace;
   KV_CACHE: KVNamespace;
