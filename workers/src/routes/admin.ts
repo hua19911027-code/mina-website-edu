@@ -20,14 +20,28 @@ const DEFAULT_SETTINGS: AdminSettings = {
   notionPracticeDbId: '',
 };
 
+const ADMIN_RATE_LIMIT = 10;
+const ADMIN_RATE_WINDOW_SECS = 3600;
+
 const route = new Hono<{ Bindings: Bindings }>();
 
-/* ── Auth middleware ── */
+/* ── Auth middleware（含 IP 限流） ── */
 route.use('*', async (c, next) => {
+  const ip = c.req.header('CF-Connecting-IP') ?? 'unknown';
+  const rlKey = `ratelimit:admin:${ip}`;
+  const raw = await c.env.KV_RATE_LIMIT.get(rlKey);
+  const failures = raw ? parseInt(raw, 10) : 0;
+
+  if (failures >= ADMIN_RATE_LIMIT) {
+    return c.json({ ok: false, error: { code: 'RATE_LIMITED', message: '嘗試次數過多，請 1 小時後再試' } }, 429);
+  }
+
   const secret = c.req.header('X-Admin-Secret');
   if (!secret || secret !== c.env.ADMIN_SECRET) {
+    await c.env.KV_RATE_LIMIT.put(rlKey, String(failures + 1), { expirationTtl: ADMIN_RATE_WINDOW_SECS });
     return c.json({ ok: false, error: { code: 'UNAUTHORIZED', message: 'Invalid admin secret' } }, 401);
   }
+
   return next();
 });
 
