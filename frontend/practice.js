@@ -17,6 +17,48 @@
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
   }
 
+  function openPrintPage(examName, grade, subject, questions) {
+    var win = window.open('', '_blank')
+    if (!win) return
+    var rows = (questions || []).map(function(q, i) {
+      return '<div class="q">'
+        + '<p class="qt"><b>' + (i + 1) + '.</b> ' + esc(q.question) + '</p>'
+        + '<ol class="opts" type="A">'
+        + '<li>' + esc(q.optionA) + '</li>'
+        + '<li>' + esc(q.optionB) + '</li>'
+        + '<li>' + esc(q.optionC) + '</li>'
+        + '<li>' + esc(q.optionD) + '</li>'
+        + '</ol></div>'
+    }).join('')
+    var answers = (questions || []).map(function(q, i) {
+      return (i + 1) + '.' + esc(q.answer)
+    }).join('　')
+    var css = [
+      'body{font-family:"Noto Sans TC",Arial,sans-serif;margin:0;padding:18mm 20mm;font-size:11pt;color:#111;}',
+      '.hd{text-align:center;border-bottom:2px solid #333;padding-bottom:12px;margin-bottom:20px;}',
+      '.hd h1{font-size:15pt;margin:0 0 4px;}.hd p{font-size:9.5pt;color:#555;margin:0;}',
+      '.q{margin-bottom:18px;page-break-inside:avoid;}',
+      '.qt{margin:0 0 6px;font-weight:600;line-height:1.6;}',
+      '.opts{margin:0;padding-left:26px;line-height:1.9;}',
+      '.opts li{margin-bottom:1px;}',
+      '.ans{margin-top:28px;padding-top:10px;border-top:1.5px dashed #aaa;font-size:9.5pt;color:#555;}',
+      '.noprint{text-align:center;margin-bottom:18px;}',
+      '@media print{.noprint{display:none!important;}body{padding:10mm 12mm;}}'
+    ].join('')
+    win.document.write('<!DOCTYPE html><html lang="zh-TW"><head>'
+      + '<meta charset="UTF-8">'
+      + '<title>' + esc(examName) + ' ' + esc(grade) + ' ' + esc(subject) + '</title>'
+      + '<style>' + css + '</style>'
+      + '</head><body>'
+      + '<div class="hd"><h1>' + esc(examName) + '　' + esc(grade) + '　' + esc(subject) + '複習卷</h1>'
+      + '<p>卓越國際文理補習班　共 ' + (questions || []).length + ' 題，每題 5 分</p></div>'
+      + '<div class="noprint"><button onclick="window.print()" style="padding:10px 32px;background:#E60D85;color:#fff;border:none;border-radius:24px;font-size:14px;font-weight:700;cursor:pointer;">🖨️ 列印 / 儲存 PDF</button></div>'
+      + rows
+      + '<div class="ans"><b>答案：</b>' + answers + '</div>'
+      + '</body></html>')
+    win.document.close()
+  }
+
   function getContainer() {
     return document.getElementById('qcards')
   }
@@ -229,7 +271,7 @@
         if (!active) {
           if (inactiveMsg) {
             inactiveMsg.style.display = 'block'
-            inactiveMsg.innerHTML = '😴 <b>現在不是考試季</b><br>複習卷會在段考前一週的週六中午開放<br>到時候再來找我喔～ 🌟'
+            inactiveMsg.innerHTML = '😴 <b>現在不是考試季</b><br>複習卷會在段考前一周開放<br>到時候再來找我喔～ 🌟'
           }
           return
         }
@@ -238,19 +280,20 @@
         subjectList.innerHTML = ''
         var SUBJ_META = {
           '英文': { icon: '📘', cls: 's-en' },
-          '數學': { icon: '📐', cls: 's-ma' },
-          '國語': { icon: '✏️', cls: 's-chi' },
-          '自然': { icon: '🔬', cls: 's-sci' },
-          '社會': { icon: '🌍', cls: 's-soc' }
+          '數學': { icon: '📐', cls: 's-ma' }
         }
+        var examName = json.data.examName || '考前複習'
         ;(json.data.items || []).forEach(function(item) {
+          if (item.subject !== '英文' && item.subject !== '數學') return
           var meta = SUBJ_META[item.subject] || { icon: '📄', cls: 's-other' }
           var btn = document.createElement('button')
           btn.className = 'exam-subj-btn ' + meta.cls
           btn.innerHTML = '<span class="subj-icon">' + meta.icon + '</span>'
             + '<span class="subj-name">' + esc(item.subject) + '</span>'
-            + '<span class="subj-label">⬇ 下載 PDF 複習卷</span>'
-          btn.addEventListener('click', function() { window.open(item.pdfUrl, '_blank') })
+            + '<span class="subj-label">🖨️ 列印複習卷</span>'
+          btn.addEventListener('click', function() {
+            openPrintPage(examName, grade, item.subject, item.questions)
+          })
           subjectList.appendChild(btn)
         })
       })
@@ -263,7 +306,7 @@
         if (backBtn)   backBtn.style.display = 'inline-flex'
         if (inactiveMsg) {
           inactiveMsg.style.display = 'block'
-          inactiveMsg.innerHTML = '😴 <b>現在不是考試季</b><br>複習卷會在段考前一週的週六中午開放<br>到時候再來找我喔～ 🌟'
+          inactiveMsg.innerHTML = '😴 <b>現在不是考試季</b><br>複習卷會在段考前一周開放<br>到時候再來找我喔～ 🌟'
         }
       })
   }
@@ -287,7 +330,7 @@
           + '<span style="font-size:.8rem;font-weight:700;color:var(--pink,#E60D85);letter-spacing:.3px;">EXAM REVIEW</span>'
         + '</div>'
         + '<h3 style="margin:0 0 6px;font-size:1.4rem;font-weight:900;color:var(--ink,#241019);letter-spacing:-.3px;">選擇你的年級</h3>'
-        + '<p style="margin:0 0 24px;font-size:.85rem;color:var(--ink-mute,#A593A0);line-height:1.6;">段考前週六中午開放複習卷<br>點選年級，找到你的科目 👇</p>'
+        + '<p style="margin:0 0 24px;font-size:.85rem;color:var(--ink-mute,#A593A0);line-height:1.6;">段考前一周開放複習卷<br>點選年級，找到你要列印的科目 👇</p>'
         /* grade grid */
         + '<div id="exam-grade-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">'
           + [['小一','1'],['小二','2'],['小三','3'],['小四','4'],['小五','5'],['小六','6']].map(function(pair) {

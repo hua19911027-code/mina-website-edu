@@ -1,0 +1,150 @@
+{
+  "name": "考前複習生題",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "手動觸發",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 300],
+      "parameters": {}
+    },
+    {
+      "id": "params",
+      "name": "設定考試參數",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [400, 300],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            { "id": "1", "name": "examName",   "value": "2026上學期期中考",           "type": "string" },
+            { "id": "2", "name": "openAt",     "value": "2026-10-01T00:00:00+08:00", "type": "string" },
+            { "id": "3", "name": "closeAt",    "value": "2026-10-09T23:59:00+08:00", "type": "string" },
+            { "id": "4", "name": "rangeStart", "value": "2026-08-01",                "type": "string" },
+            { "id": "5", "name": "rangeEnd",   "value": "2026-09-19",                "type": "string" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "generate",
+      "name": "呼叫 Worker 生題",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [620, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.minaedu.tw/api/v1/admin/exam-review/generate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "X-Admin-Secret", "value": "={{ $env.ADMIN_SECRET }}" },
+            { "name": "Content-Type",   "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ examName: $json.examName, openAt: $json.openAt, closeAt: $json.closeAt, rangeStart: $json.rangeStart, rangeEnd: $json.rangeEnd }) }}"
+      }
+    },
+    {
+      "id": "notify",
+      "name": "LINE 通知老師",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [840, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.LINE_NOTIFY_URL }}",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "={{ '\\n📋 ' + $('設定考試參數').item.json.examName + ' 考前複習卷已生成完畢\\n\\n請於 ' + $('設定考試參數').item.json.openAt.slice(0,10).replace(/-/g,'/').replace('2026/','').replace(/\\//g,'/') + ' 前完成審核\\n開放列印時間：' + $('設定考試參數').item.json.openAt.slice(0,10).replace(/-/g,'/') + ' ～ ' + $('設定考試參數').item.json.closeAt.slice(0,10).replace(/-/g,'/') + '\\n\\n🔗 Notion 審核頁：' + $json.data.notionParentUrl }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "remind_trigger",
+      "name": "每日凌晨確認（排程）",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [200, 500],
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "1 0 * * *" }]
+        }
+      }
+    },
+    {
+      "id": "check_remind",
+      "name": "讀取 KV 狀態",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [420, 500],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.minaedu.tw/api/v1/practice/exam-review?grade=小六",
+        "options": {}
+      }
+    },
+    {
+      "id": "check_date",
+      "name": "判斷是否為提醒日",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [640, 500],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ (() => { const raw = $('讀取 KV 狀態').item.json; if(!raw.ok || !raw.data || !raw.data.examName) return 'no'; const kv = JSON.parse($env.EXAM_STATE || '{}'); const remind = new Date(new Date(kv.openAt || '').getTime() - 2*86400000); const today = new Date(); return (remind.getFullYear() === today.getFullYear() && remind.getMonth() === today.getMonth() && remind.getDate() === today.getDate()) ? 'yes' : 'no'; })() }}",
+              "operator": { "type": "string", "operation": "equals" },
+              "rightValue": "yes"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "remind_line",
+      "name": "LINE 最後提醒",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [860, 460],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.LINE_NOTIFY_URL }}",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "⚠️ 考前複習卷審核最後提醒\\n明後天即將開放列印，請儘速完成審核！\\n🔗 Notion：{{ $env.EXAM_NOTION_URL }}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "手動觸發":        { "main": [[{ "node": "設定考試參數",      "type": "main", "index": 0 }]] },
+    "設定考試參數":    { "main": [[{ "node": "呼叫 Worker 生題",  "type": "main", "index": 0 }]] },
+    "呼叫 Worker 生題":{ "main": [[{ "node": "LINE 通知老師",     "type": "main", "index": 0 }]] },
+    "每日凌晨確認（排程）": { "main": [[{ "node": "讀取 KV 狀態", "type": "main", "index": 0 }]] },
+    "讀取 KV 狀態":   { "main": [[{ "node": "判斷是否為提醒日",  "type": "main", "index": 0 }]] },
+    "判斷是否為提醒日":{ "main": [[{ "node": "LINE 最後提醒",     "type": "main", "index": 0 }], []] }
+  },
+  "active": false,
+  "settings": { "timezone": "Asia/Taipei" },
+  "_comment": "使用前請設定 n8n 環境變數：ADMIN_SECRET、LINE_NOTIFY_URL。生題節點中 rangeEnd 需手動改為當次考試的生題日前一個週六。"
+}

@@ -1,12 +1,14 @@
 /* GET    /api/v1/admin/settings              — 讀取 Admin 設定（從 KV）
    PUT    /api/v1/admin/settings              — 寫入 Admin 設定（至 KV）
    POST   /api/v1/admin/practice/regenerate  — 觸發 n8n 重新出題 webhook
+   POST   /api/v1/admin/exam-review/generate — 生成考前複習卷並存入 KV
    DELETE /api/v1/admin/cache                — 清除 KV_CACHE 所有快取
    DELETE /api/v1/admin/cache/:prefix        — 清除指定前綴快取（news/practice）
    所有路由需 X-Admin-Secret header */
 
 import { Hono } from 'hono';
-import type { Bindings } from '../types';
+import type { Bindings, ExamQuestion, ExamReviewState } from '../types';
+import * as notion from '../adapters/notion';
 
 const KV_KEY = 'admin_settings';
 
@@ -94,6 +96,166 @@ route.post('/practice/regenerate', async (c) => {
   } catch (e) {
     return c.json({ ok: false, error: { code: 'FETCH_ERROR', message: String(e) } }, 502);
   }
+});
+
+/* POST /exam-review/generate */
+
+const GRADES = ['小一','小二','小三','小四','小五','小六'];
+const EXAM_SUBJECTS = ['英文','數學'] as const;
+const QUESTIONS_PER_PAPER = 20;
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function extractExamQuestions(results: unknown[]): ExamQuestion[] {
+  return (results as Record<string, unknown>[])
+    .map((page) => {
+      const props = page['properties'] as Record<string, unknown>;
+      function text(name: string): string {
+        const p = (props[name] as Record<string, unknown>) || {};
+        const arr = (p['rich_text'] ?? p['title']) as Array<{ plain_text: string }> | undefined;
+        return arr ? arr.map((t) => t.plain_text).join('') : '';
+      }
+      function sel(name: string): string {
+        const p = (props[name] as Record<string, unknown>) || {};
+        const s = p['select'] as Record<string, unknown> | null | undefined;
+        return s ? (s['name'] as string) || '' : '';
+      }
+      const q: ExamQuestion = {
+        id: (page['id'] as string) || '',
+        question: text('題目'),
+        optionA: text('選項A'),
+        optionB: text('選項B'),
+        optionC: text('選項C'),
+        optionD: text('選項D'),
+        answer: sel('答案'),
+      };
+      return q;
+    })
+    .filter((q) => q.question && q.optionA);
+}
+
+function buildNotionBlocks(questions: ExamQuestion[]): unknown[] {
+  const blocks: unknown[] = [];
+  questions.forEach((q, i) => {
+    blocks.push({
+      type: 'paragraph',
+      paragraph: { rich_text: [{ type: 'text', text: { content: `${i + 1}. ${q.question}` }, annotations: { bold: true } }] },
+    });
+    ['A','B','C','D'].forEach((opt) => {
+      blocks.push({
+        type: 'bulleted_list_item',
+        bulleted_list_item: { rich_text: [{ type: 'text', text: { content: `(${opt}) ${q[`option${opt}` as keyof ExamQuestion]}` } }] },
+      });
+    });
+    blocks.push({
+      type: 'paragraph',
+      paragraph: { rich_text: [{ type: 'text', text: { content: `答案：${q.answer}` }, annotations: { color: 'gray' as const } }] },
+    });
+    blocks.push({ type: 'divider', divider: {} });
+  });
+  return blocks;
+}
+
+route.post('/exam-review/generate', async (c) => {
+  let body: { examName: string; openAt: string; closeAt: string; rangeStart: string; rangeEnd: string };
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json({ ok: false, error: { code: 'BAD_REQUEST', message: 'Invalid JSON' } }, 400);
+  }
+  const { examName, openAt, closeAt, rangeStart, rangeEnd } = body;
+  if (!examName || !openAt || !closeAt || !rangeStart || !rangeEnd) {
+    return c.json({ ok: false, error: { code: 'MISSING_PARAMS', message: '缺少必要欄位' } }, 400);
+  }
+
+  const papers: ExamReviewState['papers'] = {};
+
+  for (const grade of GRADES) {
+    papers[grade] = {};
+    for (const subject of EXAM_SUBJECTS) {
+      /* 1. 優先抓範圍內 */
+      const rangeFilter = {
+        and: [
+          { property: '年級', select: { equals: grade } },
+          { property: '科目', select: { equals: subject } },
+          { property: '發布日期', date: { on_or_after: rangeStart } },
+          { property: '發布日期', date: { on_or_before: rangeEnd } },
+        ],
+      };
+      const rangeResult = await notion.queryDatabase(
+        c.env.NOTION_API_KEY, c.env.NOTION_PRACTICE_DB_ID,
+        { filter: rangeFilter, page_size: 100 }
+      );
+      let questions = extractExamQuestions(rangeResult.results as unknown[]);
+
+      /* 2. 不足時往前補 */
+      if (questions.length < QUESTIONS_PER_PAPER) {
+        const needed = QUESTIONS_PER_PAPER - questions.length;
+        const fallbackFilter = {
+          and: [
+            { property: '年級', select: { equals: grade } },
+            { property: '科目', select: { equals: subject } },
+            { property: '發布日期', date: { before: rangeStart } },
+          ],
+        };
+        const fallbackResult = await notion.queryDatabase(
+          c.env.NOTION_API_KEY, c.env.NOTION_PRACTICE_DB_ID,
+          { filter: fallbackFilter, sorts: [{ property: '發布日期', direction: 'descending' }], page_size: needed }
+        );
+        questions = [...questions, ...extractExamQuestions(fallbackResult.results as unknown[])];
+      }
+
+      papers[grade][subject] = shuffle(questions).slice(0, QUESTIONS_PER_PAPER);
+    }
+  }
+
+  /* 3. 建立 Notion 審核頁面 */
+  let notionParentUrl = '';
+  const parentPageId = c.env.NOTION_EXAM_REVIEW_PARENT_PAGE_ID;
+  if (parentPageId) {
+    try {
+      const parent = await notion.createPage(c.env.NOTION_API_KEY, parentPageId, `${examName}　考前複習卷`);
+      notionParentUrl = parent.url;
+      for (const grade of GRADES) {
+        for (const subject of EXAM_SUBJECTS) {
+          const blocks = buildNotionBlocks(papers[grade][subject]);
+          /* Notion API 每次最多 100 個 blocks，分批送 */
+          const chunks: unknown[][] = [];
+          for (let i = 0; i < blocks.length; i += 100) chunks.push(blocks.slice(i, i + 100));
+          let subPageId = '';
+          const first = chunks.shift()!;
+          const sub = await notion.createPage(c.env.NOTION_API_KEY, parent.id, `${grade} ${subject}`, first);
+          subPageId = sub.id;
+          for (const chunk of chunks) {
+            await fetch(`https://api.notion.com/v1/blocks/${subPageId}/children`, {
+              method: 'PATCH',
+              headers: { Authorization: `Bearer ${c.env.NOTION_API_KEY}`, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
+              body: JSON.stringify({ children: chunk }),
+            });
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Notion page creation error:', e);
+    }
+  }
+
+  /* 4. 寫入 KV */
+  const state: ExamReviewState = {
+    examName, openAt, closeAt, notionParentUrl,
+    generatedAt: new Date().toISOString(),
+    papers,
+  };
+  await c.env.KV_SETTINGS.put('exam_review_state', JSON.stringify(state));
+
+  return c.json({ ok: true, data: { examName, notionParentUrl, generatedAt: state.generatedAt } });
 });
 
 /* DELETE /cache                — 清除所有快取

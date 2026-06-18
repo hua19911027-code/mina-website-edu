@@ -3,7 +3,7 @@
    GET /api/v1/practice/exam-review  — 考前複習 */
 
 import { Hono } from 'hono';
-import type { Bindings, PracticeQuestion, PracticeList } from '../types';
+import type { Bindings, PracticeQuestion, PracticeList, ExamReviewState } from '../types';
 import * as notion from '../adapters/notion';
 
 /* Static fallback imports — used only when ENVIRONMENT=development */
@@ -275,83 +275,36 @@ route.get('/exam-review', async (c) => {
     return c.json({ ok: false, error: { code: 'MISSING_PARAM', message: 'grade is required' } }, 400);
   }
 
-  if (c.env.ENVIRONMENT === 'development') {
-    return c.json({ ok: true, data: { active: false, grade, items: [] } }, 200, {
-      'Cache-Control': 'no-store',
-    });
-  }
-
   try {
+    const raw = await c.env.KV_SETTINGS.get('exam_review_state');
+    if (!raw) {
+      return c.json({ ok: true, data: { active: false, grade, items: [] } }, 200, { 'Cache-Control': 'no-store' });
+    }
+
+    const state = JSON.parse(raw) as ExamReviewState;
     const n = now();
-    // Notion 端直接過濾時間範圍，減少傳輸量
-    const filter = {
-      and: [
-        { property: '是否啟用', checkbox: { equals: true } },
-        { property: '年級', select: { equals: grade } },
-        { property: '開始時間', date: { on_or_before: n.toISOString() } },
-        { property: '結束時間', date: { on_or_after: n.toISOString() } },
-      ],
-    };
+    const openAt  = new Date(state.openAt);
+    const closeAt = new Date(state.closeAt);
 
-    const result = await notion.queryDatabase(c.env.NOTION_API_KEY, c.env.NOTION_EXAM_REVIEW_DB_ID, {
-      filter,
-      sorts: [{ property: '科目', direction: 'ascending' }],
-      page_size: 20,
-    });
+    if (n < openAt || n > closeAt) {
+      return c.json({ ok: true, data: { active: false, grade, items: [] } }, 200, { 'Cache-Control': 'no-store' });
+    }
 
-    const items = (result.results as unknown[])
-      .map(page => {
-        const p = page as Record<string, unknown>;
-        const props = p.properties as Record<string, unknown>;
+    const gradePapers = state.papers[grade];
+    if (!gradePapers) {
+      return c.json({ ok: true, data: { active: false, grade, items: [] } }, 200, { 'Cache-Control': 'no-store' });
+    }
 
-        function getTitle(): string {
-          const entries = Object.values(props) as Array<Record<string, unknown>>;
-          const titleProp = entries.find(e => e['type'] === 'title');
-          if (!titleProp) return '';
-          const arr = titleProp['title'] as Array<{ plain_text: string }> | undefined;
-          return arr ? arr.map(t => t.plain_text).join('') : '';
-        }
-        function getSelect(name: string): string {
-          const prop = (props[name] as Record<string, unknown>) || {};
-          const sel = prop['select'] as Record<string, unknown> | null | undefined;
-          return sel ? (sel['name'] as string) || '' : '';
-        }
+    const items = (['英文', '數學'] as const)
+      .filter((s) => gradePapers[s]?.length > 0)
+      .map((subject) => ({ subject, questions: gradePapers[subject] }));
 
-        const pdfProp = props['PDF'] as { type: string; files: Array<{ type: string; file?: { url: string }; external?: { url: string } }> } | undefined;
-        const pdfUrl = pdfProp?.files?.[0]
-          ? (pdfProp.files[0].type === 'file' ? pdfProp.files[0].file?.url : pdfProp.files[0].external?.url) ?? ''
-          : '';
-
-        if (!pdfUrl) return null;
-
-        // 時間比對：獨立的「開始時間」與「結束時間」Date 欄位
-        const startProp = (props['開始時間'] as Record<string, unknown>) || {};
-        const endProp   = (props['結束時間'] as Record<string, unknown>) || {};
-        const startDate = (startProp['date'] as { start?: string } | null | undefined)?.start || '';
-        const endDate   = (endProp['date'] as { start?: string } | null | undefined)?.start || '';
-        if (startDate && endDate) {
-          if (n < new Date(startDate) || n > new Date(endDate)) return null;
-        }
-
-        return {
-          id: (p.id as string) || '',
-          name: getTitle(),
-          subject: getSelect('科目'),
-          grade: getSelect('年級'),
-          pdfUrl,
-          startAt: startDate,
-          endAt: endDate,
-        };
-      })
-      .filter((item): item is NonNullable<typeof item> => item !== null);
-
-    const active = items.length > 0;
-    return c.json({ ok: true, data: { active, grade, items } }, 200, {
+    return c.json({ ok: true, data: { active: true, grade, examName: state.examName, items } }, 200, {
       'Cache-Control': 'no-store',
     });
   } catch (e) {
     console.error('practice /exam-review error:', e);
-    return c.json({ ok: false, error: { code: 'NOTION_ERROR', message: 'Failed to fetch exam review' } }, 500);
+    return c.json({ ok: false, error: { code: 'KV_ERROR', message: 'Failed to fetch exam review' } }, 500);
   }
 });
 

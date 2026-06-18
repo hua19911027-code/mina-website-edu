@@ -7,6 +7,7 @@ export type Bindings = {
   NOTION_FAQ_DB_ID: string;
   NOTION_PRACTICE_DB_ID: string;
   NOTION_EXAM_REVIEW_DB_ID: string;
+  NOTION_EXAM_REVIEW_PARENT_PAGE_ID: string;
   LINE_OFFICIAL_URL: string;
   N8N_BOOKING_WEBHOOK?: string;
   N8N_REGEN_WEBHOOK?: string;
@@ -117,20 +118,39 @@ export interface PracticeList {
   reachedLimit?: boolean;
 }
 
-export interface ExamReviewItem {
+export interface ExamQuestion {
   id: string;
-  name: string;
+  question: string;
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  optionD: string;
+  answer: string;
+}
+
+export interface ExamReviewState {
+  examName: string;
+  openAt: string;
+  closeAt: string;
+  notionParentUrl: string;
+  generatedAt: string;
+  papers: {
+    [grade: string]: {
+      [subject: string]: ExamQuestion[];
+    };
+  };
+}
+
+export interface ExamReviewSubject {
   subject: string;
-  grade: string;
-  pdfUrl: string;
-  startAt: string;
-  endAt: string;
+  questions: ExamQuestion[];
 }
 
 export interface ExamReviewData {
   active: boolean;
   grade: string;
-  items: ExamReviewItem[];
+  examName?: string;
+  items: ExamReviewSubject[];
 }
 
 export interface PracticeData {

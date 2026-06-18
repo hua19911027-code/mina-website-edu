@@ -281,3 +281,27 @@ export function getPropTags(page: NotionPage, name: string): string[] {
   const arr = prop['multi_select'] as Record<string, unknown>[] | undefined;
   return arr ? arr.map((s) => s['name'] as string) : [];
 }
+
+/* ── createPage ── */
+
+export async function createPage(
+  apiKey: string,
+  parentPageId: string,
+  title: string,
+  children: unknown[] = []
+): Promise<{ id: string; url: string }> {
+  const res = await fetch(`${BASE_URL}/pages`, {
+    method: 'POST',
+    headers: headers(apiKey),
+    body: JSON.stringify({
+      parent: { type: 'page_id', page_id: parentPageId },
+      properties: {
+        title: [{ type: 'text', text: { content: title } }],
+      },
+      children,
+    }),
+  });
+  if (!res.ok) throw new Error(`createPage failed: ${res.status}`);
+  const data = await res.json() as { id: string; url: string };
+  return { id: data.id, url: data.url };
+}
