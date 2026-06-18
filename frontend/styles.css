@@ -600,6 +600,7 @@ a.camp-link:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,0
 .carousel-dots .dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.55);border:none;cursor:pointer;padding:0;transition:.2s;}
 .carousel-dots .dot.on{background:#fff;width:24px;border-radius:6px;}
 .carousel-counter{position:absolute;top:14px;right:14px;background:rgba(36,16,25,.6);color:#fff;font-family:var(--fred);font-weight:500;font-size:13px;padding:4px 12px;border-radius:20px;z-index:2;}
+.env-carousel{margin:0;border-color:#B9CFEA;}
 @media(max-width:600px){
   .carousel-prev,.carousel-next{width:40px;height:40px;font-size:20px;background:rgba(255,255,255,.78);}
   .carousel-prev{left:10px;}.carousel-next{right:10px;}

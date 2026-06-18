@@ -131,7 +131,17 @@
     <div class="wrap">
       <div class="split rev reveal">
         <div class="split-media">
-          <div class="imgph alt"><div class="ph-in"><span class="ico">📍</span>環境／設備照片<br>（待提供）</div></div>
+          <div class="photo-carousel env-carousel" role="region" aria-label="教室環境照片">
+            <div class="carousel-track">
+              <div class="carousel-slide on"><img src="assets/images/space/space-1.jpg" alt="安親大教室" loading="lazy"></div>
+              <div class="carousel-slide"><img src="assets/images/space/space-2.jpg" alt="前台接待區" loading="lazy"></div>
+              <div class="carousel-slide"><img src="assets/images/space/space-3.jpg" alt="數學小班教室" loading="lazy"></div>
+              <div class="carousel-slide"><img src="assets/images/space/space-4.jpg" alt="英文小班教室" loading="lazy"></div>
+            </div>
+            <button class="carousel-prev" aria-label="上一張">‹</button>
+            <button class="carousel-next" aria-label="下一張">›</button>
+            <div class="carousel-dots"></div>
+          </div>
         </div>
         <div class="split-text">
           <span class="kicker">✦ Our Space</span>
@@ -213,6 +223,34 @@
   </div>
 </footer>
 
+<script>
+(function(){
+  var car = document.querySelector('.env-carousel');
+  if(!car) return;
+  var slides = car.querySelectorAll('.carousel-slide');
+  var dotsEl = car.querySelector('.carousel-dots');
+  var cur = 0;
+  slides.forEach(function(_,i){
+    var d = document.createElement('button');
+    d.className = 'dot' + (i===0?' on':'');
+    d.setAttribute('aria-label', '第'+(i+1)+'張');
+    d.onclick = function(){ go(i); };
+    dotsEl.appendChild(d);
+  });
+  function go(n){
+    slides[cur].classList.remove('on');
+    dotsEl.children[cur].classList.remove('on');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].classList.add('on');
+    dotsEl.children[cur].classList.add('on');
+  }
+  car.querySelector('.carousel-prev').onclick = function(){ go(cur-1); };
+  car.querySelector('.carousel-next').onclick = function(){ go(cur+1); };
+  var t = setInterval(function(){ go(cur+1); }, 4000);
+  car.addEventListener('mouseenter', function(){ clearInterval(t); });
+  car.addEventListener('mouseleave', function(){ t = setInterval(function(){ go(cur+1); }, 4000); });
+})();
+</script>
 <script src="site.js" defer></script>
 <link rel="stylesheet" href="components/mina-widget.css" media="print" onload="this.media='all'"/>
 <script src="components/mina-widget.js" defer></script>
