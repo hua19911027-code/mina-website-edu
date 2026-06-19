@@ -628,3 +628,78 @@ a.camp-link:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,0
   .art-body{font-size:16px;}
 }
 #hp-qcard{min-height:180px;}
+
+/* ═══════════════════════ 學年行事曆 ═══════════════════════ */
+.yearcal{margin-top:52px;}
+
+.yc-bar{display:flex;align-items:center;flex-wrap:wrap;gap:12px 24px;margin-bottom:16px;}
+.yc-bar h3{font-size:19px;font-weight:900;}
+.yr{font-size:12px;font-weight:700;background:var(--pink-soft);color:var(--pink-deep);padding:3px 12px;border-radius:20px;vertical-align:middle;margin-left:6px;}
+
+.yc-legend{display:flex;gap:8px 16px;flex-wrap:wrap;margin-left:auto;}
+.lg{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;color:var(--ink-soft);}
+.lg::before{content:'';width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.l-en::before  {background:var(--pink);}
+.l-ex::before  {background:var(--orange);}
+.l-camp::before{background:#2980d9;}
+.l-reg::before {background:#c9a000;}
+.l-fest::before{background:#823cc8;}
+
+.yc-hint{font-size:13px;color:var(--ink-mute);text-align:center;margin-bottom:10px;}
+
+.yc-scroll{overflow-x:auto;overflow-y:visible;padding:4px 0 10px;-webkit-overflow-scrolling:touch;}
+.yc-scroll::-webkit-scrollbar{height:4px;}
+.yc-scroll::-webkit-scrollbar-track{background:var(--line);border-radius:4px;}
+.yc-scroll::-webkit-scrollbar-thumb{background:var(--pink-soft);border-radius:4px;}
+
+/* rail — center line via ::before */
+.yc-rail{display:flex;align-items:stretch;min-width:max-content;position:relative;}
+.yc-rail::before{content:'';position:absolute;left:0;right:0;top:50%;height:3px;margin-top:-1.5px;background:var(--line);z-index:0;}
+
+.yc-seg{display:flex;align-items:stretch;position:relative;}
+.yc-seg.s2{border-left:2px dashed var(--line);}
+
+.yc-seg-label{writing-mode:vertical-rl;font-size:11px;font-weight:700;letter-spacing:2px;padding:0 8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1;background:var(--bg);}
+.yc-seg.s1 .yc-seg-label{color:var(--orange);}
+.yc-seg.s2 .yc-seg-label{color:#2980d9;}
+
+.yc-stops{display:flex;align-items:stretch;padding:0 4px;position:relative;z-index:1;}
+
+/* 每個 stop：3 列 grid，確保 dot 精確對齊中心線 */
+.yc-stop{display:grid;grid-template-rows:1fr 36px 1fr;justify-items:center;width:148px;min-height:240px;flex-shrink:0;padding:0 6px;position:relative;z-index:1;}
+
+/* .up：card(列1) / dot(列2) / mon(列3) */
+.yc-stop.up .yc-card{grid-row:1;align-self:end;margin-bottom:6px;}
+.yc-stop.up .yc-dot {grid-row:2;align-self:center;}
+.yc-stop.up .yc-mon {grid-row:3;align-self:start;margin-top:6px;}
+
+/* .down：mon(列1) / dot(列2) / card(列3) */
+.yc-stop.down .yc-mon {grid-row:1;align-self:end;margin-bottom:6px;}
+.yc-stop.down .yc-dot {grid-row:2;align-self:center;}
+.yc-stop.down .yc-card{grid-row:3;align-self:start;margin-top:6px;}
+
+.yc-dot{width:36px;height:36px;border-radius:50%;background:#fff;border:3px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;box-shadow:0 2px 10px rgba(0,0,0,.1);position:relative;z-index:2;}
+
+.yc-card{background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px 12px;width:136px;text-align:center;box-shadow:0 4px 16px -8px rgba(0,0,0,.12);}
+.yc-tag{font-size:11px;font-weight:700;font-family:var(--fred);color:var(--ink-mute);display:block;margin-bottom:4px;}
+.yc-card h4{font-size:13px;font-weight:700;line-height:1.4;}
+.yc-card p{font-size:11px;color:var(--ink-soft);line-height:1.5;margin-top:4px;}
+
+.yc-mon{font-size:11px;font-weight:700;font-family:var(--fred);color:var(--ink-mute);white-space:nowrap;}
+
+/* 分類色 */
+.yc-stop.en   .yc-dot {border-color:var(--pink);}
+.yc-stop.en   .yc-card{border-color:var(--pink-soft);}
+.yc-stop.ex   .yc-dot {border-color:var(--orange);}
+.yc-stop.ex   .yc-card{border-color:var(--orange-soft);}
+.yc-stop.camp .yc-dot {border-color:#2980d9;}
+.yc-stop.camp .yc-card{border-color:#c5ddf8;}
+.yc-stop.reg  .yc-dot {border-color:#c9a000;}
+.yc-stop.reg  .yc-card{border-color:var(--yellow-soft);}
+.yc-stop.fest .yc-dot {border-color:#823cc8;}
+.yc-stop.fest .yc-card{border-color:#ead5f5;}
+
+@media(max-width:640px){
+  .yc-bar{flex-direction:column;align-items:flex-start;}
+  .yc-legend{margin-left:0;}
+}
