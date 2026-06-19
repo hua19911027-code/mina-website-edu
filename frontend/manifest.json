@@ -1,16 +1,22 @@
 {
-  "name": "徐薇英文 × 偉智數學",
-  "short_name": "Mina 補習班",
+  "name": "徐薇英文台中烏日旭光分校",
+  "short_name": "徐薇英文台中烏日旭光分校",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#E60D85",
   "icons": [
     {
-      "src": "assets/logo/zhuoyue-logo.svg",
+      "src": "assets/logo/icon-white-bg.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "assets/logo/icon-white-bg.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ]
 }
