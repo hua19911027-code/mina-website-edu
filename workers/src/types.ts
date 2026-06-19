@@ -8,6 +8,7 @@ export type Bindings = {
   NOTION_PRACTICE_DB_ID: string;
   NOTION_EXAM_REVIEW_DB_ID: string;
   NOTION_EXAM_REVIEW_PARENT_PAGE_ID: string;
+  NOTION_CALENDAR_DB_ID: string;
   LINE_OFFICIAL_URL: string;
   N8N_BOOKING_WEBHOOK?: string;
   N8N_REGEN_WEBHOOK?: string;

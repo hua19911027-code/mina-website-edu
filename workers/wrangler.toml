@@ -20,6 +20,7 @@ routes = [
 # wrangler secret put N8N_PUBLISHER_WEBHOOK
 # wrangler secret put ADMIN_SECRET
 # wrangler secret put NOTION_EXAM_REVIEW_PARENT_PAGE_ID
+# wrangler secret put NOTION_CALENDAR_DB_ID
 # wrangler secret put CORS_ORIGIN
 
 [[kv_namespaces]]

@@ -242,61 +242,66 @@
 
 <script src="site.js"></script>
 <script>
-/* ===== 學年行事曆：資料驅動 =====
-   後端 Notion 整理成下面這種陣列即可（或設定 window.YEARCAL_EVENTS）：
-   { date:'2025-09-01', title:'課輔正式啟動', desc:'說明…', type:'en', icon:'📚' }
-   type 對應分類顏色：en=學期課程 / ex=段考評量 / camp=營隊 / reg=報名活動 / fest=節慶活動
-   icon 可省略（會用該分類預設圖示）。加幾筆都行，會自動依日期排序、分上下學期、上下交錯。 */
 (function(){
   const TYPE_ICON={en:'📘',ex:'📝',camp:'🎒',reg:'📋',fest:'🎉'};
-  const aOrder=m=>m>=8?m-8:m+4;            // 學年排序：8月=0 … 隔年7月=11
   const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
   function render(events){
     const rail=document.getElementById('ycRail');
     if(!rail) return;
+    /* 純日期排序：7月為學年起點，跨年資料正確排列 */
     const items=(events||[]).map(e=>{
       const p=String(e.date||'').split('-').map(Number);
-      const d=new Date(p[0]||2025,(p[1]||1)-1,p[2]||1);
-      return Object.assign({},e,{_d:d,_ord:aOrder(d.getMonth()+1)});
-    }).sort((a,b)=> a._ord===b._ord ? a._d-b._d : a._ord-b._ord);
+      return Object.assign({},e,{_d:new Date(p[0]||2025,(p[1]||1)-1,p[2]||1)});
+    }).filter(e=>e.date&&e.title).sort((a,b)=>a._d-b._d);
 
-    const s1={cls:'s1',label:'📘 上學期',html:''};
-    const s2={cls:'s2',label:'📙 下學期',html:''};
+    if(!items.length){rail.innerHTML='';return;}
+
+    /* 以第一筆事件的年份區分上/下學期 */
+    const minYear=items[0]._d.getFullYear();
+    const s1={cls:'s1',label:'☀️ 夏令營・上學期',html:''};
+    const s2={cls:'s2',label:'🌸 下學期・暑假',html:''};
+
     items.forEach((e,i)=>{
       const ud=i%2===0?'up':'down';
       const type=e.type||'en';
       const icon=e.icon||TYPE_ICON[type]||'📌';
-      const tag=e.tag||((e._d.getMonth()+1)+'/'+e._d.getDate());
+      const tag=(e._d.getMonth()+1)+'/'+e._d.getDate();
       const mon=(e._d.getMonth()+1)+' 月';
       const card='<div class="yc-card"><span class="yc-tag">'+esc(tag)+'</span><h4>'+esc(e.title)+'</h4>'+(e.desc?'<p>'+esc(e.desc)+'</p>':'')+'</div>';
       const stop='<div class="yc-stop '+type+' '+ud+'">'+card+'<span class="yc-dot">'+icon+'</span><span class="yc-mon">'+mon+'</span></div>';
-      (e._ord<=5?s1:s2).html+=stop;
+      (e._d.getFullYear()===minYear?s1:s2).html+=stop;
     });
     rail.innerHTML=[s1,s2].filter(s=>s.html).map(s=>'<div class="yc-seg '+s.cls+'"><span class="yc-seg-label">'+s.label+'</span><div class="yc-stops">'+s.html+'</div></div>').join('');
   }
 
-  /* 預設示意資料（114 學年）。串 Notion 後改用後端資料即可。 */
+  window.renderYearCalendar=render;
+
+  /* 備用示意資料（Notion 未設定時顯示） */
   const DEFAULT_EVENTS=[
-    {date:'2025-08-25',type:'en',  title:'開學銜接週',     desc:'暑假收心、新班開課，幫孩子轉回學習節奏。'},
-    {date:'2025-09-01',type:'en',  title:'課輔正式啟動',   desc:'英數正課與課後安親同步開跑。',icon:'📚'},
-    {date:'2025-10-15',type:'ex',  title:'第一次段考衝刺', desc:'考前兩週密集複習與模擬演練。'},
-    {date:'2025-10-31',type:'fest',title:'萬聖節變裝活動', desc:'節慶主題日，邊玩邊學英語單字。',icon:'🎃'},
-    {date:'2025-11-12',type:'ex',  title:'第二次段考衝刺', desc:'針對弱點加強，錯題重練不放過。',icon:'✏️'},
-    {date:'2025-12-22',type:'ex',  title:'期末總複習',     desc:'全學期重點整理，迎接學期末評量。',icon:'📖'},
-    {date:'2026-01-15',type:'ex',  title:'學期末評量',     desc:'期末考＋成果回饋，掌握孩子進度。',icon:'🏆'},
-    {date:'2026-01-25',type:'camp',title:'冬令營開跑',     desc:'寒假銜接營，預習下學期贏在起跑點。',icon:'⛄'},
+    {date:'2025-07-07',type:'camp',title:'夏令營開始',     desc:'暑期密集營隊，邊玩邊學不退步。',icon:'☀️'},
+    {date:'2025-08-15',type:'camp',title:'夏令營結束',     icon:'🏁'},
+    {date:'2025-09-01',type:'en',  title:'開學日',         desc:'114 學年正式開始。',icon:'📚'},
+    {date:'2025-10-15',type:'ex',  title:'期中考衝刺',     desc:'考前兩週密集複習與模擬演練。'},
+    {date:'2025-10-31',type:'fest',title:'萬聖節特別活動', desc:'節慶主題日，邊玩邊學英語單字。',icon:'🎃'},
+    {date:'2025-12-25',type:'fest',title:'聖誕節活動',     desc:'節慶主題課程，歡慶聖誕！',icon:'🎄'},
+    {date:'2026-01-20',type:'ex',  title:'期末總複習',     desc:'全學期重點整理，迎接期末評量。',icon:'📖'},
+    {date:'2026-01-26',type:'camp',title:'冬令營開始',     desc:'寒假銜接營，預習下學期贏在起跑點。',icon:'⛄'},
+    {date:'2026-02-06',type:'camp',title:'冬令營結束',     icon:'🏁'},
     {date:'2026-02-16',type:'en',  title:'開學・新進度',   desc:'下學期正課啟動，延續學習不中斷。',icon:'🌱'},
-    {date:'2026-03-18',type:'ex',  title:'第一次段考衝刺', desc:'新學期第一戰，觀念與題型同步加強。'},
-    {date:'2026-04-20',type:'ex',  title:'第二次段考衝刺', desc:'錯題診斷＋解題策略，穩住段考表現。',icon:'✏️'},
+    {date:'2026-03-18',type:'ex',  title:'期中考衝刺',     desc:'新學期第一戰，觀念與題型同步加強。'},
     {date:'2026-05-18',type:'ex',  title:'期末總複習',     desc:'學期重點收網，準備期末評量。',icon:'📖'},
     {date:'2026-06-19',type:'fest',title:'端午節特別活動', desc:'佳節主題課程與闖關，文化＋學習一起玩。',icon:'🐉'},
-    {date:'2026-06-25',type:'reg', title:'暑期班報名開始', desc:'夏令營與暑期輔導開放卡位。'},
-    {date:'2026-07-06',type:'camp',title:'夏令營開跑',     desc:'暑期密集營隊，邊玩邊學不退步。',icon:'☀️'}
+    {date:'2026-07-06',type:'camp',title:'夏令營開始',     desc:'暑期密集營隊，邊玩邊學不退步。',icon:'☀️'}
   ];
 
-  window.renderYearCalendar=render;
-  render(window.YEARCAL_EVENTS||DEFAULT_EVENTS);
+  fetch('https://api.minaedu.tw/api/v1/calendar')
+    .then(r=>r.json())
+    .then(res=>{
+      if(res.ok&&Array.isArray(res.data)&&res.data.length) render(res.data);
+      else render(DEFAULT_EVENTS);
+    })
+    .catch(()=>render(DEFAULT_EVENTS));
 })();
 </script>
 </body>
