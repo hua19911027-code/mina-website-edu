@@ -42,9 +42,9 @@ header.nav{position:sticky;top:0;z-index:120;background:var(--pink);border-botto
 .mobile-menu{display:none;}
 
 /* HERO */
-.hero{position:relative;padding:56px 0 80px;background:radial-gradient(ellipse 80% 60% at 70% 0%,var(--pink-soft),transparent 60%),var(--bg);overflow:hidden;}
+.hero{position:relative;padding:56px 0 80px;background:radial-gradient(ellipse 80% 60% at 70% 0%,var(--pink-soft),transparent 60%),var(--bg);overflow:hidden;contain:paint;}
 .hero-logo{width:94px;height:94px;margin:0 auto 22px;display:block;filter:drop-shadow(0 12px 26px rgba(184,0,95,.22));animation:float 5s ease-in-out infinite;}
-.blob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.85;z-index:0;}
+.blob{position:absolute;border-radius:50%;opacity:.85;z-index:0;}
 .sparkle{position:absolute;z-index:1;animation:float 5s ease-in-out infinite;}
 .sparkle svg{display:block;}
 @keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-16px) rotate(12deg)}}
@@ -267,7 +267,7 @@ footer{background:var(--pink-deep);color:rgba(255,255,255,.7);padding:56px 0 30p
 }
 
 /* ===================== INNER PAGES ===================== */
-.page-hero{position:relative;padding:52px 0 46px;background:radial-gradient(ellipse 70% 90% at 82% -10%,var(--pink-soft),transparent 60%),var(--bg);overflow:hidden;text-align:center;}
+.page-hero{position:relative;padding:52px 0 46px;background:radial-gradient(ellipse 70% 90% at 82% -10%,var(--pink-soft),transparent 60%),var(--bg);overflow:hidden;contain:paint;text-align:center;}
 .page-hero .blob{opacity:.4;}
 .breadcrumb{display:flex;justify-content:center;gap:8px;font-size:13px;color:var(--ink-mute);font-weight:600;margin-bottom:18px;position:relative;z-index:2;}
 .breadcrumb a:hover{color:var(--pink);}
@@ -464,7 +464,7 @@ a.camp-link:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,0
 
 /* --- Enriched course media (課程介紹) --- */
 .cdetail .cd-media{overflow:hidden;}
-.cd-deco{position:absolute;border-radius:50%;z-index:0;filter:blur(1px);}
+.cd-deco{position:absolute;border-radius:50%;z-index:0;}
 .cdetail.en .cd-deco{background:rgba(255,255,255,.55);}
 .cdetail.ma .cd-deco{background:rgba(255,255,255,.5);}
 .cdetail.af .cd-deco{background:rgba(255,255,255,.6);}
