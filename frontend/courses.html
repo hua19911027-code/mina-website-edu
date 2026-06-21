@@ -249,21 +249,21 @@
    icon 可省略（會用該分類預設圖示）。加幾筆都行，會自動依日期排序、分上下學期、上下交錯。 */
 (function(){
   const TYPE_ICON={en:'📘',ex:'📝',camp:'🎒',reg:'📋',fest:'🎉'};
-  const aOrder=m=>m>=8?m-8:m+4;  // 學年排序：8月=0 … 隔年7月=11
   const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
   function render(events){
     const rail=document.getElementById('ycRail');
     if(!rail) return;
-    /* 學年排序（8月起點），跨年正確排列 */
+    /* 依日期順序排（7月起點跨年行事曆） */
     const items=(events||[]).map(e=>{
       const p=String(e.date||'').split('-').map(Number);
-      const d=new Date(p[0]||2025,(p[1]||1)-1,p[2]||1);
-      return Object.assign({},e,{_d:d,_ord:aOrder(d.getMonth()+1)});
-    }).filter(e=>e.date&&e.title).sort((a,b)=>a._ord===b._ord?a._d-b._d:a._ord-b._ord);
+      return Object.assign({},e,{_d:new Date(p[0]||2025,(p[1]||1)-1,p[2]||1)});
+    }).filter(e=>e.date&&e.title).sort((a,b)=>a._d-b._d);
     if(!items.length) return;
 
-    /* s1（上學期）= 8–1月（_ord 0–5），s2（下學期）= 2–7月（_ord 6–11） */
+    /* 分學期邊界：第一筆年份+1 的 2/1 為分界
+       s1（上學期含暑假前）= 7月～1月，s2（下學期含暑假後）= 2月～8月 */
+    const semBound=new Date(items[0]._d.getFullYear()+1,1,1);
     const s1={cls:'s1',label:'📘 上學期',html:''};
     const s2={cls:'s2',label:'📙 下學期',html:''};
     items.forEach((e,i)=>{
@@ -274,13 +274,14 @@
       const mon=(e._d.getMonth()+1)+' 月';
       const card='<div class="yc-card"><span class="yc-tag">'+esc(tag)+'</span><h4>'+esc(e.title)+'</h4>'+(e.desc?'<p>'+esc(e.desc)+'</p>':'')+'</div>';
       const stop='<div class="yc-stop '+type+' '+ud+'">'+card+'<span class="yc-dot">'+icon+'</span><span class="yc-mon">'+mon+'</span></div>';
-      (e._ord<=5?s1:s2).html+=stop;
+      (e._d<semBound?s1:s2).html+=stop;
     });
     rail.innerHTML=[s1,s2].filter(s=>s.html).map(s=>'<div class="yc-seg '+s.cls+'"><span class="yc-seg-label">'+s.label+'</span><div class="yc-stops">'+s.html+'</div></div>').join('');
   }
 
-  /* 備用示意資料（114 學年）。Notion 有資料時自動替換。 */
+  /* 備用示意資料（114 學年，7月起～隔年8月終）。Notion 有資料時自動替換。 */
   const DEFAULT_EVENTS=[
+    {date:'2025-07-07',type:'camp',title:'夏令營開跑',     desc:'暑期密集營隊，邊玩邊學不退步。',icon:'☀️'},
     {date:'2025-08-25',type:'en',  title:'開學銜接週',     desc:'暑假收心、新班開課，幫孩子轉回學習節奏。'},
     {date:'2025-09-01',type:'en',  title:'課輔正式啟動',   desc:'英數正課與課後安親同步開跑。',icon:'📚'},
     {date:'2025-10-15',type:'ex',  title:'第一次段考衝刺', desc:'考前兩週密集複習與模擬演練。'},
@@ -295,7 +296,8 @@
     {date:'2026-05-18',type:'ex',  title:'期末總複習',     desc:'學期重點收網，準備期末評量。',icon:'📖'},
     {date:'2026-06-19',type:'fest',title:'端午節特別活動', desc:'佳節主題課程與闖關，文化＋學習一起玩。',icon:'🐉'},
     {date:'2026-06-25',type:'reg', title:'暑期班報名開始', desc:'夏令營與暑期輔導開放卡位。'},
-    {date:'2026-07-06',type:'camp',title:'夏令營開跑',     desc:'暑期密集營隊，邊玩邊學不退步。',icon:'☀️'}
+    {date:'2026-07-06',type:'camp',title:'夏令營開跑',     desc:'暑期密集營隊，邊玩邊學不退步。',icon:'☀️'},
+    {date:'2026-08-15',type:'camp',title:'夏令營結束',     desc:'暑假圓滿收官，準備迎接新學年！',icon:'🏁'}
   ];
 
   window.renderYearCalendar=render;
