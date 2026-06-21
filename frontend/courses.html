@@ -302,13 +302,14 @@
 
   window.renderYearCalendar=render;
 
+  render(DEFAULT_EVENTS);
+
   fetch('https://api.minaedu.tw/api/v1/calendar')
     .then(r=>r.json())
     .then(res=>{
       if(res.ok&&Array.isArray(res.data)&&res.data.length) render(res.data);
-      else render(DEFAULT_EVENTS);
     })
-    .catch(()=>render(DEFAULT_EVENTS));
+    .catch(()=>{});
 })();
 </script>
 </body>
