@@ -27,13 +27,19 @@ function daysAgo(d: Date, n: number): Date {
   return new Date(d.getTime() - n * 24 * 60 * 60 * 1000);
 }
 
-/** 題目篩選：年級/科目/題型（不限制日期與發布狀態，方便初期使用） */
-function buildCurrentWeekFilter(grade?: string, subject?: string, type?: string): unknown | undefined {
-  const and: unknown[] = [];
-  if (grade) and.push({ property: '年級', select: { equals: grade } });
+/** 題目篩選：本週窗口（發布日期 ≤ 現在 且 > 7天前）*/
+function buildCurrentWeekFilter(grade?: string, subject?: string, type?: string): unknown {
+  const n = now();
+  const and: unknown[] = [
+    { property: '是否發布', checkbox: { equals: true } },
+    { property: '已封存',   checkbox: { equals: false } },
+    { property: '發布日期', date: { on_or_before: n.toISOString() } },
+    { property: '發布日期', date: { after: daysAgo(n, 7).toISOString() } },
+  ];
+  if (grade)   and.push({ property: '年級', select: { equals: grade } });
   if (subject) and.push({ property: '科目', select: { equals: subject } });
-  if (type) and.push({ property: '題型', select: { equals: type } });
-  return and.length > 0 ? { and } : undefined;
+  if (type)    and.push({ property: '題型', select: { equals: type } });
+  return { and };
 }
 
 /** 歷屆題目：發布日期 >= 90天前 AND < 7天前 */
@@ -126,7 +132,7 @@ const fallbackAll: PracticeQuestion[] = ([...en12.questions, ...en34.questions, 
     } as PracticeQuestion;
   });
 
-/* ── GET / — 近三個月 ── */
+/* ── GET / — 本週題目（発布日期在過去7天內）── */
 
 route.get('/', async (c) => {
   const grade = c.req.query('grade');
@@ -135,10 +141,12 @@ route.get('/', async (c) => {
   const page = Math.max(1, parseInt(c.req.query('page') || '1', 10));
 
   if (c.env.ENVIRONMENT === 'development') {
+    const sevenDaysAgo = daysAgo(now(), 7);
     const filtered = fallbackAll.filter(q =>
       (!grade || q.grade === grade) &&
       (!subject || q.subject === subject) &&
-      (!type || q.type === type)
+      (!type || q.type === type) &&
+      (!q.publishedAt || new Date(q.publishedAt) > sevenDaysAgo)
     );
     const start = (page - 1) * PAGE_SIZE;
     const slice = filtered.slice(start, start + PAGE_SIZE);
@@ -160,12 +168,11 @@ route.get('/', async (c) => {
   if (cached) return c.json(JSON.parse(cached), 200, { 'Cache-Control': 'public, max-age=300' });
 
   try {
-    const n = now();
     const filter = buildCurrentWeekFilter(grade, subject, type);
     const total_page_size = page * PAGE_SIZE + 1;
     const result = await notion.queryDatabase(c.env.NOTION_API_KEY, c.env.NOTION_PRACTICE_DB_ID, {
-      ...(filter ? { filter } : {}),
-      sorts: [{ timestamp: 'created_time', direction: 'descending' }],
+      filter,
+      sorts: [{ property: '發布日期', direction: 'descending' }],
       page_size: total_page_size,
     });
 
@@ -173,7 +180,7 @@ route.get('/', async (c) => {
     const start = (page - 1) * PAGE_SIZE;
     const slice = all.slice(start, start + PAGE_SIZE);
     const hasMore = all.length > start + PAGE_SIZE;
-    const lastUpdated = slice[0]?.publishedAt || n.toISOString();
+    const lastUpdated = slice[0]?.publishedAt || now().toISOString();
 
     const data: PracticeList = {
       questions: slice,
