@@ -19,7 +19,7 @@ img{display:block;max-width:100%;}
 h1,h2,h3{font-weight:900;letter-spacing:-.5px;}
 
 /* NAV */
-header.nav{position:sticky;top:0;z-index:120;background:var(--pink);border-bottom:3px solid var(--pink-deep);}
+header.nav{position:sticky;top:0;z-index:120;background:var(--pink);border-bottom:3px solid var(--pink-deep);-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0);}
 .nav-in{display:flex;align-items:center;gap:24px;padding:13px 32px;max-width:1140px;margin:0 auto;}
 .brand{display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .brand img{height:42px;width:auto;transition:transform .4s;}
@@ -42,7 +42,7 @@ header.nav{position:sticky;top:0;z-index:120;background:var(--pink);border-botto
 .mobile-menu{display:none;}
 
 /* HERO */
-.hero{position:relative;padding:56px 0 80px;background:radial-gradient(ellipse 80% 60% at 70% 0%,var(--pink-soft),transparent 60%),var(--bg);overflow:hidden;contain:paint;}
+.hero{position:relative;padding:56px 0 80px;background:radial-gradient(ellipse 80% 60% at 70% 0%,var(--pink-soft),transparent 60%),var(--bg);overflow:hidden;}
 .hero-logo{width:94px;height:94px;margin:0 auto 22px;display:block;filter:drop-shadow(0 12px 26px rgba(184,0,95,.22));animation:float 5s ease-in-out infinite;}
 .blob{position:absolute;border-radius:50%;opacity:.85;z-index:0;}
 .sparkle{position:absolute;z-index:1;animation:float 5s ease-in-out infinite;}
@@ -189,8 +189,8 @@ h1.hero-h .hl{background:var(--yellow);color:var(--ink);padding:0 10px;border-ra
 .linecta::after{content:'';position:absolute;width:150px;height:150px;border-radius:50%;background:rgba(255,233,77,.18);bottom:-70px;left:30%;}
 .lc-left{position:relative;z-index:2;}
 .lc-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.4);padding:6px 16px;border-radius:30px;font-size:13px;font-weight:700;margin-bottom:18px;}
-.lc-badge .pulse{width:9px;height:9px;border-radius:50%;background:#7CF29B;position:relative;will-change:transform;}
-.lc-badge .pulse::after{content:'';position:absolute;inset:0;border-radius:50%;background:#7CF29B;animation:pulse 1.8s infinite;will-change:transform,opacity;}
+.lc-badge .pulse{width:9px;height:9px;border-radius:50%;background:#7CF29B;position:relative;}
+.lc-badge .pulse::after{content:'';position:absolute;inset:0;border-radius:50%;background:#7CF29B;animation:pulse 1.8s infinite;}
 @keyframes pulse{0%{transform:scale(1);opacity:.8}70%{transform:scale(2.4);opacity:0}100%{transform:scale(1);opacity:0}}
 .linecta h3{font-size:clamp(30px,4.2vw,46px);margin-bottom:14px;line-height:1.1;}
 .linecta h3 .wig{display:inline-block;animation:wiggle 2.4s ease-in-out infinite;transform-origin:70% 70%;}
@@ -267,7 +267,7 @@ footer{background:var(--pink-deep);color:rgba(255,255,255,.7);padding:56px 0 30p
 }
 
 /* ===================== INNER PAGES ===================== */
-.page-hero{position:relative;padding:52px 0 46px;background:radial-gradient(ellipse 70% 90% at 82% -10%,var(--pink-soft),transparent 60%),var(--bg);overflow:hidden;contain:paint;text-align:center;}
+.page-hero{position:relative;padding:52px 0 46px;background:radial-gradient(ellipse 70% 90% at 82% -10%,var(--pink-soft),transparent 60%),var(--bg);overflow:hidden;text-align:center;}
 .page-hero .blob{opacity:.4;}
 .breadcrumb{display:flex;justify-content:center;gap:8px;font-size:13px;color:var(--ink-mute);font-weight:600;margin-bottom:18px;position:relative;z-index:2;}
 .breadcrumb a:hover{color:var(--pink);}
