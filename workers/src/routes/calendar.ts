@@ -18,6 +18,7 @@ interface CalendarEvent {
   desc?: string;
   type: string;
   icon?: string;
+  link?: string;
 }
 
 const route = new Hono<{ Bindings: Bindings }>();
@@ -57,8 +58,13 @@ route.get('/', async (c) => {
         return d ? (d['start'] as string) || '' : '';
       }
 
-      const desc  = getText('說明');
-      const icon  = getText('圖示');
+      function getUrl(name: string): string {
+        const prop = (props[name] as Record<string, unknown>) || {};
+        return (prop['url'] as string) || '';
+      }
+      const desc = getText('說明');
+      const icon = getText('圖示');
+      const link = getUrl('連結');
       const ev: CalendarEvent = {
         date:  getDate('日期'),
         title: getText('名稱'),
@@ -66,6 +72,7 @@ route.get('/', async (c) => {
       };
       if (desc) ev.desc = desc;
       if (icon) ev.icon = icon;
+      if (link) ev.link = link;
       return ev;
     }).filter(e => e.date && e.title);
 

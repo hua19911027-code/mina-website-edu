@@ -673,6 +673,7 @@ a.camp-link:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,0
 .yc-stop.yc-c-fest .yc-mon{background:#6E45C9;box-shadow:0 7px 15px -6px rgba(110,69,201,.5);}
 
 .yc-card{position:absolute;left:50%;transform:translateX(-50%);width:172px;background:#fff;border:2px solid var(--pink-soft);border-radius:18px;padding:13px 15px 15px;box-shadow:0 12px 26px -18px rgba(230,13,133,.45);transition:transform .25s,box-shadow .25s,border-color .25s;z-index:2;}
+a.yc-card{display:block;text-decoration:none;color:inherit;cursor:pointer;}
 .yc-stop.down .yc-card{top:206px;}
 .yc-stop.up .yc-card{bottom:206px;}
 .yc-card::after{content:'';position:absolute;left:50%;transform:translateX(-50%);width:3px;height:24px;background:var(--pink-soft);z-index:-1;}

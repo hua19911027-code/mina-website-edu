@@ -163,7 +163,7 @@
       <!-- 學年行事曆 ROADMAP -->
       <div class="yearcal">
         <div class="yc-bar">
-          <h3>學年重要行事曆 <span class="yr">114 學年</span></h3>
+          <h3>學年重要行事曆 <span class="yr" id="ycYear">114 學年</span></h3>
           <div class="yc-legend">
             <span class="lg l-en">學期・課程</span>
             <span class="lg l-ex">段考・評量</span>
@@ -252,6 +252,12 @@
   const semOf=e=> e.sem || ((m=> (m===1||m>=7) ? 1 : 2)(e._d.getMonth()+1));   // 學期：可用 sem 欄位指定，省略則 7~12月與1月→上、2~6月→下
   const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
+  // 自動計算民國學年（每年 8/1 後切換至下個學年）
+  const _n=new Date();
+  const _yr=_n.getMonth()>=7?_n.getFullYear()-1911:_n.getFullYear()-1912;
+  const _yrEl=document.getElementById('ycYear');
+  if(_yrEl) _yrEl.textContent=_yr+' 學年';
+
   function render(events){
     const rail=document.getElementById('ycRail');
     if(!rail) return;
@@ -269,7 +275,10 @@
       const icon=e.icon||TYPE_ICON[type]||'📌';
       const tag=e.tag||((e._d.getMonth()+1)+'/'+e._d.getDate());
       const mon=(e._d.getMonth()+1)+' 月';
-      const card='<div class="yc-card"><span class="yc-tag">'+esc(tag)+'</span><h4>'+esc(e.title)+'</h4>'+(e.desc?'<p>'+esc(e.desc)+'</p>':'')+'</div>';
+      const cardInner='<span class="yc-tag">'+esc(tag)+'</span><h4>'+esc(e.title)+'</h4>'+(e.desc?'<p>'+esc(e.desc)+'</p>':'');
+      const card=e.link
+        ? '<a class="yc-card" href="'+esc(e.link)+'">'+cardInner+'</a>'
+        : '<div class="yc-card">'+cardInner+'</div>';
       const stop='<div class="yc-stop yc-c-'+type+' '+ud+'">'+card+'<span class="yc-dot">'+icon+'</span><span class="yc-mon">'+mon+'</span></div>';
       (semOf(e)===2?s2:s1).html+=stop;
     });
