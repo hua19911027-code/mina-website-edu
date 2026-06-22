@@ -60,7 +60,12 @@ route.get('/', async (c) => {
 
       function getUrl(name: string): string {
         const prop = (props[name] as Record<string, unknown>) || {};
-        return (prop['url'] as string) || '';
+        // URL 類型欄位
+        if (typeof prop['url'] === 'string' && prop['url']) return prop['url'];
+        // 富文字 / 文字類型欄位（用戶可能建成此類型）
+        const arr = prop['rich_text'] as Array<{ plain_text: string }> | undefined;
+        if (arr && arr.length) return arr.map(t => t.plain_text).join('');
+        return '';
       }
       const desc = getText('說明');
       const icon = getText('圖示');
