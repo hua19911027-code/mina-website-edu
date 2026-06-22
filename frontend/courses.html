@@ -249,7 +249,7 @@
    icon 可省略（會用該分類預設圖示）。加幾筆都行，會自動依日期排序、分上下學期、上下交錯。 */
 (function(){
   const TYPE_ICON={en:'📘',ex:'📝',camp:'🎒',reg:'📋',fest:'🎉'};
-  const semOf=e=> e.sem || ((m=> (m===1||m>=8) ? 1 : 2)(e._d.getMonth()+1));   // 學期：可用 sem 欄位指定，省略則 8~12月與1月→上、2~7月→下
+  const semOf=e=> e.sem || ((m=> (m===1||m>=7) ? 1 : 2)(e._d.getMonth()+1));   // 學期：可用 sem 欄位指定，省略則 7~12月與1月→上、2~6月→下
   const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
   function render(events){
