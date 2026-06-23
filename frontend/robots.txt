@@ -2,4 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /booking-success.html
 
-Sitemap: https://mina-website.pages.dev/sitemap.xml
+Disallow: /admin/
+
+Sitemap: https://minaedu.tw/sitemap.xml
