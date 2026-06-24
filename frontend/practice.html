@@ -163,15 +163,17 @@
         </button>
       </div>
 
-      <!-- 歷屆題庫 Coming Soon（inline，避免被 widget 遮住） -->
+      <!-- 歷屆題庫 面板 -->
       <div id="archive-inline-msg" style="display:none;max-width:760px;margin:20px auto 0;">
-        <div style="background:linear-gradient(135deg,#FFF7E6,#FFFBF0);border:2px solid #FFD966;border-radius:24px;padding:28px 28px 24px;text-align:center;">
-          <div style="font-size:2.5rem;margin-bottom:10px">🧱</div>
-          <p style="font-size:1.05rem;font-weight:900;color:#241019;margin:0 0 8px">歷屆題庫蓋房子中！</p>
-          <p style="font-size:.875rem;color:#7A6570;line-height:1.85;margin:0 0 20px">Mina 正在努力搬磚堆題目 🥹<br>每週六都有新題目入庫，請多給我一點時間！<br><b style="color:#E60D85">先來刷本週新題目，超有感！</b></p>
-          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-            <button id="archive-inline-close" style="padding:10px 22px;border-radius:30px;background:#FFE3F1;color:#E60D85;font-weight:700;font-size:.9rem;border:none;cursor:pointer;font-family:inherit;">先刷新題 🔥</button>
-            <button id="archive-inline-ask" style="padding:10px 22px;border-radius:30px;background:#E60D85;color:#fff;font-weight:700;font-size:.9rem;border:none;cursor:pointer;font-family:inherit;">還是問 Mina 看看</button>
+        <div style="background:#fff;border:2px solid #FFD966;border-radius:24px;padding:24px 24px 20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <h3 style="margin:0;font-size:1.05rem;font-weight:900;color:#241019;">📚 歷屆題庫（近90天）</h3>
+            <button id="archive-inline-close" style="padding:6px 16px;border-radius:30px;background:#FFE3F1;color:#E60D85;font-weight:700;font-size:.85rem;border:none;cursor:pointer;font-family:inherit;">✕ 關閉</button>
+          </div>
+          <div id="archive-cards"></div>
+          <div style="text-align:center;margin-top:12px;">
+            <button id="archive-load-more" style="display:none;padding:10px 28px;border-radius:30px;background:var(--pink,#E60D85);color:#fff;font-weight:700;font-size:.9rem;border:none;cursor:pointer;font-family:inherit;">載入更多題目</button>
+            <p id="archive-limit-msg" style="display:none;color:var(--ink-mute,#A593A0);font-size:.875rem;margin:8px 0 0;">已顯示近90天全部題目（上限36題）</p>
           </div>
         </div>
       </div>

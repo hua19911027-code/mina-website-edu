@@ -8,6 +8,10 @@
   var MAX = 36
   var initialized = false
 
+  var archivePage = 1
+  var archiveLoaded = 0
+  var archiveFetching = false
+
   var GRADE_MAP = { '1':'小一','2':'小二','3':'小三','4':'小四','5':'小五','6':'小六' }
   var SUBJ_MAP  = { 'en':'英文','ma':'數學' }
 
@@ -59,8 +63,8 @@
     win.document.close()
   }
 
-  function getContainer() {
-    return document.getElementById('qcards')
+  function getContainer(id) {
+    return document.getElementById(id || 'qcards')
   }
 
   function getFilters() {
@@ -133,8 +137,8 @@
   }
 
   /* Build one question card using the bundler template's .qcard (details) structure */
-  function appendCard(q, n) {
-    var container = getContainer()
+  function appendCard(q, n, containerId) {
+    var container = getContainer(containerId)
     if (!container) return
 
     var optHtml = ['A','B','C','D'].map(function(lbl, i) {
@@ -423,15 +427,69 @@
       console.warn('practice.js: .qbanner.b-review not found')
     }
 
-    /* 歷屆題庫 coming soon — 顯示 inline 訊息盒（不用 overlay，避免被 widget 遮住） */
-    function showArchiveInline() {
-      var msg = document.getElementById('archive-inline-msg')
-      if (!msg) return
-      msg.style.display = 'block'
-      msg.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    /* 歷屆題庫 — 實際抓 API 並顯示 */
+    function fetchArchive(isMore) {
+      if (archiveFetching) return
+      archiveFetching = true
+      if (!isMore) { archivePage = 1; archiveLoaded = 0 }
+
+      var f = getFilters()
+      var reqPage = isMore ? archivePage + 1 : 1
+      var params = 'page=' + reqPage
+      if (f.grade)   params += '&grade='   + encodeURIComponent(f.grade)
+      if (f.subject) params += '&subject=' + encodeURIComponent(f.subject)
+
+      var ac = getContainer('archive-cards')
+      if (!isMore && ac) {
+        ac.innerHTML = '<p style="text-align:center;padding:20px;color:var(--ink-mute,#A593A0)">載入中…</p>'
+      }
+
+      fetch(API_BASE + '/practice/archive?' + params)
+        .then(function(r) { return r.json() })
+        .then(function(json) {
+          archiveFetching = false
+          if (!json.ok || !json.data) {
+            if (ac) ac.innerHTML = '<p style="text-align:center;padding:20px;color:#E60D85">載入失敗，請稍後再試。</p>'
+            return
+          }
+          var qs = json.data.questions || []
+          if (!isMore && ac) ac.innerHTML = ''
+          if (!isMore && !qs.length && ac) {
+            ac.innerHTML = '<p style="text-align:center;padding:20px;color:var(--ink-mute,#A593A0)">目前沒有符合條件的歷屆題目</p>'
+            return
+          }
+          qs.forEach(function(q, i) { appendCard(q, archiveLoaded + i + 1, 'archive-cards') })
+          archiveLoaded += qs.length
+          archivePage = json.data.page
+
+          var moreBtn  = document.getElementById('archive-load-more')
+          var limitMsg = document.getElementById('archive-limit-msg')
+          if (json.data.reachedLimit) {
+            if (moreBtn) moreBtn.style.display = 'none'
+            if (limitMsg) limitMsg.style.display = ''
+          } else if (json.data.hasMore) {
+            if (moreBtn) moreBtn.style.display = ''
+            if (limitMsg) limitMsg.style.display = 'none'
+          } else {
+            if (moreBtn) moreBtn.style.display = 'none'
+          }
+        })
+        .catch(function() {
+          archiveFetching = false
+          var ac2 = getContainer('archive-cards')
+          if (ac2) ac2.innerHTML = '<p style="text-align:center;padding:20px;color:#E60D85">載入失敗，請稍後再試。</p>'
+        })
     }
 
-    /* inline 訊息盒的按鈕事件 */
+    function openArchive() {
+      var msg = document.getElementById('archive-inline-msg')
+      if (!msg) return
+      var wasHidden = msg.style.display === 'none' || !msg.style.display
+      msg.style.display = 'block'
+      msg.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      if (wasHidden || archiveLoaded === 0) fetchArchive(false)
+    }
+
     var inlineClose = document.getElementById('archive-inline-close')
     if (inlineClose) {
       inlineClose.addEventListener('click', function() {
@@ -440,14 +498,10 @@
         window.scrollTo({ top: 0, behavior: 'smooth' })
       })
     }
-    var inlineAsk = document.getElementById('archive-inline-ask')
-    if (inlineAsk) {
-      inlineAsk.addEventListener('click', function() {
-        var msg = document.getElementById('archive-inline-msg')
-        if (msg) msg.style.display = 'none'
-        if (window.minaWidget && window.minaWidget.openToNode) window.minaWidget.openToNode('archive_welcome')
-        else if (window.minaWidget && window.minaWidget.open) window.minaWidget.open()
-      })
+
+    var archiveMoreBtn = document.getElementById('archive-load-more')
+    if (archiveMoreBtn) {
+      archiveMoreBtn.addEventListener('click', function() { fetchArchive(true) })
     }
 
     /* 歷屆題庫 banner */
@@ -455,7 +509,7 @@
     if (pastBanner) {
       pastBanner.addEventListener('click', function(e) {
         e.preventDefault()
-        showArchiveInline()
+        openArchive()
       })
     } else {
       console.warn('practice.js: .qbanner.b-past not found')
@@ -466,7 +520,7 @@
     if (widgetBtn) {
       widgetBtn.addEventListener('click', function(e) {
         e.preventDefault()
-        showArchiveInline()
+        openArchive()
       })
     } else {
       console.warn('practice.js: .btn-w not found')
@@ -478,14 +532,12 @@
       moreBtn.addEventListener('click', function() { fetchQuestions(true) })
     }
 
-    /* Archive CTA → widget archive 流程 */
+    /* Archive CTA → 開啟歷屆面板 */
     var archiveBtn = document.getElementById('open-archive-btn') || document.querySelector('[data-open-archive]')
     if (archiveBtn) {
       archiveBtn.addEventListener('click', function(e) {
         e.preventDefault()
-        if (window.minaWidget && window.minaWidget.openToNode) {
-          window.minaWidget.openToNode('archive_welcome')
-        }
+        openArchive()
       })
     }
 
