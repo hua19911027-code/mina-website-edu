@@ -1,0 +1,117 @@
+{
+  "name": "一次性：建立114學年度新題庫",
+  "nodes": [
+    {
+      "id": "trigger-1",
+      "name": "手動觸發",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "create-db-1",
+      "name": "建立新114題庫DB",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        300
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "AzXLvJt1dpTqr9fB",
+          "name": "Notion account"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/databases",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Notion-Version",
+              "value": "2022-06-28"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "string",
+        "body": "{\"parent\": {\"type\": \"page_id\", \"page_id\": \"374b8ee106b480eaa0f9dccaae830e8a\"}, \"title\": [{\"type\": \"text\", \"text\": {\"content\": \"114學年度題庫（新版）\"}}], \"properties\": {\"題目ID\": {\"title\": {}}, \"年級\": {\"select\": {\"options\": [{\"name\": \"小一\"}, {\"name\": \"小二\"}, {\"name\": \"小三\"}, {\"name\": \"小四\"}, {\"name\": \"小五\"}, {\"name\": \"小六\"}]}}, \"科目\": {\"select\": {\"options\": [{\"name\": \"英文\"}, {\"name\": \"數學\"}]}}, \"教材版本\": {\"select\": {\"options\": [{\"name\": \"康軒Wonder World\"}, {\"name\": \"何嘉仁Super Fun\"}, {\"name\": \"康軒\"}, {\"name\": \"翰林\"}, {\"name\": \"南一\"}]}}, \"單元\": {\"rich_text\": {}}, \"題型\": {\"select\": {\"options\": [{\"name\": \"標準題型\"}, {\"name\": \"觀念拆解\"}, {\"name\": \"錯題診斷\"}]}}, \"題目\": {\"rich_text\": {}}, \"選項A\": {\"rich_text\": {}}, \"選項B\": {\"rich_text\": {}}, \"選項C\": {\"rich_text\": {}}, \"選項D\": {\"rich_text\": {}}, \"答案\": {\"select\": {\"options\": [{\"name\": \"A\"}, {\"name\": \"B\"}, {\"name\": \"C\"}, {\"name\": \"D\"}]}}, \"正確觀念\": {\"rich_text\": {}}, \"常見錯誤\": {\"rich_text\": {}}, \"記憶提示\": {\"rich_text\": {}}, \"學期\": {\"select\": {\"options\": [{\"name\": \"上學期\"}, {\"name\": \"下學期\"}]}}, \"發布日期\": {\"date\": {}}, \"是否發布\": {\"checkbox\": {}}, \"已封存\": {\"checkbox\": {}}}}",
+        "options": {}
+      }
+    },
+    {
+      "id": "extract-1",
+      "name": "取得新DB ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        300
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "新DB ID",
+              "value": "={{ $json.id.replace(/-/g, '') }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "新DB URL",
+              "value": "={{ 'https://notion.so/' + $json.id.replace(/-/g, '') }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "下一步提示",
+              "value": "資料庫建立完成！請在 Notion 中手動加 view：1) 已發布 (是否發布=勾選) 2) 未發布 (是否發布=不勾選)，再告訴我 DB ID。",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "手動觸發": {
+      "main": [
+        [
+          {
+            "node": "建立新114題庫DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "建立新114題庫DB": {
+      "main": [
+        [
+          {
+            "node": "取得新DB ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
