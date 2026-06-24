@@ -14,12 +14,14 @@ const KV_KEY = 'admin_settings';
 
 interface AdminSettings {
   reviewModeEnabled: boolean;
-  notionPracticeDbId: string;
+  notionPracticeDbId: string;    // 網站讀題用（A3 每年 8/1 切換）
+  notionPracticeGenDbId: string; // A1 出題寫入用（A2 每年 7/10 切換）
 }
 
 const DEFAULT_SETTINGS: AdminSettings = {
   reviewModeEnabled: false,
   notionPracticeDbId: '',
+  notionPracticeGenDbId: '',
 };
 
 const ADMIN_RATE_LIMIT = 10;
@@ -69,6 +71,7 @@ route.put('/settings', async (c) => {
   const updated: AdminSettings = {
     reviewModeEnabled: typeof body.reviewModeEnabled === 'boolean' ? body.reviewModeEnabled : current.reviewModeEnabled,
     notionPracticeDbId: typeof body.notionPracticeDbId === 'string' ? body.notionPracticeDbId.trim() : current.notionPracticeDbId,
+    notionPracticeGenDbId: typeof body.notionPracticeGenDbId === 'string' ? body.notionPracticeGenDbId.trim() : current.notionPracticeGenDbId,
   };
 
   await c.env.KV_SETTINGS.put(KV_KEY, JSON.stringify(updated));

@@ -16,8 +16,18 @@ import ma56 from '../../../data/practice/ma/grade5-6.json';
 
 const PAGE_SIZE = 12;
 const ARCHIVE_HARD_LIMIT = 36;
+const ADMIN_SETTINGS_KV_KEY = 'admin_settings';
 
 const route = new Hono<{ Bindings: Bindings }>();
+
+async function getPracticeDbId(env: Bindings): Promise<string> {
+  const raw = await env.KV_SETTINGS.get(ADMIN_SETTINGS_KV_KEY);
+  if (raw) {
+    const s = JSON.parse(raw) as { notionPracticeDbId?: string };
+    if (s.notionPracticeDbId) return s.notionPracticeDbId;
+  }
+  return env.NOTION_PRACTICE_DB_ID;
+}
 
 /* ── helpers ── */
 
@@ -170,7 +180,8 @@ route.get('/', async (c) => {
   try {
     const filter = buildCurrentWeekFilter(grade, subject, type);
     const total_page_size = page * PAGE_SIZE + 1;
-    const result = await notion.queryDatabase(c.env.NOTION_API_KEY, c.env.NOTION_PRACTICE_DB_ID, {
+    const dbId = await getPracticeDbId(c.env);
+    const result = await notion.queryDatabase(c.env.NOTION_API_KEY, dbId, {
       filter,
       sorts: [{ property: '發布日期', direction: 'descending' }],
       page_size: total_page_size,
@@ -245,7 +256,8 @@ route.get('/archive', async (c) => {
   try {
     const filter = buildOlderFilter(grade, subject, type);
     const fetchSize = ARCHIVE_HARD_LIMIT + 1;
-    const result = await notion.queryDatabase(c.env.NOTION_API_KEY, c.env.NOTION_PRACTICE_DB_ID, {
+    const dbId = await getPracticeDbId(c.env);
+    const result = await notion.queryDatabase(c.env.NOTION_API_KEY, dbId, {
       filter,
       sorts: [{ property: '發布日期', direction: 'descending' }],
       page_size: fetchSize,
