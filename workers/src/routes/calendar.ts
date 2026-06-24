@@ -6,7 +6,9 @@ import * as notion from '../adapters/notion';
 
 const TYPE_MAP: Record<string, string> = {
   '學期・課程': 'en',
-  '段考・評量': 'ex',
+  '段考':       'ex',
+  '學測評量':   'ex',
+  '段考・評量': 'ex',  // 舊名稱相容
   '營隊':       'camp',
   '報名・活動': 'reg',
   '節慶・活動': 'fest',
