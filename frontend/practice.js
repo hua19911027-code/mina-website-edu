@@ -385,6 +385,88 @@
     return panel
   }
 
+  function ensureArchivePanel() {
+    var existing = document.getElementById('archive-grade-section')
+    if (existing) return existing
+
+    var panel = document.createElement('div')
+    panel.id = 'archive-grade-section'
+    panel.style.cssText = 'display:none;position:fixed;inset:0;z-index:9000;background:rgba(20,8,16,.6);align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px;'
+    panel.innerHTML =
+      '<div style="background:#fff;border-radius:32px;padding:32px 28px 28px;max-width:460px;width:100%;text-align:center;box-shadow:0 40px 100px -20px rgba(0,0,0,.4);position:relative;">'
+        + '<div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:#FFF7C2;opacity:.7;pointer-events:none;"></div>'
+        + '<div style="position:absolute;bottom:-16px;left:-16px;width:60px;height:60px;border-radius:50%;background:#FFE3F1;opacity:.8;pointer-events:none;"></div>'
+        + '<div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#FFF7C2,#FFEEA0);border-radius:30px;padding:6px 16px 6px 8px;margin-bottom:16px;">'
+          + '<span style="font-size:1.2rem;">📚</span>'
+          + '<span style="font-size:.8rem;font-weight:700;color:#7A4F00;letter-spacing:.3px;">ARCHIVE</span>'
+        + '</div>'
+        + '<h3 style="margin:0 0 6px;font-size:1.4rem;font-weight:900;color:var(--ink,#241019);letter-spacing:-.3px;">選擇你的年級</h3>'
+        + '<p style="margin:0 0 24px;font-size:.85rem;color:var(--ink-mute,#A593A0);line-height:1.6;">近三個月以前的歷屆題目<br>選年級和科目，立刻顯示 👇</p>'
+        + '<div id="archive-grade-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">'
+          + [['小一','1'],['小二','2'],['小三','3'],['小四','4'],['小五','5'],['小六','6']].map(function(pair) {
+              return '<button class="archive-grade-btn exam-grade-btn" data-ag="' + pair[0] + '" data-ag-num="' + pair[1] + '">'
+                + '<span class="eg-num">' + pair[1] + '</span>'
+                + '<span class="eg-lbl">' + pair[0] + '</span>'
+              + '</button>'
+            }).join('')
+        + '</div>'
+        + '<div id="archive-subj-list" style="display:none;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;"></div>'
+        + '<div style="display:flex;gap:10px;justify-content:center;align-items:center;">'
+          + '<button id="archive-back-btn" style="display:none;padding:12px 20px;border-radius:30px;border:1.5px solid var(--line,#F2D9E7);background:#fff;color:var(--ink-soft,#6A5560);font-weight:700;cursor:pointer;font-size:.9rem;">← 重選年級</button>'
+          + '<button id="archive-panel-close" style="padding:12px 36px;border-radius:30px;border:none;background:#FFF7C2;color:#7A4F00;font-weight:800;cursor:pointer;font-size:.95rem;letter-spacing:.2px;">關閉</button>'
+        + '</div>'
+      + '</div>'
+
+    document.body.appendChild(panel)
+
+    panel.querySelector('#archive-panel-close').addEventListener('click', function() {
+      panel.style.display = 'none'
+    })
+    panel.addEventListener('click', function(e) {
+      if (e.target === panel) panel.style.display = 'none'
+    })
+    panel.querySelector('#archive-back-btn').addEventListener('click', function() {
+      panel.querySelector('#archive-grade-grid').style.display = 'grid'
+      var sl = panel.querySelector('#archive-subj-list')
+      sl.style.display = 'none'; sl.innerHTML = ''
+      panel.querySelector('#archive-back-btn').style.display = 'none'
+      panel.querySelectorAll('.archive-grade-btn').forEach(function(b) { b.classList.remove('selected') })
+    })
+    panel.querySelectorAll('.archive-grade-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        panel.querySelectorAll('.archive-grade-btn').forEach(function(b) { b.classList.remove('selected') })
+        btn.classList.add('selected')
+        var grade = btn.dataset.ag
+        var gradeNum = btn.dataset.agNum
+        panel.querySelector('#archive-grade-grid').style.display = 'none'
+        panel.querySelector('#archive-back-btn').style.display = 'inline-flex'
+        var sl = panel.querySelector('#archive-subj-list')
+        sl.style.display = 'flex'; sl.innerHTML = ''
+        ;[['英文','en','📘','s-en'],['數學','ma','📐','s-ma']].forEach(function(s) {
+          var sbtn = document.createElement('button')
+          sbtn.className = 'exam-subj-btn ' + s[3]
+          sbtn.innerHTML = '<span class="subj-icon">' + s[2] + '</span>'
+            + '<span class="subj-name">' + esc(s[0]) + '</span>'
+            + '<span class="subj-label">查看題目</span>'
+          sbtn.addEventListener('click', function() {
+            document.querySelectorAll('.grade').forEach(function(g) { g.classList.remove('active') })
+            var gEl = document.querySelector('.grade[data-g="' + gradeNum + '"]')
+            if (gEl) gEl.classList.add('active')
+            document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active') })
+            var tEl = document.querySelector('.tab[data-subj="' + s[1] + '"]')
+            if (tEl) tEl.classList.add('active')
+            var hdr = document.querySelector('#archive-inline-msg h3')
+            if (hdr) hdr.textContent = '📚 ' + grade + '　' + s[0] + '　歷屆題庫'
+            panel.style.display = 'none'
+            openArchive()
+          })
+          sl.appendChild(sbtn)
+        })
+      })
+    })
+    return panel
+  }
+
   function bindAll() {
     /* 年級 .grade[data-g] — radio button behavior, always one selected */
     document.querySelectorAll('.grade').forEach(function(btn) {
@@ -509,7 +591,16 @@
     if (pastBanner) {
       pastBanner.addEventListener('click', function(e) {
         e.preventDefault()
-        openArchive()
+        e.stopImmediatePropagation()
+        var panel = ensureArchivePanel()
+        panel.style.display = 'flex'
+        var gg = panel.querySelector('#archive-grade-grid')
+        var sl = panel.querySelector('#archive-subj-list')
+        var bb = panel.querySelector('#archive-back-btn')
+        if (gg) gg.style.display = 'grid'
+        if (sl) { sl.style.display = 'none'; sl.innerHTML = '' }
+        if (bb) bb.style.display = 'none'
+        panel.querySelectorAll('.archive-grade-btn').forEach(function(b) { b.classList.remove('selected') })
       })
     } else {
       console.warn('practice.js: .qbanner.b-past not found')
