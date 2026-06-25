@@ -70,8 +70,10 @@ route.put('/settings', async (c) => {
 
   const updated: AdminSettings = {
     reviewModeEnabled: typeof body.reviewModeEnabled === 'boolean' ? body.reviewModeEnabled : current.reviewModeEnabled,
-    notionPracticeDbId: typeof body.notionPracticeDbId === 'string' ? body.notionPracticeDbId.trim() : current.notionPracticeDbId,
-    notionPracticeGenDbId: typeof body.notionPracticeGenDbId === 'string' ? body.notionPracticeGenDbId.trim() : current.notionPracticeGenDbId,
+    notionPracticeDbId: (typeof body.notionPracticeDbId === 'string' && body.notionPracticeDbId.trim())
+      ? body.notionPracticeDbId.trim() : current.notionPracticeDbId,
+    notionPracticeGenDbId: (typeof body.notionPracticeGenDbId === 'string' && body.notionPracticeGenDbId.trim())
+      ? body.notionPracticeGenDbId.trim() : current.notionPracticeGenDbId,
   };
 
   await c.env.KV_SETTINGS.put(KV_KEY, JSON.stringify(updated));

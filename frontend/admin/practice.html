@@ -378,7 +378,15 @@ body { background:var(--adm-bg); }
   });
 
   document.getElementById('saveSettingsBtn').addEventListener('click', function() {
-    saveSetting({ notionPracticeDbId: document.getElementById('notionDbInput').value.trim() });
+    var val = document.getElementById('notionDbInput').value.trim();
+    var statusEl = document.getElementById('saveStatus');
+    if (!val) {
+      statusEl.textContent = '❌ DB ID 不可為空，請填入正確的 Notion DB ID';
+      statusEl.className = 'save-status err';
+      setTimeout(function() { statusEl.textContent = ''; }, 4000);
+      return;
+    }
+    saveSetting({ notionPracticeDbId: val });
   });
 
   async function saveSetting(patch) {
