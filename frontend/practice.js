@@ -467,6 +467,70 @@
     return panel
   }
 
+  function fetchArchive(isMore) {
+    if (archiveFetching) return
+    archiveFetching = true
+    if (!isMore) { archivePage = 1; archiveLoaded = 0 }
+
+    var f = getFilters()
+    var reqPage = isMore ? archivePage + 1 : 1
+    var params = 'page=' + reqPage
+    if (f.grade)   params += '&grade='   + encodeURIComponent(f.grade)
+    if (f.subject) params += '&subject=' + encodeURIComponent(f.subject)
+
+    var ac = getContainer('archive-cards')
+    if (!isMore && ac) {
+      ac.innerHTML = '<p style="text-align:center;padding:20px;color:var(--ink-mute,#A593A0)">載入中…</p>'
+    }
+
+    fetch(API_BASE + '/practice/archive?' + params)
+      .then(function(r) { return r.json() })
+      .then(function(json) {
+        archiveFetching = false
+        if (!json.ok || !json.data) {
+          var ac = getContainer('archive-cards')
+          if (ac) ac.innerHTML = '<p style="text-align:center;padding:20px;color:#E60D85">載入失敗，請稍後再試。</p>'
+          return
+        }
+        var qs = json.data.questions || []
+        var ac = getContainer('archive-cards')
+        if (!isMore && ac) ac.innerHTML = ''
+        if (!isMore && !qs.length && ac) {
+          ac.innerHTML = '<p style="text-align:center;padding:20px;color:var(--ink-mute,#A593A0)">目前沒有符合條件的歷屆題目</p>'
+          return
+        }
+        qs.forEach(function(q, i) { appendCard(q, archiveLoaded + i + 1, 'archive-cards') })
+        archiveLoaded += qs.length
+        archivePage = json.data.page
+
+        var moreBtn  = document.getElementById('archive-load-more')
+        var limitMsg = document.getElementById('archive-limit-msg')
+        if (json.data.reachedLimit) {
+          if (moreBtn) moreBtn.style.display = 'none'
+          if (limitMsg) limitMsg.style.display = ''
+        } else if (json.data.hasMore) {
+          if (moreBtn) moreBtn.style.display = ''
+          if (limitMsg) limitMsg.style.display = 'none'
+        } else {
+          if (moreBtn) moreBtn.style.display = 'none'
+        }
+      })
+      .catch(function() {
+        archiveFetching = false
+        var ac = getContainer('archive-cards')
+        if (ac) ac.innerHTML = '<p style="text-align:center;padding:20px;color:#E60D85">載入失敗，請稍後再試。</p>'
+      })
+  }
+
+  function openArchive() {
+    var msg = document.getElementById('archive-inline-msg')
+    if (!msg) return
+    var wasHidden = msg.style.display === 'none' || !msg.style.display
+    msg.style.display = 'block'
+    msg.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    if (wasHidden || archiveLoaded === 0) fetchArchive(false)
+  }
+
   function bindAll() {
     /* 年級 .grade[data-g] — radio button behavior, always one selected */
     document.querySelectorAll('.grade').forEach(function(btn) {
@@ -507,69 +571,6 @@
       })
     } else {
       console.warn('practice.js: .qbanner.b-review not found')
-    }
-
-    /* 歷屆題庫 — 實際抓 API 並顯示 */
-    function fetchArchive(isMore) {
-      if (archiveFetching) return
-      archiveFetching = true
-      if (!isMore) { archivePage = 1; archiveLoaded = 0 }
-
-      var f = getFilters()
-      var reqPage = isMore ? archivePage + 1 : 1
-      var params = 'page=' + reqPage
-      if (f.grade)   params += '&grade='   + encodeURIComponent(f.grade)
-      if (f.subject) params += '&subject=' + encodeURIComponent(f.subject)
-
-      var ac = getContainer('archive-cards')
-      if (!isMore && ac) {
-        ac.innerHTML = '<p style="text-align:center;padding:20px;color:var(--ink-mute,#A593A0)">載入中…</p>'
-      }
-
-      fetch(API_BASE + '/practice/archive?' + params)
-        .then(function(r) { return r.json() })
-        .then(function(json) {
-          archiveFetching = false
-          if (!json.ok || !json.data) {
-            if (ac) ac.innerHTML = '<p style="text-align:center;padding:20px;color:#E60D85">載入失敗，請稍後再試。</p>'
-            return
-          }
-          var qs = json.data.questions || []
-          if (!isMore && ac) ac.innerHTML = ''
-          if (!isMore && !qs.length && ac) {
-            ac.innerHTML = '<p style="text-align:center;padding:20px;color:var(--ink-mute,#A593A0)">目前沒有符合條件的歷屆題目</p>'
-            return
-          }
-          qs.forEach(function(q, i) { appendCard(q, archiveLoaded + i + 1, 'archive-cards') })
-          archiveLoaded += qs.length
-          archivePage = json.data.page
-
-          var moreBtn  = document.getElementById('archive-load-more')
-          var limitMsg = document.getElementById('archive-limit-msg')
-          if (json.data.reachedLimit) {
-            if (moreBtn) moreBtn.style.display = 'none'
-            if (limitMsg) limitMsg.style.display = ''
-          } else if (json.data.hasMore) {
-            if (moreBtn) moreBtn.style.display = ''
-            if (limitMsg) limitMsg.style.display = 'none'
-          } else {
-            if (moreBtn) moreBtn.style.display = 'none'
-          }
-        })
-        .catch(function() {
-          archiveFetching = false
-          var ac2 = getContainer('archive-cards')
-          if (ac2) ac2.innerHTML = '<p style="text-align:center;padding:20px;color:#E60D85">載入失敗，請稍後再試。</p>'
-        })
-    }
-
-    function openArchive() {
-      var msg = document.getElementById('archive-inline-msg')
-      if (!msg) return
-      var wasHidden = msg.style.display === 'none' || !msg.style.display
-      msg.style.display = 'block'
-      msg.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      if (wasHidden || archiveLoaded === 0) fetchArchive(false)
     }
 
     var inlineClose = document.getElementById('archive-inline-close')
