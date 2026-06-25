@@ -56,7 +56,7 @@
       + '</head><body>'
       + '<div class="hd"><h1>' + esc(examName) + '　' + esc(grade) + '　' + esc(subject) + '複習卷</h1>'
       + '<p>卓越國際文理補習班　共 ' + (questions || []).length + ' 題，每題 5 分</p></div>'
-      + '<div class="noprint"><button onclick="window.print()" style="padding:10px 32px;background:#E60D85;color:#fff;border:none;border-radius:24px;font-size:14px;font-weight:700;cursor:pointer;">🖨️ 列印 / 儲存 PDF</button></div>'
+      + '<div class="noprint"><button onclick="window.print()" style="padding:10px 32px;background:#E60D85;color:#fff;border:none;border-radius:24px;font-size:14px;font-weight:700;cursor:pointer;margin-right:10px;">🖨️ 列印 / 儲存 PDF</button><button onclick="window.close()" style="padding:10px 28px;background:#f5f5f5;color:#333;border:1.5px solid #ddd;border-radius:24px;font-size:14px;font-weight:700;cursor:pointer;">✕ 關閉視窗</button></div>'
       + rows
       + '<div class="ans"><b>答案：</b>' + answers + '</div>'
       + '</body></html>')
