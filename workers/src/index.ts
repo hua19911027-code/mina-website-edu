@@ -34,7 +34,7 @@ app.route('/api/v1/admin', adminRoute);
 app.route('/api/v1/admin/publisher', publisherRoute);
 app.route('/api/v1/calendar', calendarRoute);
 
-app.get('/health', (c) => c.json({ status: 'ok', env: c.env.ENVIRONMENT }));
+app.get('/health', (c) => c.json({ status: 'ok' }));
 
 /* 404 fallback */
 app.notFound((c) => c.json({ ok: false, error: { code: 'NOT_FOUND', message: 'Route not found' } }, 404));

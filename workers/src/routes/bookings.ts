@@ -71,11 +71,23 @@ route.post('/', async (c) => {
   if (!body.parentName?.trim()) {
     return c.json({ ok: false, error: { code: 'VALIDATION', message: '家長姓名為必填' } }, 422);
   }
+  if (body.parentName.trim().length > 100) {
+    return c.json({ ok: false, error: { code: 'VALIDATION', message: '家長姓名過長' } }, 422);
+  }
   if (!body.phone?.trim()) {
     return c.json({ ok: false, error: { code: 'VALIDATION', message: '聯絡電話為必填' } }, 422);
   }
+  if (body.phone.trim().length > 30) {
+    return c.json({ ok: false, error: { code: 'VALIDATION', message: '電話號碼過長' } }, 422);
+  }
   if (!body.grade) {
     return c.json({ ok: false, error: { code: 'VALIDATION', message: '年級為必填' } }, 422);
+  }
+  if ((body.studentName?.length ?? 0) > 50) {
+    return c.json({ ok: false, error: { code: 'VALIDATION', message: '學生姓名過長' } }, 422);
+  }
+  if ((body.note?.length ?? 0) > 500) {
+    return c.json({ ok: false, error: { code: 'VALIDATION', message: '備註不得超過 500 字' } }, 422);
   }
   const courses = body.courses?.length ? body.courses : (body.subjects ?? []);
   if (courses.length === 0) {
