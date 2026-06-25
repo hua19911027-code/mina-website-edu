@@ -1,13 +1,18 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-06-25（PageSpeed Performance 95 + Accessibility 100 達標）  
+**最後更新**：2026-06-25（QA 全面通過 93/100，CSP GA4 修正）  
 **分支**：dev（自動部署至 minaedu.tw）  
 **Mobile PageSpeed**：Performance **95** ✅、Accessibility **100** ✅、Best Practices 100、SEO 100  
-**安全健康分數**：88 / 100 ✅（6月25日 CSO 審計）
+**QA 健康分數**：93 / 100 ✅（6月25日 /qa 全面審計，修正 CSP GA4）
 
 ---
 
 ## ✅ 已完成（2026-06-25 最新）
+
+### QA 全面審計（6月25日完成）
+- 9 個頁面全部通過，API 4 個端點全部正常
+- CSP GA4 修正：`connect-src` 補加 `www.google.com`、`stats.g.doubleclick.net`、`region1.google-analytics.com`（commit `e5840eb`）
+- QA 健康分 88 → 93
 
 ### PageSpeed Performance 95 + Accessibility 100（本輪完成）
 - GA4 defer 至 window.load → TBT 210ms→50ms、LCP 3.5s→2.6s
