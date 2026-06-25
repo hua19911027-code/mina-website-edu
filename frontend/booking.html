@@ -2,12 +2,17 @@
 <html lang="zh-Hant">
 <head>
     <!-- Google Analytics GA4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPFSNS0JMB"></script>
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-ZPFSNS0JMB');
+    window.dataLayer=window.dataLayer||[];
+    window.gtag=function(){dataLayer.push(arguments);}
+    gtag('js',new Date());
+    gtag('config','G-ZPFSNS0JMB');
+    window.addEventListener('load',function(){
+      var s=document.createElement('script');
+      s.async=true;
+      s.src='https://www.googletagmanager.com/gtag/js?id=G-ZPFSNS0JMB';
+      document.head.appendChild(s);
+    },{once:true});
   </script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
