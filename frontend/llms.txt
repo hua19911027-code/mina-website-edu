@@ -1,0 +1,18 @@
+# Mina 教育中心
+
+Mina 教育中心是位於台中的數學補習班，提供國中、高中數學一對一與小班精英課程，以及線上學測評量練習。
+
+## 服務
+
+- [課程介紹](https://minaedu.tw/courses.html) — 國中、高中數學課程說明與師資介紹
+- [題庫練習](https://minaedu.tw/practice.html) — 依年級與科目分類的每日題庫，含考前複習卷
+- [最新消息](https://minaedu.tw/news.html) — 最新課程公告與活動照片
+- [預約試聽](https://minaedu.tw/booking.html) — 免費試聽課程預約表單
+- [常見問題](https://minaedu.tw/faq.html) — 家長與學生常見問題
+- [關於我們](https://minaedu.tw/about.html) — 教學理念與師資介紹
+
+## 聯絡
+
+- 電話：04-2336-6868
+- LINE：https://lin.ee/5oH6pOc
+- 地址：台中市（詳見官網）

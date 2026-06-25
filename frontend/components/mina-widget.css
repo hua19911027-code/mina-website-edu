@@ -14,7 +14,7 @@
   width: 62px;
   height: 62px;
   border-radius: 50%;
-  background: #E60D85;
+  background: #C80079;
   color: #fff;
   border: none;
   cursor: pointer;
@@ -22,14 +22,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 22px rgba(230,13,133,.45);
+  box-shadow: 0 4px 22px rgba(200,0,121,.45);
   transition: transform .2s;
   position: relative;
   outline: none;
 }
 .mina-fab:hover {
   transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 8px 30px rgba(230,13,133,.55);
+  box-shadow: 0 8px 30px rgba(200,0,121,.55);
 }
 .mina-fab:focus-visible {
   outline: 3px solid #FFB3DC;
@@ -65,7 +65,7 @@
 
 /* ── Header ── */
 .mina-panel-header {
-  background: #E60D85;
+  background: #C80079;
   padding: 12px 14px;
   display: flex;
   align-items: center;
@@ -92,7 +92,7 @@
 }
 .mina-header-text { flex: 1; min-width: 0; }
 .mina-name { font-weight: 800; font-size: 14px; color: #fff; line-height: 1.2; }
-.mina-status { font-size: 11px; color: rgba(255,255,255,.85); line-height: 1.3; }
+.mina-status { font-size: 11px; color: #fff; line-height: 1.3; }
 .mina-status::before { content: '● '; font-size: 8px; vertical-align: 1px; }
 
 .mina-close {
@@ -167,7 +167,7 @@
   word-break: break-word;
 }
 .mina-bubble.user {
-  background: #E60D85;
+  background: #C80079;
   color: #fff;
   border-radius: 16px 4px 16px 16px;
   font-size: 12.5px;
@@ -187,8 +187,8 @@
 
 .mina-opt-btn {
   background: #fff;
-  color: #E60D85;
-  border: 1.5px solid #E60D85;
+  color: #C80079;
+  border: 1.5px solid #C80079;
   border-radius: 20px;
   padding: 6px 13px;
   font-size: 12px;
@@ -200,19 +200,19 @@
   outline: none;
 }
 .mina-opt-btn:hover:not(:disabled) {
-  background: #E60D85;
+  background: #C80079;
   color: #fff;
 }
 .mina-opt-btn:focus-visible {
-  outline: 2px solid #E60D85;
+  outline: 2px solid #C80079;
   outline-offset: 2px;
 }
 .mina-opt-btn:disabled { opacity: .35; cursor: default; }
 .mina-opt-btn.chosen {
-  background: #E60D85;
+  background: #C80079;
   color: #fff;
   opacity: 1 !important;
-  border-color: #E60D85;
+  border-color: #C80079;
 }
 
 /* ── CTA 按鈕區 ── */
@@ -244,7 +244,7 @@
   box-shadow: 0 4px 12px rgba(0,0,0,.15);
 }
 
-.cta-primary  { background: #E60D85; color: #fff !important; }
+.cta-primary  { background: #C80079; color: #fff !important; }
 .cta-line     { background: #06C755; color: #fff !important; }
 .cta-secondary {
   background: #fff;
@@ -288,7 +288,7 @@
 }
 .mina-articles a {
   font-size: 12.5px;
-  color: #E60D85;
+  color: #C80079;
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -315,7 +315,7 @@
   transition: color .15s, background .15s;
   outline: none;
 }
-.mina-reset:hover { color: #E60D85; background: #FFE3F1; }
+.mina-reset:hover { color: #C80079; background: #FFE3F1; }
 
 /* ── Archive Question Cards ── */
 .mina-q-list { display: flex; flex-direction: column; gap: 6px; width: 100%; margin: 6px 0; }
@@ -342,7 +342,7 @@
 }
 .mina-q-number {
   flex-shrink: 0;
-  background: #E60D85;
+  background: #C80079;
   color: #fff;
   border-radius: 5px;
   font-size: 10px;
@@ -412,7 +412,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #E60D85;
+  background: #C80079;
   animation: dotPulse 1.2s infinite;
   font-style: normal;
 }
