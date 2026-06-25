@@ -1,13 +1,18 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-06-25（/review + /qa + /cso 三輪稽核完成）  
+**最後更新**：2026-06-25（PageSpeed LCP + Accessibility 修正）  
 **分支**：dev（自動部署至 minaedu.tw）  
-**Mobile PageSpeed**：91 / 100 ✅  
+**Mobile PageSpeed**：81 → 目標 90+（LCP/CLS/A11y 修正已 push，待 Lighthouse 重新驗證）  
 **安全健康分數**：88 / 100 ✅（6月25日 CSO 審計）
 
 ---
 
 ## ✅ 已完成（2026-06-25 最新）
+
+### PageSpeed LCP + Accessibility 修正（本輪完成）
+- 移除 9 個 HTML 的 `body{opacity:0}` → 解決 LCP Element Render Delay 1590ms + CLS 0.095
+- WCAG AA contrast 修正 7 處（btn-line / soc / tstat orange/gold / ink-mute / nav / widget）
+- 新增 llms.txt（H1 + 6 links，代理瀏覽 3/3）
 
 ### 品質 / 安全稽核（本輪完成）
 - `/review 全面`：找出 3 項問題 → 已全部修正

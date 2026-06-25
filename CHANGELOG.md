@@ -2,9 +2,22 @@
 
 ## 2026-06-25
 
+### 效能（PageSpeed 修正，目標 90+）
+- **LCP 根本原因修正**：移除 9 個 HTML 的 `body{opacity:0}` + setTimeout fallback → 解決 LCP Element Render Delay 1590ms 問題
+- **CLS 修正**：body 不再隱藏，CLS 0.095 → 近 0
+- **llms.txt**：新增含 H1 標題與 6 個連結（代理瀏覽 3/3）
+
+### Accessibility（WCAG AA 修正）
+- `.btn-line`：背景 `#06C755` → `#048A2E`，白字對比 2.3:1 → 5.3:1 ✅
+- `.soc`：文字 `--pink` → `--pink-deep`，粉底上對比 3.8:1 → 7.7:1 ✅
+- `.tstat` 統計數字：橘色 `#EE7700` → `#C76A00`，金色 `#C7A800` → `#8C7400` ✅
+- `--ink-mute`：`#A593A0` → `#7A6574`，小字對比 2.8:1 → 4.9:1 ✅
+- `.nav-links a`：`rgba(255,255,255,.92)` → `#fff`，移除透明度
+- mina-widget.css：FAB/Header/Bubble `#E60D85` → `#C80079`（對比 4.2:1 → 5.5:1）✅
+- mina-status：`rgba(255,255,255,.85)` → `#fff`，修正 11px 小字對比
+
 ### 修正
 - **CSP**：`script-src` 加入 `https://www.googletagmanager.com`，`connect-src` 加入 GA 端點，修正 Google Analytics 無法載入
-- **效能**：`body{opacity:0}` 加入 500ms setTimeout 保底（9 個 HTML），防止 PageSpeed Lighthouse 找不到 LCP 元素
 - **效能**：移除 mina-fab `box-shadow` transition（非合成動畫）
 - **效能**：移除 footer link `color` transition → 改 `opacity`（合成動畫）
 - **程式碼**：修正 `practice.js` `fetchArchive` 內 `var ac` 重複宣告
