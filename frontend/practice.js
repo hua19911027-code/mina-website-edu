@@ -607,12 +607,14 @@
       console.warn('practice.js: .qbanner.b-past not found')
     }
 
-    /* Mina 小幫手 btn-w */
+    /* Mina 小幫手 btn-w — 開啟浮動視窗歷屆查詢 */
     var widgetBtn = document.querySelector('.btn-w')
     if (widgetBtn) {
       widgetBtn.addEventListener('click', function(e) {
         e.preventDefault()
-        openArchive()
+        if (window.minaWidget) {
+          window.minaWidget.openToNode('archive_welcome')
+        }
       })
     } else {
       console.warn('practice.js: .btn-w not found')
