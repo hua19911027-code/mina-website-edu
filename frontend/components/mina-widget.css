@@ -259,7 +259,7 @@
 
 .mina-line-note {
   font-size: 10.5px;
-  color: #A593A0;
+  color: #7A6574;
   text-align: center;
   margin-top: -1px;
   padding: 0 4px;
@@ -281,7 +281,7 @@
   display: block;
   font-size: 10.5px;
   font-weight: 700;
-  color: #A593A0;
+  color: #7A6574;
   text-transform: uppercase;
   letter-spacing: .5px;
   margin-bottom: 2px;
@@ -306,7 +306,7 @@
 .mina-reset {
   background: none;
   border: none;
-  color: #A593A0;
+  color: #7A6574;
   font-size: 11.5px;
   cursor: pointer;
   font-family: inherit;
@@ -353,7 +353,7 @@
 .mina-q-title { flex: 1; font-weight: 500; }
 .mina-q-toggle {
   flex-shrink: 0;
-  color: #A593A0;
+  color: #7A6574;
   font-size: 1rem;
   line-height: 1;
   transition: transform .2s;
