@@ -1,8 +1,25 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-06-16（全域名上線，含 api.minaedu.tw DNS ✅）  
+**最後更新**：2026-06-25（/review + /qa + /cso 三輪稽核完成）  
 **分支**：dev（自動部署至 minaedu.tw）  
-**Mobile PageSpeed**：91 / 100 ✅
+**Mobile PageSpeed**：91 / 100 ✅  
+**安全健康分數**：88 / 100 ✅（6月25日 CSO 審計）
+
+---
+
+## ✅ 已完成（2026-06-25 最新）
+
+### 品質 / 安全稽核（本輪完成）
+- `/review 全面`：找出 3 項問題 → 已全部修正
+  - body opacity 保底 setTimeout（9 個 HTML，防 LCP 找不到元素）
+  - 非合成動畫移除（mina-fab box-shadow、footer link color transition）
+  - var ac 重複宣告修正（practice.js）
+- `/qa 全面`：線上 minaedu.tw 全面測試 → 找出 GA 未載入 → CSP 已修正
+- `/cso 全面`：安全審計完成，3 項已修：
+  - `X-Frame-Options: SAMEORIGIN` → `DENY`（與 CSP frame-ancestors 一致）
+  - `/health` 移除 env 欄位（避免洩漏環境資訊）
+  - Booking API 新增欄位長度上限（姓名100/電話30/備註500字）
+- CSO SEC-001：確認 Notion API key + LINE token 已重發、repo 私有 → RESOLVED
 
 ---
 
