@@ -1,17 +1,21 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-06-25（PageSpeed LCP + Accessibility 修正）  
+**最後更新**：2026-06-25（PageSpeed Performance 95 + Accessibility 100 達標）  
 **分支**：dev（自動部署至 minaedu.tw）  
-**Mobile PageSpeed**：81 → 目標 90+（LCP/CLS/A11y 修正已 push，待 Lighthouse 重新驗證）  
+**Mobile PageSpeed**：Performance **95** ✅、Accessibility **100** ✅、Best Practices 100、SEO 100  
 **安全健康分數**：88 / 100 ✅（6月25日 CSO 審計）
 
 ---
 
 ## ✅ 已完成（2026-06-25 最新）
 
-### PageSpeed LCP + Accessibility 修正（本輪完成）
+### PageSpeed Performance 95 + Accessibility 100（本輪完成）
+- GA4 defer 至 window.load → TBT 210ms→50ms、LCP 3.5s→2.6s
+- SVG preload 移至 head 最前 → Resource Load Delay 改善
+- `.bub.me` / `.chat-top span` #06C755→#04882E（2.16:1→4.60:1）
+- LINE 綠色全局修正：#048A2E（4.49:1）→ #04882E（4.60:1），通過 WCAG AA 4.5:1
 - 移除 9 個 HTML 的 `body{opacity:0}` → 解決 LCP Element Render Delay 1590ms + CLS 0.095
-- WCAG AA contrast 修正 7 處（btn-line / soc / tstat orange/gold / ink-mute / nav / widget）
+- WCAG AA contrast 修正共 9 處（btn-line / soc / tstat / ink-mute / nav / widget / bub.me）
 - 新增 llms.txt（H1 + 6 links，代理瀏覽 3/3）
 
 ### 品質 / 安全稽核（本輪完成）
