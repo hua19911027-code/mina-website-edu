@@ -23,7 +23,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 22px rgba(230,13,133,.45);
-  transition: transform .2s, box-shadow .2s;
+  transition: transform .2s;
   position: relative;
   outline: none;
 }

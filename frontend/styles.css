@@ -236,7 +236,7 @@ footer{background:var(--pink-deep);color:rgba(255,255,255,.7);padding:56px 0 30p
 .ft-brand .fb-loc{font-size:13px;color:rgba(255,255,255,.8);font-weight:500;display:flex;align-items:center;gap:7px;}
 .ft-brand .fb-loc::before{content:'◉';color:var(--yellow);}
 .ft-col h4{color:#fff;font-size:15px;margin-bottom:14px;font-weight:900;}
-.ft-col a{display:block;font-size:14px;padding:5px 0;transition:color .2s;}
+.ft-col a{display:block;font-size:14px;padding:5px 0;transition:opacity .2s;}
 .ft-col a:hover{color:var(--yellow);}
 .ft-bottom{border-top:1px solid rgba(255,255,255,.18);padding-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:13px;color:rgba(255,255,255,.75);}
 

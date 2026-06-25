@@ -486,14 +486,13 @@
     fetch(API_BASE + '/practice/archive?' + params)
       .then(function(r) { return r.json() })
       .then(function(json) {
+        var ac = getContainer('archive-cards')
         archiveFetching = false
         if (!json.ok || !json.data) {
-          var ac = getContainer('archive-cards')
           if (ac) ac.innerHTML = '<p style="text-align:center;padding:20px;color:#E60D85">載入失敗，請稍後再試。</p>'
           return
         }
         var qs = json.data.questions || []
-        var ac = getContainer('archive-cards')
         if (!isMore && ac) ac.innerHTML = ''
         if (!isMore && !qs.length && ac) {
           ac.innerHTML = '<p style="text-align:center;padding:20px;color:var(--ink-mute,#A593A0)">目前沒有符合條件的歷屆題目</p>'
