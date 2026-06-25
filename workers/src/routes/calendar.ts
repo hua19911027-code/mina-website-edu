@@ -5,12 +5,14 @@ import type { Bindings } from '../types';
 import * as notion from '../adapters/notion';
 
 const TYPE_MAP: Record<string, string> = {
-  '學期・課程': 'en',
+  '課程':       'en',   // Notion 新名稱
+  '學期・課程': 'en',   // 舊名稱相容
   '段考':       'ex',
   '學測評量':   'ex',
-  '段考・評量': 'ex',  // 舊名稱相容
+  '段考・評量': 'ex',   // 舊名稱相容
   '營隊':       'camp',
-  '報名・活動': 'reg',
+  '報名':       'reg',  // Notion 新名稱
+  '報名・活動': 'reg',  // 舊名稱相容
   '節慶・活動': 'fest',
 };
 
