@@ -1,0 +1,298 @@
+[
+  {
+    "updatedAt": "2026-06-24T08:13:18.296Z",
+    "createdAt": "2026-06-24T08:13:18.296Z",
+    "id": "a4300c790fa4b944",
+    "name": "A4-每年8月1日切換網站閱讀DB",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "id": "a4-n1",
+        "name": "每年8月1日",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -800,
+          300
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 3 1 8 *"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "a4-n2",
+        "name": "讀取目前設定",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -600,
+          300
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "https://api.minaedu.tw/api/v1/admin/settings",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-Admin-Secret",
+                "value": "={{ $env.MINA_ADMIN_SECRET }}"
+              }
+            ]
+          },
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "a4-n3",
+        "name": "檢查DB狀態",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -400,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const s = $input.first().json;\nconst genDbId = (s.data && s.data.notionPracticeGenDbId) || '';\nconst curDbId = (s.data && s.data.notionPracticeDbId)    || '';\nconst needsSwitch = !!(genDbId && genDbId !== curDbId);\nreturn [{ json: { genDbId, curDbId, needsSwitch } }];"
+        }
+      },
+      {
+        "id": "a4-n4",
+        "name": "切換網站閱讀DB",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -200,
+          300
+        ],
+        "parameters": {
+          "method": "={{ $json.needsSwitch ? 'PUT' : 'GET' }}",
+          "url": "={{ $json.needsSwitch ? 'https://api.minaedu.tw/api/v1/admin/settings' : 'https://api.minaedu.tw/api/v1/admin/settings' }}",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-Admin-Secret",
+                "value": "={{ $env.MINA_ADMIN_SECRET }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $('檢查DB狀態').first().json.needsSwitch ? JSON.stringify({ notionPracticeDbId: $('檢查DB狀態').first().json.genDbId }) : '{}' }}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "a4-n5",
+        "name": "清除KV快取",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          0,
+          300
+        ],
+        "parameters": {
+          "method": "={{ $('檢查DB狀態').first().json.needsSwitch ? 'DELETE' : 'GET' }}",
+          "url": "https://api.minaedu.tw/api/v1/admin/cache",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-Admin-Secret",
+                "value": "={{ $env.MINA_ADMIN_SECRET }}"
+              }
+            ]
+          },
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "a4-n6",
+        "name": "彙整結果",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          200,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const st = $('檢查DB狀態').first().json;\nconst genDbId = st.genDbId;\nconst curDbId = st.curDbId;\nconst switched = st.needsSwitch;\nconst deleted = ($('清除KV快取').first().json.data || {}).deleted || 0;\nconst msg = switched\n  ? '✅ A4 DB 切換完成！\\n\\n🔄 舊DB：' + curDbId.slice(0,8) + '…\\n✨ 新DB：' + genDbId.slice(0,8) + '…\\n🗑️ 清除快取：' + deleted + ' 筆\\n\\n網站現在已讀取新學年度題庫。'\n  : '⚠️ A4 執行：兩個 DB ID 相同（A3 尚未執行？），無需切換。';\nreturn [{ json: { msg, switched } }];"
+        }
+      },
+      {
+        "id": "a4-n7",
+        "name": "通知老師 LINE",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          400,
+          300
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.line.me/v2/bot/message/broadcast",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "={{ 'Bearer ' + $env.LINE_CHANNEL_ACCESS_TOKEN }}"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ messages: [{ type: 'text', text: $json.msg }] }) }}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        }
+      }
+    ],
+    "connections": {
+      "每年8月1日": {
+        "main": [
+          [
+            {
+              "node": "讀取目前設定",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "讀取目前設定": {
+        "main": [
+          [
+            {
+              "node": "檢查DB狀態",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "檢查DB狀態": {
+        "main": [
+          [
+            {
+              "node": "切換網站閱讀DB",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "切換網站閱讀DB": {
+        "main": [
+          [
+            {
+              "node": "清除KV快取",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "清除KV快取": {
+        "main": [
+          [
+            {
+              "node": "彙整結果",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "彙整結果": {
+        "main": [
+          [
+            {
+              "node": "通知老師 LINE",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": {
+      "node:每年8月1日": {
+        "recurrenceRules": []
+      }
+    },
+    "meta": null,
+    "nodeGroups": [],
+    "pinData": null,
+    "versionId": "9eb8ccf0-6f54-437d-967b-74a678989522",
+    "activeVersionId": "9eb8ccf0-6f54-437d-967b-74a678989522",
+    "versionCounter": 8,
+    "triggerCount": 1,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-06-24T08:13:18.300Z",
+        "createdAt": "2026-06-24T08:13:18.300Z",
+        "role": "workflow:owner",
+        "workflowId": "a4300c790fa4b944",
+        "projectId": "TR9S4ARFHuw7aPNS",
+        "project": {
+          "updatedAt": "2026-06-24T14:22:52.449Z",
+          "createdAt": "2026-05-22T08:49:59.173Z",
+          "id": "TR9S4ARFHuw7aPNS",
+          "name": "Mina Admin <hua19911027@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "48a45a60-09e1-47ba-9adf-54d7134b64e5"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]

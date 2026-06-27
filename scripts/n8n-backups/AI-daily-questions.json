@@ -1,0 +1,439 @@
+[
+  {
+    "updatedAt": "2026-06-24T02:44:08.368Z",
+    "createdAt": "2026-06-10T15:04:32.298Z",
+    "id": "IpxBWR3Nbg2z798v",
+    "name": "AI -自動出題（每月15日）",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 9 15 * *"
+              }
+            ]
+          }
+        },
+        "id": "f2-n1-sched",
+        "name": "每月15日 09:00",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -496,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "method": "GET",
+          "url": "https://api.minaedu.tw/api/v1/admin/settings",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-Admin-Secret",
+                "value": "={{ $env.MINA_ADMIN_SECRET }}"
+              }
+            ]
+          },
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "id": "f2-n0-settings",
+        "name": "讀取出題DB設定",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -496,
+          160
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// 出版社對照（114學年度 旭光）\nconst publishers = {\n  '英文': { '小一':'康軒Wonder World','小二':'康軒Wonder World','小三':'康軒Wonder World',\n            '小四':'康軒Wonder World','小五':'何嘉仁Super Fun','小六':'康軒Wonder World' },\n  '數學': { '小一':'康軒','小二':'翰林','小三':'康軒','小四':'南一','小五':'康軒','小六':'南一' }\n};\n\nconst now = new Date();\nconst nm = (now.getMonth() + 1) % 12;\nconst ny = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear();\nconst sats = [];\nconst last = new Date(ny, nm + 1, 0);\nfor (let d = new Date(ny, nm, 1); d <= last; d.setDate(d.getDate() + 1)) {\n  if (d.getDay() === 6) sats.push(new Date(d));\n}\n\nfunction schoolWeek(date) {\n  const m = date.getMonth() + 1, y = date.getFullYear();\n  const syy = m >= 8 ? y : y - 1;\n  const upper = new Date(syy, 7, 1);\n  const lower = new Date(syy + 1, 1, 1);\n  const ms = 7 * 24 * 3600 * 1000;\n  if (m >= 2 && m <= 7) return Math.floor((date - lower) / ms) + 19;\n  if (m >= 8 || m === 1) return Math.floor((date - upper) / ms) + 1;\n  return 0;\n}\nfunction acadYear(date) {\n  const m = date.getMonth() + 1, y = date.getFullYear();\n  return (m >= 8 ? y - 1911 : y - 1912) + '學年度';\n}\nfunction sem(date) {\n  const m = date.getMonth() + 1;\n  return (m >= 8 || m === 1) ? '上學期' : '下學期';\n}\nfunction weekOfMonth(date) {\n  const y = date.getFullYear(), m = date.getMonth();\n  const first = new Date(y, m, 1);\n  const offset = (6 - first.getDay() + 7) % 7;\n  const firstSat = new Date(y, m, 1 + offset);\n  return Math.floor((date - firstSat) / (7 * 24 * 3600 * 1000)) + 1;\n}\nconst grades = ['小一','小二','小三','小四','小五','小六'];\nconst subjects = ['英文','數學'];\nconst qTypes = ['標準題型','錯題診斷','觀念拆解'];\nconst tasks = [];\nfor (const sat of sats) {\n  let wk = schoolWeek(sat) || ((sat.getMonth() + 1 >= 8) ? 1 : 36);\n  const publishDate = sat.toISOString().split('T')[0];\n  for (const grade of grades) {\n    for (const subject of subjects) {\n      const publisher = publishers[subject][grade] || '';\n      for (const qType of qTypes) {\n        tasks.push({ grade, subject, publisher, qType, publishDate,\n          semester: sem(sat), acadYear: acadYear(sat), schoolWeek: wk, weekOfMonth: weekOfMonth(sat), count: 1 });\n      }\n    }\n  }\n}\nreturn tasks.map(t => ({ json: t }));"
+        },
+        "id": "f2-n2-tasks",
+        "name": "建立出題任務清單",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -256,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://openrouter.ai/api/v1/chat/completions",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer {{ OPENROUTER_API_KEY }}"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\"models\": [\"google/gemini-2.5-flash\", \"google/gemini-2.5-pro\", \"google/gemini-2.5-flash-lite\"], \"route\": \"fallback\", \"messages\": [{\"role\": \"user\", \"content\": \"你是台灣國小補習班的資深老師，請依以下規範出 1 道選擇題。\\n\\n【基本資訊】\\n年級：{{ $json.grade }}\\n科目：{{ $json.subject }}\\n教材版本：{{ $json.publisher }}\\n學期：{{ $json.semester }} 第 {{ $json.schoolWeek }} 週\\n題型：{{ $json.qType }}\\n\\n【題型設計方向】\\n- 標準題型：考核本週單元的基本知識與應用，難度適中，讓學生清楚練習核心概念\\n- 觀念拆解：重點在「為什麼」，解析觀念原理，幫助學生釐清概念混淆，步驟要清楚\\n- 錯題診斷：專門設計「很容易錯的題目」，選項具有誤導性，加強學生對易錯點的警覺\\n\\n【出題規則】\\n1. 依此教材版本的課程進度，推估本週合適的單元出題，不要重複上個月的單元\\n2. 四個選項（A/B/C/D）的錯誤選項需具「合理誤導性」，不可太明顯\\n3. 正確答案請隨機放在 A/B/C/D 其中一個，絕對不可以每題都集中在 A，答案分布要均勻\n4. 禁止出需要圖形、圖表、幾何圖形、座標圖等視覺輔助才能作答的題目，所有題目必須純文字即可作答\\n\\n【說明欄位風格（重要！）】\\n正確觀念、常見錯誤、記憶提示，請用板書極簡風：\\n- 每欄 1 句核心 + 1 個 emoji，不超過 40 字\\n- 禁止招呼語（小朋友、你們好棒）、禁止鼓勵語、禁止重複解釋\\n- 用 emoji 取代冗長描述，字少打準\\n- 範例：mom = 媽媽 💡｜注意 m/d 音差 ❌\\n\\n【輸出格式】\\n以 JSON 陣列格式輸出 1 道題（必含所有欄位），不要多餘說明：\\n[{\\\"chapter\\\":\\\"(本週推估的單元名稱)\\\", \\\"question\\\":\\\"...\\\", \\\"optionA\\\":\\\"...\\\", \\\"optionB\\\":\\\"...\\\", \\\"optionC\\\":\\\"...\\\", \\\"optionD\\\":\\\"...\\\", \\\"answer\\\":\\\"A或B或C或D其中一個\\\", \\\"concept\\\":\\\"(口語化正確觀念，多行+表情符號)\\\", \\\"mistake\\\":\\\"(口語化常見錯誤，多行+表情符號)\\\", \\\"hint\\\":\\\"(口語化記憶提示，多行+表情符號)\\\"}]\"}]}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "id": "f2-n3-ai",
+        "name": "OpenRouter 生成題目",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          0,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "let resp, task;\ntry {\n  resp = $input.item.json;\n  task = $('建立出題任務清單').item.json;\n} catch(e) { return null; }\n\nif (!resp || typeof resp !== 'object' || Array.isArray(resp)) return null;\nif (!task || typeof task !== 'object') return null;\n\nconst grade = task.grade || '';\nconst subject = task.subject || '';\nconst publisher = task.publisher || '';\nconst semester = task.semester || '';\nconst acadYear = task.acadYear || '';\nconst qType = task.qType || '標準題型';\nconst publishDate = task.publishDate || '';\nconst schoolWeek = task.schoolWeek || 1;\nconst wom = task.weekOfMonth || 1;\n\nlet raw = '';\ntry {\n  const content = resp.choices[0].message.content;\n  raw = (content != null) ? String(content) : '';\n} catch(e) { return null; }\n\nraw = raw.replace(/```json/g,'').replace(/```/g,'').trim();\n\nlet qs = [];\ntry {\n  const s = raw.indexOf('['), e = raw.lastIndexOf(']');\n  if (s !== -1 && e > s) {\n    const parsed = JSON.parse(raw.slice(s, e+1));\n    if (Array.isArray(parsed)) qs = parsed;\n  }\n} catch(err) { return null; }\n\nif (qs.length === 0) return null;\nconst q = qs[0];\nif (!q || typeof q !== 'object' || Array.isArray(q)) return null;\n\nconst code = subject === '英文' ? 'en' : 'ma';\nconst gc = {'小一':1,'小二':2,'小三':3,'小四':4,'小五':5,'小六':6}[grade] || 0;\nconst typeCode = {'標準題型':'標','錯題診斷':'錯','觀念拆解':'觀'}[qType] || '標';\nconst ym = publishDate.replace(/-/g,'').slice(0,6);\nconst publishDateISO = publishDate || '';\n\nreturn {\n  json: {\n    questionId: code + '-' + gc + '-' + typeCode + '-w' + wom + '-' + ym,\n    grade, subject, curriculum: publisher, semester, acadYear, qType,\n    chapter:  String(q.chapter  || '').slice(0, 150),\n    question: String(q.question || '').slice(0, 150),\n    optionA:  String(q.optionA  || '').slice(0, 80), optionB: String(q.optionB || '').slice(0, 80),\n    optionC:  String(q.optionC  || '').slice(0, 80), optionD: String(q.optionD || '').slice(0, 80),\n    answer:   String(q.answer   || 'A'),\n    concept:  String(q.concept  || '').slice(0, 40),\n    mistake:  String(q.mistake  || '').slice(0, 40),\n    hint:     String(q.hint     || '').slice(0, 40),\n    publishDate: publishDateISO\n  }\n};"
+        },
+        "id": "f2-n4-parse",
+        "name": "解析 AI 題目",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          272,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\nconst count = items.length;\nconst now = new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });\nreturn [{ json: {\n  count,\n  lineMsg: '【Mina 自動出題完成】\\n本月共新增 ' + count + ' 道題目至 Notion 題庫\\n狀態：待審核\\n請登入 Notion 審核後勾選「是否發布」\\n時間：' + now,\n  emailSubject: '【Mina 題庫】' + count + ' 道新題目待審核',\n  emailBody: 'Mina AI 自動出題完成\\n\\n共新增：' + count + ' 道題\\n狀態：待審核\\n\\n請登入 Notion 題庫 Database，\\n確認題目無誤後勾選「是否發布」=✓\\n\\n時間：' + now\n}}];"
+        },
+        "id": "f2-n6-merge",
+        "name": "彙整出題結果",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          784,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.line.me/v2/bot/message/broadcast",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer {{ LINE_CHANNEL_ACCESS_TOKEN }}"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\"messages\": [{\"type\": \"text\", \"text\": {{ JSON.stringify($json.lineMsg) }}}]}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "id": "f2-n7-line",
+        "name": "通知老師審核 (LINE)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          528,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "fromEmail": "hua19911027@gmail.com",
+          "toEmail": "hua19911027@gmail.com, manko94134@gmail.com",
+          "subject": "={{ $json.emailSubject }}",
+          "options": {}
+        },
+        "id": "f2-n8-email",
+        "name": "通知老師審核 (Email)",
+        "type": "n8n-nodes-base.emailSend",
+        "typeVersion": 2.1,
+        "position": [
+          528,
+          160
+        ],
+        "webhookId": "e90ca63e-7d5e-4936-bbc5-62059b451e38",
+        "credentials": {
+          "smtp": {
+            "id": "BdOVsK33NdWdJUob",
+            "name": "Gmail SMTP (Mina)"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## Flow A1 — AI 自動出題\n\n**觸發：每月15日 09:00 (Asia/Taipei)**\n\n流程：讀取出題DB設定 → 計算下月周六 → 6年級×2科目×3題型 = N道題\n\n**題型：** 標準題型 + 錯題診斷 + 觀念拆解\n\n**DB 動態設定：**\n由 Admin Settings (KV) 的 notionPracticeGenDbId 決定\n預設 fallback：2502b420...（舊114）\n\n**A2 在 7/10 自動更新 KV → 切至新年度DB**",
+          "height": 300,
+          "width": 400,
+          "color": 3
+        },
+        "id": "f2-n9-note",
+        "name": "⚙️ 設定說明",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -656,
+          -48
+        ]
+      },
+      {
+        "parameters": {
+          "resource": "databasePage",
+          "databaseId": {
+            "__rl": true,
+            "value": "={{ $('讀取出題DB設定').first().json.data?.notionPracticeGenDbId || '2502b420-9049-4621-a4b9-99a299a9b922' }}",
+            "mode": "id"
+          },
+          "title": "={{ $json.questionId }}",
+          "propertiesUi": {
+            "propertyValues": [
+              {
+                "key": "年級|select",
+                "selectValue": "={{ $json.grade }}"
+              },
+              {
+                "key": "科目|select",
+                "selectValue": "={{ $json.subject }}"
+              },
+              {
+                "key": "題型|select",
+                "selectValue": "={{ $json.qType }}"
+              },
+              {
+                "key": "教材版本|select",
+                "selectValue": "={{ $json.curriculum }}"
+              },
+              {
+                "key": "學期|select",
+                "selectValue": "={{ $json.semester }}"
+              },
+              {
+                "key": "單元|rich_text",
+                "textContent": "={{ $json.chapter }}"
+              },
+              {
+                "key": "題目|rich_text",
+                "textContent": "={{ $json.question }}"
+              },
+              {
+                "key": "選項A|rich_text",
+                "textContent": "={{ $json.optionA }}"
+              },
+              {
+                "key": "選項B|rich_text",
+                "textContent": "={{ $json.optionB }}"
+              },
+              {
+                "key": "選項C|rich_text",
+                "textContent": "={{ $json.optionC }}"
+              },
+              {
+                "key": "選項D|rich_text",
+                "textContent": "={{ $json.optionD }}"
+              },
+              {
+                "key": "答案|select",
+                "selectValue": "={{ $json.answer }}"
+              },
+              {
+                "key": "正確觀念|rich_text",
+                "textContent": "={{ $json.concept }}"
+              },
+              {
+                "key": "常見錯誤|rich_text",
+                "textContent": "={{ $json.mistake }}"
+              },
+              {
+                "key": "記憶提示|rich_text",
+                "textContent": "={{ $json.hint }}"
+              },
+              {
+                "key": "發布日期|date",
+                "date": "={{ $json.publishDate }}"
+              },
+              {
+                "key": "是否發布|checkbox"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "f2-n5-notion",
+        "name": "寫入 Notion 題庫",
+        "type": "n8n-nodes-base.notion",
+        "typeVersion": 2.2,
+        "position": [
+          528,
+          304
+        ],
+        "credentials": {
+          "notionApi": {
+            "id": "AzXLvJt1dpTqr9fB",
+            "name": "Notion account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "每月15日 09:00": {
+        "main": [
+          [
+            {
+              "node": "讀取出題DB設定",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "讀取出題DB設定": {
+        "main": [
+          [
+            {
+              "node": "建立出題任務清單",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "建立出題任務清單": {
+        "main": [
+          [
+            {
+              "node": "OpenRouter 生成題目",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenRouter 生成題目": {
+        "main": [
+          [
+            {
+              "node": "解析 AI 題目",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "解析 AI 題目": {
+        "main": [
+          [
+            {
+              "node": "寫入 Notion 題庫",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "寫入 Notion 題庫": {
+        "main": [
+          [
+            {
+              "node": "彙整出題結果",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "彙整出題結果": {
+        "main": [
+          [
+            {
+              "node": "通知老師審核 (LINE)",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "通知老師審核 (Email)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "staticData": {
+      "node:每月15日 09:00": {
+        "recurrenceRules": []
+      }
+    },
+    "meta": null,
+    "nodeGroups": [],
+    "pinData": {},
+    "versionId": "a5793bad-6271-4886-ab75-93fff038c004",
+    "activeVersionId": "a5793bad-6271-4886-ab75-93fff038c004",
+    "versionCounter": 97,
+    "triggerCount": 1,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-06-10T15:04:32.299Z",
+        "createdAt": "2026-06-10T15:04:32.299Z",
+        "role": "workflow:owner",
+        "workflowId": "IpxBWR3Nbg2z798v",
+        "projectId": "TR9S4ARFHuw7aPNS",
+        "project": {
+          "updatedAt": "2026-06-24T14:22:52.449Z",
+          "createdAt": "2026-05-22T08:49:59.173Z",
+          "id": "TR9S4ARFHuw7aPNS",
+          "name": "Mina Admin <hua19911027@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "48a45a60-09e1-47ba-9adf-54d7134b64e5"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]

@@ -1,0 +1,285 @@
+[
+  {
+    "updatedAt": "2026-06-27T14:09:14.171Z",
+    "createdAt": "2026-06-27T09:45:51.808Z",
+    "id": "KzKCaInqd8K0nayo",
+    "name": "Mina Publisher",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "id": "trigger",
+        "name": "Hourly Cron",
+        "type": "n8n-nodes-base.cron",
+        "position": [
+          200,
+          300
+        ],
+        "parameters": {
+          "triggerTimes": {
+            "item": [
+              {
+                "mode": "everyHour"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "get-confirmed",
+        "name": "Get Confirmed Posts",
+        "type": "n8n-nodes-base.httpRequest",
+        "position": [
+          450,
+          300
+        ],
+        "parameters": {
+          "url": "={{ $env.RAILWAY_URL }}/admin/posts?status=已確認",
+          "method": "GET",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Cookie",
+                "value": "={{ $env.ADMIN_SESSION_COOKIE }}"
+              },
+              {
+                "name": "x-internal-token",
+                "value": "9pL3xW8vN2qR5mT7jK4cB6fY0hD1aU9sE3wI8oN6mZ5"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "filter-due",
+        "name": "Filter Due Posts",
+        "type": "n8n-nodes-base.code",
+        "position": [
+          700,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const now = new Date().toISOString();\nconst posts = $input.first().json.posts || [];\nconst due = posts.filter(p => p.scheduled_time && p.scheduled_time <= now && !p.is_publishing);\nreturn due.map(p => ({ json: p }));"
+        }
+      },
+      {
+        "id": "split-posts",
+        "name": "Split Posts",
+        "type": "n8n-nodes-base.splitInBatches",
+        "position": [
+          950,
+          300
+        ],
+        "parameters": {
+          "batchSize": 1
+        }
+      },
+      {
+        "id": "publish-fb",
+        "name": "Publish to Facebook",
+        "type": "n8n-nodes-base.httpRequest",
+        "position": [
+          1200,
+          200
+        ],
+        "parameters": {
+          "url": "={{ $env.RAILWAY_URL }}/publish/facebook",
+          "method": "POST",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Cookie",
+                "value": "={{ $env.ADMIN_SESSION_COOKIE }}"
+              },
+              {
+                "name": "x-internal-token",
+                "value": "9pL3xW8vN2qR5mT7jK4cB6fY0hD1aU9sE3wI8oN6mZ5"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "post_id",
+                "value": "={{ $json.id }}"
+              }
+            ]
+          },
+          "options": {
+            "timeout": 60000
+          }
+        }
+      },
+      {
+        "id": "publish-ig",
+        "name": "Publish to Instagram",
+        "type": "n8n-nodes-base.httpRequest",
+        "position": [
+          1200,
+          400
+        ],
+        "parameters": {
+          "url": "={{ $env.RAILWAY_URL }}/publish/instagram",
+          "method": "POST",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Cookie",
+                "value": "={{ $env.ADMIN_SESSION_COOKIE }}"
+              },
+              {
+                "name": "x-internal-token",
+                "value": "9pL3xW8vN2qR5mT7jK4cB6fY0hD1aU9sE3wI8oN6mZ5"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "post_id",
+                "value": "={{ $json.id }}"
+              }
+            ]
+          },
+          "options": {
+            "timeout": 60000
+          }
+        }
+      },
+      {
+        "id": "check-ig-time",
+        "name": "Check IG Due Time",
+        "type": "n8n-nodes-base.if",
+        "position": [
+          1050,
+          400
+        ],
+        "parameters": {
+          "conditions": {
+            "string": [
+              {
+                "value1": "={{ $json.ig_scheduled_time <= new Date().toISOString() ? 'yes' : 'no' }}",
+                "operation": "equal",
+                "value2": "yes"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Hourly Cron": {
+        "main": [
+          [
+            {
+              "node": "Get Confirmed Posts",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Confirmed Posts": {
+        "main": [
+          [
+            {
+              "node": "Filter Due Posts",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter Due Posts": {
+        "main": [
+          [
+            {
+              "node": "Split Posts",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split Posts": {
+        "main": [
+          [
+            {
+              "node": "Publish to Facebook",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Check IG Due Time",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check IG Due Time": {
+        "main": [
+          [
+            {
+              "node": "Publish to Instagram",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": null,
+    "meta": null,
+    "nodeGroups": [],
+    "pinData": null,
+    "versionId": "a9b70e22-a0e6-4137-871f-cbf518856193",
+    "activeVersionId": "a9b70e22-a0e6-4137-871f-cbf518856193",
+    "versionCounter": 2,
+    "triggerCount": 1,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-06-27T09:45:51.811Z",
+        "createdAt": "2026-06-27T09:45:51.811Z",
+        "role": "workflow:owner",
+        "workflowId": "KzKCaInqd8K0nayo",
+        "projectId": "TR9S4ARFHuw7aPNS",
+        "project": {
+          "updatedAt": "2026-06-24T14:22:52.449Z",
+          "createdAt": "2026-05-22T08:49:59.173Z",
+          "id": "TR9S4ARFHuw7aPNS",
+          "name": "Mina Admin <hua19911027@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "48a45a60-09e1-47ba-9adf-54d7134b64e5"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]

@@ -1,0 +1,481 @@
+[
+  {
+    "updatedAt": "2026-06-24T07:47:07.931Z",
+    "createdAt": "2026-06-24T07:32:19.656Z",
+    "id": "f59cf0bd74534067",
+    "name": "A2-每週六自動發布封存",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 3 * * 6"
+              }
+            ]
+          }
+        },
+        "id": "a2-n1",
+        "name": "每週六 03:00",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -800,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://api.minaedu.tw/api/v1/admin/settings",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-Admin-Secret",
+                "value": "={{ $env.MINA_ADMIN_SECRET }}"
+              }
+            ]
+          },
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "id": "a2-n2",
+        "name": "讀取出題DB設定",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -608,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const s = $('讀取出題DB設定').first().json;\nconst dbId = s.data?.notionPracticeDbId || '';\nconst now = new Date();\nconst today = now.toISOString().split('T')[0];\nconst archiveCutoff = new Date(now - 180 * 24 * 3600 * 1000).toISOString().split('T')[0];\nreturn [{ json: { dbId, today, archiveCutoff } }];"
+        },
+        "id": "a2-n3",
+        "name": "計算目標日期",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -400,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "={{ 'https://api.notion.com/v1/databases/' + $('計算目標日期').first().json.dbId + '/query' }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "notionApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ filter: { and: [ { property: '發布日期', date: { equals: $('計算目標日期').first().json.today } }, { property: '是否發布', checkbox: { equals: false } } ] }, page_size: 100 }) }}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "id": "a2-n4",
+        "name": "查詢今日未發布題目",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -208,
+          304
+        ],
+        "credentials": {
+          "notionApi": {
+            "id": "AzXLvJt1dpTqr9fB",
+            "name": "Notion account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const res = $input.first().json;\nconst pages = res.results || [];\nif (pages.length === 0) return [{ json: { pageId: '__NONE__' } }];\nreturn pages.map(p => ({ json: { pageId: p.id } }));"
+        },
+        "id": "a2-n5",
+        "name": "拆分今日題目",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          0,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "method": "PATCH",
+          "url": "={{ $json.pageId === '__NONE__' ? 'https://api.notion.com/v1/pages/__NONE__' : 'https://api.notion.com/v1/pages/' + $json.pageId }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "notionApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={ \"properties\": { \"是否發布\": { \"checkbox\": true } } }",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "id": "a2-n6",
+        "name": "發布今日題目",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          208,
+          304
+        ],
+        "credentials": {
+          "notionApi": {
+            "id": "AzXLvJt1dpTqr9fB",
+            "name": "Notion account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\nconst count = items.filter(i => i.json.object === 'page').length;\nreturn [{ json: { publishedCount: count } }];"
+        },
+        "id": "a2-n7",
+        "name": "計數已發布",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          400,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "={{ 'https://api.notion.com/v1/databases/' + $('計算目標日期').first().json.dbId + '/query' }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "notionApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ filter: { and: [ { property: '發布日期', date: { before: $('計算目標日期').first().json.archiveCutoff } }, { property: '已封存', checkbox: { equals: false } }, { property: '是否發布', checkbox: { equals: true } } ] }, page_size: 100 }) }}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "id": "a2-n8",
+        "name": "查詢應封存題目",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          608,
+          304
+        ],
+        "credentials": {
+          "notionApi": {
+            "id": "AzXLvJt1dpTqr9fB",
+            "name": "Notion account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const res = $input.first().json;\nconst pages = res.results || [];\nif (pages.length === 0) return [{ json: { pageId: '__NONE__' } }];\nreturn pages.map(p => ({ json: { pageId: p.id } }));"
+        },
+        "id": "a2-n9",
+        "name": "拆分應封存題目",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          800,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "method": "PATCH",
+          "url": "={{ $json.pageId === '__NONE__' ? 'https://api.notion.com/v1/pages/__NONE__' : 'https://api.notion.com/v1/pages/' + $json.pageId }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "notionApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={ \"properties\": { \"已封存\": { \"checkbox\": true } } }",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "id": "a2-n10",
+        "name": "封存舊題",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1008,
+          304
+        ],
+        "credentials": {
+          "notionApi": {
+            "id": "AzXLvJt1dpTqr9fB",
+            "name": "Notion account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\nconst count = items.filter(i => i.json.object === 'page').length;\nreturn [{ json: { archivedCount: count } }];"
+        },
+        "id": "a2-n11",
+        "name": "計數已封存",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1200,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const pub = $('計數已發布').first().json.publishedCount || 0;\nconst arc = $('計數已封存').first().json.archivedCount || 0;\nconst today = $('計算目標日期').first().json.today;\nconst msg = `✅ 週六自動作業完成（${today}）\\n\\n📢 今日發布：${pub} 題\\n🗄️ 封存舊題：${arc} 題`;\nreturn [{ json: { msg, pub, arc } }];"
+        },
+        "id": "a2-n12",
+        "name": "彙整結果",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1408,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.line.me/v2/bot/message/broadcast",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "={{ 'Bearer ' + $env.LINE_CHANNEL_ACCESS_TOKEN }}"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ messages: [{ type: 'text', text: $json.msg }] }) }}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "id": "a2-n13",
+        "name": "通知老師 LINE",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1600,
+          304
+        ]
+      }
+    ],
+    "connections": {
+      "每週六 03:00": {
+        "main": [
+          [
+            {
+              "node": "讀取出題DB設定",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "讀取出題DB設定": {
+        "main": [
+          [
+            {
+              "node": "計算目標日期",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "計算目標日期": {
+        "main": [
+          [
+            {
+              "node": "查詢今日未發布題目",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "查詢今日未發布題目": {
+        "main": [
+          [
+            {
+              "node": "拆分今日題目",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "拆分今日題目": {
+        "main": [
+          [
+            {
+              "node": "發布今日題目",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "發布今日題目": {
+        "main": [
+          [
+            {
+              "node": "計數已發布",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "計數已發布": {
+        "main": [
+          [
+            {
+              "node": "查詢應封存題目",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "查詢應封存題目": {
+        "main": [
+          [
+            {
+              "node": "拆分應封存題目",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "拆分應封存題目": {
+        "main": [
+          [
+            {
+              "node": "封存舊題",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "封存舊題": {
+        "main": [
+          [
+            {
+              "node": "計數已封存",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "計數已封存": {
+        "main": [
+          [
+            {
+              "node": "彙整結果",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "彙整結果": {
+        "main": [
+          [
+            {
+              "node": "通知老師 LINE",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "staticData": {
+      "node:每週六 03:00": {
+        "recurrenceRules": []
+      }
+    },
+    "meta": null,
+    "nodeGroups": [],
+    "pinData": {},
+    "versionId": "6e40c8ba-e4d8-49b9-8065-5d7a16c76414",
+    "activeVersionId": "3acabbae-b0fe-469a-a6e5-b826297af471",
+    "versionCounter": 9,
+    "triggerCount": 1,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-06-24T07:32:19.659Z",
+        "createdAt": "2026-06-24T07:32:19.659Z",
+        "role": "workflow:owner",
+        "workflowId": "f59cf0bd74534067",
+        "projectId": "TR9S4ARFHuw7aPNS",
+        "project": {
+          "updatedAt": "2026-06-24T14:22:52.449Z",
+          "createdAt": "2026-05-22T08:49:59.173Z",
+          "id": "TR9S4ARFHuw7aPNS",
+          "name": "Mina Admin <hua19911027@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "48a45a60-09e1-47ba-9adf-54d7134b64e5"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]

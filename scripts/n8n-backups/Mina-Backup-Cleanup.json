@@ -1,0 +1,260 @@
+[
+  {
+    "updatedAt": "2026-06-27T14:09:14.470Z",
+    "createdAt": "2026-06-27T09:45:51.973Z",
+    "id": "zpCP5DsONvEuAhBn",
+    "name": "Mina Backup & Cleanup",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "id": "trigger",
+        "name": "Daily 01:00 Cron",
+        "type": "n8n-nodes-base.cron",
+        "position": [
+          200,
+          300
+        ],
+        "parameters": {
+          "triggerTimes": {
+            "item": [
+              {
+                "mode": "custom",
+                "cronExpression": "0 1 * * *"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "backup-n8n-workflows",
+        "name": "Backup n8n Workflows to GitHub",
+        "type": "n8n-nodes-base.httpRequest",
+        "position": [
+          450,
+          300
+        ],
+        "parameters": {
+          "url": "={{ $env.RAILWAY_URL }}/backup/n8n-workflows",
+          "method": "POST",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Cookie",
+                "value": "={{ $env.ADMIN_SESSION_COOKIE }}"
+              },
+              {
+                "name": "x-internal-token",
+                "value": "9pL3xW8vN2qR5mT7jK4cB6fY0hD1aU9sE3wI8oN6mZ5"
+              }
+            ]
+          },
+          "options": {
+            "timeout": 60000
+          }
+        }
+      },
+      {
+        "id": "check-backup-ok",
+        "name": "Check Backup Result",
+        "type": "n8n-nodes-base.code",
+        "position": [
+          700,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const result = $input.first().json;\nif (!result.ok) throw new Error('n8n backup failed: ' + JSON.stringify(result));\nconsole.log('n8n backup OK:', result.path, '(' + result.workflow_count + ' workflows)');\nreturn [{ json: result }];"
+        }
+      },
+      {
+        "id": "list-old-github-backups",
+        "name": "List GitHub n8n Backups",
+        "type": "n8n-nodes-base.httpRequest",
+        "position": [
+          950,
+          300
+        ],
+        "parameters": {
+          "url": "=https://api.github.com/repos/{{ $env.GITHUB_OWNER }}/{{ $env.GITHUB_REPO }}/contents/n8n-backups",
+          "method": "GET",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $env.GITHUB_TOKEN }}"
+              },
+              {
+                "name": "User-Agent",
+                "value": "mina-edu-backup"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "filter-old-backups",
+        "name": "Filter Backups Older Than 90 Days",
+        "type": "n8n-nodes-base.code",
+        "position": [
+          1200,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const files = $input.first().json;\nif (!Array.isArray(files)) return [];\nconst cutoff = new Date();\ncutoff.setDate(cutoff.getDate() - 90);\nconst old = files.filter(f => {\n  const match = f.name.match(/^(\\d{4}-\\d{2}-\\d{2})\\.json$/);\n  if (!match) return false;\n  return new Date(match[1]) < cutoff;\n});\nconsole.log('Old backups to delete:', old.map(f => f.name));\nreturn old.map(f => ({ json: { name: f.name, sha: f.sha, path: f.path } }));"
+        }
+      },
+      {
+        "id": "delete-old-backups",
+        "name": "Delete Old GitHub Backup",
+        "type": "n8n-nodes-base.httpRequest",
+        "position": [
+          1450,
+          300
+        ],
+        "parameters": {
+          "url": "=https://api.github.com/repos/{{ $env.GITHUB_OWNER }}/{{ $env.GITHUB_REPO }}/contents/{{ $json.path }}",
+          "method": "DELETE",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $env.GITHUB_TOKEN }}"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "User-Agent",
+                "value": "mina-edu-backup"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "message",
+                "value": "=chore: remove old n8n backup {{ $json.name }}"
+              },
+              {
+                "name": "sha",
+                "value": "={{ $json.sha }}"
+              }
+            ]
+          },
+          "options": {
+            "batching": {
+              "batch": {
+                "batchSize": 1,
+                "batchInterval": 500
+              }
+            }
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Daily 01:00 Cron": {
+        "main": [
+          [
+            {
+              "node": "Backup n8n Workflows to GitHub",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Backup n8n Workflows to GitHub": {
+        "main": [
+          [
+            {
+              "node": "Check Backup Result",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Backup Result": {
+        "main": [
+          [
+            {
+              "node": "List GitHub n8n Backups",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "List GitHub n8n Backups": {
+        "main": [
+          [
+            {
+              "node": "Filter Backups Older Than 90 Days",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter Backups Older Than 90 Days": {
+        "main": [
+          [
+            {
+              "node": "Delete Old GitHub Backup",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": null,
+    "meta": null,
+    "nodeGroups": [],
+    "pinData": null,
+    "versionId": "102efb39-d417-4117-ab82-7cb07885bfa1",
+    "activeVersionId": "102efb39-d417-4117-ab82-7cb07885bfa1",
+    "versionCounter": 2,
+    "triggerCount": 1,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-06-27T09:45:51.974Z",
+        "createdAt": "2026-06-27T09:45:51.974Z",
+        "role": "workflow:owner",
+        "workflowId": "zpCP5DsONvEuAhBn",
+        "projectId": "TR9S4ARFHuw7aPNS",
+        "project": {
+          "updatedAt": "2026-06-24T14:22:52.449Z",
+          "createdAt": "2026-05-22T08:49:59.173Z",
+          "id": "TR9S4ARFHuw7aPNS",
+          "name": "Mina Admin <hua19911027@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "48a45a60-09e1-47ba-9adf-54d7134b64e5"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]

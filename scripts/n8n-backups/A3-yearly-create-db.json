@@ -1,0 +1,283 @@
+[
+  {
+    "updatedAt": "2026-06-24T08:07:58.204Z",
+    "createdAt": "2026-06-24T08:07:58.204Z",
+    "id": "a3c23a212aecad4b",
+    "name": "A3-每年7月10日建新學年度題庫DB",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "id": "a3-n1",
+        "name": "每年7月10日",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -800,
+          300
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 3 10 7 *"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "a3-n2",
+        "name": "計算新學年度",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -600,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const now = new Date();\nconst roc = now.getFullYear() - 1911;\nconst dbName = roc + '學年度題庫';\nconst parentPageId = '374b8ee1-06b4-80ea-a0f9-dccaae830e8a';\nreturn [{ json: { roc, dbName, parentPageId } }];"
+        }
+      },
+      {
+        "id": "a3-n3a",
+        "name": "組裝DB請求體",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -400,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const info = $('計算新學年度').first().json;\nconst payload = {\n  parent: { type: 'page_id', page_id: info.parentPageId },\n  title: [{ type: 'text', text: { content: info.dbName } }],\n  properties: {\n    \"題目ID\":   { title: {} },\n    \"題目\":     { rich_text: {} },\n    \"選項A\":    { rich_text: {} },\n    \"選項B\":    { rich_text: {} },\n    \"選項C\":    { rich_text: {} },\n    \"選項D\":    { rich_text: {} },\n    \"答案\":     { select: { options: [{name:\"A\"},{name:\"B\"},{name:\"C\"},{name:\"D\"}] } },\n    \"年級\":     { select: { options: [{name:\"小一\"},{name:\"小二\"},{name:\"小三\"},{name:\"小四\"},{name:\"小五\"},{name:\"小六\"}] } },\n    \"科目\":     { select: { options: [{name:\"英文\"},{name:\"數學\"}] } },\n    \"題型\":     { select: { options: [{name:\"標準題型\"},{name:\"觀念拆解\"},{name:\"錯題診斷\"}] } },\n    \"學期\":     { select: { options: [{name:\"上學期\"},{name:\"下學期\"}] } },\n    \"教材版本\": { select: { options: [{name:\"康軒Wonder World\"},{name:\"何嘉仁Super Fun\"},{name:\"康軒\"},{name:\"翰林\"},{name:\"南一\"}] } },\n    \"單元\":     { rich_text: {} },\n    \"是否發布\": { checkbox: {} },\n    \"已封存\":   { checkbox: {} },\n    \"發布日期\": { date: {} },\n    \"正確觀念\": { rich_text: {} },\n    \"常見錯誤\": { rich_text: {} },\n    \"記憶提示\": { rich_text: {} }\n  }\n};\nreturn [{ json: { payload } }];"
+        }
+      },
+      {
+        "id": "a3-n3",
+        "name": "建立新學年度DB",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -200,
+          300
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.notion.com/v1/databases",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "notionApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify($json.payload) }}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "credentials": {
+          "notionApi": {
+            "id": "AzXLvJt1dpTqr9fB",
+            "name": "Notion account"
+          }
+        }
+      },
+      {
+        "id": "a3-n4",
+        "name": "更新KV出題DB",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          0,
+          300
+        ],
+        "parameters": {
+          "method": "PUT",
+          "url": "https://api.minaedu.tw/api/v1/admin/settings",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-Admin-Secret",
+                "value": "={{ $env.MINA_ADMIN_SECRET }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ notionPracticeGenDbId: $json.id }) }}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "a3-n5",
+        "name": "彙整結果",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          200,
+          300
+        ],
+        "parameters": {
+          "jsCode": "const newDbId = $('建立新學年度DB').first().json.id || '';\nconst dbName  = $('計算新學年度').first().json.dbName;\nconst ok = !!newDbId;\nconst msg = ok\n  ? '✅ A3 完成！\\n\\n📚 新題庫：' + dbName + '\\n🆔 ID：' + newDbId + '\\n\\nA1 出題從今日起寫入新題庫，8/1 網站將正式切換。'\n  : '⚠️ A3 建立新題庫 DB 失敗，請手動確認！';\nreturn [{ json: { msg, ok, newDbId, dbName } }];"
+        }
+      },
+      {
+        "id": "a3-n6",
+        "name": "通知老師 LINE",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          400,
+          300
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.line.me/v2/bot/message/broadcast",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "={{ 'Bearer ' + $env.LINE_CHANNEL_ACCESS_TOKEN }}"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ messages: [{ type: 'text', text: $json.msg }] }) }}",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        }
+      }
+    ],
+    "connections": {
+      "每年7月10日": {
+        "main": [
+          [
+            {
+              "node": "計算新學年度",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "計算新學年度": {
+        "main": [
+          [
+            {
+              "node": "組裝DB請求體",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "組裝DB請求體": {
+        "main": [
+          [
+            {
+              "node": "建立新學年度DB",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "建立新學年度DB": {
+        "main": [
+          [
+            {
+              "node": "更新KV出題DB",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "更新KV出題DB": {
+        "main": [
+          [
+            {
+              "node": "彙整結果",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "彙整結果": {
+        "main": [
+          [
+            {
+              "node": "通知老師 LINE",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": {
+      "node:每年7月10日": {
+        "recurrenceRules": []
+      }
+    },
+    "meta": null,
+    "nodeGroups": [],
+    "pinData": null,
+    "versionId": "d1b29659-2eaf-4327-9485-ede53d67d4c2",
+    "activeVersionId": "d1b29659-2eaf-4327-9485-ede53d67d4c2",
+    "versionCounter": 8,
+    "triggerCount": 1,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-06-24T08:07:58.208Z",
+        "createdAt": "2026-06-24T08:07:58.208Z",
+        "role": "workflow:owner",
+        "workflowId": "a3c23a212aecad4b",
+        "projectId": "TR9S4ARFHuw7aPNS",
+        "project": {
+          "updatedAt": "2026-06-24T14:22:52.449Z",
+          "createdAt": "2026-05-22T08:49:59.173Z",
+          "id": "TR9S4ARFHuw7aPNS",
+          "name": "Mina Admin <hua19911027@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "48a45a60-09e1-47ba-9adf-54d7134b64e5"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]
