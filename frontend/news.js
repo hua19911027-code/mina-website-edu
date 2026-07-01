@@ -35,7 +35,7 @@
 
   /* ── Per-article SEO: canonical, OG tags, Article + Breadcrumb JSON-LD ── */
   function updateArticleSEO(article, slug) {
-    var url = 'https://minaedu.tw/news-single.html?slug=' + encodeURIComponent(slug);
+    var url = 'https://minaedu.tw/news/' + encodeURIComponent(slug);
     var desc = truncate(stripHtml(article.excerpt || article.content || ''), 120);
     var image = article.coverImage || 'https://minaedu.tw/assets/og-cover.jpg';
 
@@ -93,7 +93,7 @@
   /* ── Article Card Factory — matches .ncard prototype structure ── */
   function buildCard(article) {
     var a = document.createElement('a');
-    a.href = 'news-single.html?slug=' + encodeURIComponent(article.slug);
+    a.href = '/news/' + encodeURIComponent(article.slug);
     a.className = 'ncard reveal';
 
     var catCls = CAT_CLASS[article.category] || '';
@@ -256,6 +256,10 @@
   /* ── Single article page ── */
   function initSinglePage() {
     var slug = new URLSearchParams(window.location.search).get('slug');
+    if (!slug) {
+      var m = window.location.pathname.match(/\/news\/([^\/]+)\/?$/);
+      if (m) slug = decodeURIComponent(m[1]);
+    }
     if (!slug) { window.location.replace('news.html'); return; }
     initShareButtons();
     loadArticle(slug);
