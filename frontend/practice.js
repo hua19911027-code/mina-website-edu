@@ -227,8 +227,7 @@
         }
         var qs = json.data.questions || []
         if (!isMore && !qs.length) {
-          var c = getContainer()
-          if (c) c.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:30px">目前沒有符合條件的題目 😊</p>'
+          fetchCurrentWeekFallback(f)
           return
         }
         var TYPE_ORDER = { '標準題型': 0, '觀念': 1, '錯題': 2 }
@@ -258,6 +257,43 @@
         console.error('fetchQuestions:', e)
         var c = getContainer()
         if (c) c.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:30px">載入失敗，請稍後再試。</p>'
+      })
+  }
+
+  /* 本週題目為空時（例如月初/月底批次交界的空窗期），退回顯示最近一批已發布的歷屆題目 */
+  function fetchCurrentWeekFallback(f) {
+    var params = 'page=1&limit=' + LIMIT
+    if (f.grade)   params += '&grade='   + encodeURIComponent(f.grade)
+    if (f.subject) params += '&subject=' + encodeURIComponent(f.subject)
+
+    fetch(API_BASE + '/practice/archive?' + params)
+      .then(function(r) { return r.json() })
+      .then(function(json) {
+        var c = getContainer()
+        if (!c) return
+        var qs = (json.ok && json.data && json.data.questions) || []
+        if (!qs.length) {
+          c.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:30px">目前沒有符合條件的題目 😊</p>'
+          return
+        }
+        c.innerHTML = ''
+        var note = document.createElement('p')
+        note.style.cssText = 'text-align:center;color:var(--ink-mute,#A593A0);font-size:13px;margin-bottom:14px'
+        var latest = qs[0] && qs[0].publishedAt ? qs[0].publishedAt.slice(0,10).replace(/-/g,'/') : ''
+        note.textContent = '本週新題準備中，先看看最近一批（' + latest + '）題目：'
+        c.appendChild(note)
+        qs.forEach(function(q, i) { appendCard(q, i + 1) })
+        loaded = qs.length
+        page = 1
+
+        var moreBtn    = document.getElementById('load-more-btn')    || document.querySelector('[data-load-more]')
+        var archiveCta = document.getElementById('archive-cta')      || document.querySelector('[data-archive-cta]')
+        if (moreBtn) moreBtn.style.display = 'none'
+        if (archiveCta) archiveCta.style.display = ''
+      })
+      .catch(function() {
+        var c = getContainer()
+        if (c) c.innerHTML = '<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:30px">目前沒有符合條件的題目 😊</p>'
       })
   }
 

@@ -371,30 +371,48 @@ h1.hero-h .hl{background:var(--yellow);color:var(--ink);padding:0 10px;border-ra
     fetch(API+'/practice?'+p)
       .then(function(r){return r.json();})
       .then(function(j){
-        if(!j.ok||!j.data||!j.data.questions||!j.data.questions.length){
-          wrap.innerHTML='<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:24px 0">此條件暫無題目，請換個選項試試。</p>';return;
-        }
-        var q=j.data.questions[0], LBL=['A','B','C','D','E'];
-        var opts=(q.options||[]).map(function(o,i){
-          var l=LBL[i],ok=(l===q.answer);
-          return '<div class="q-opt'+(ok?' correct':'')+'"><span class="q-opt-lbl">'+l+'</span><span>'+esc(o)+'</span>'+(ok?'<span class="q-correct-tag">✓ 正解</span>':'')+'</div>';
-        }).join('');
-        var ai=LBL.indexOf(q.answer), av=(q.options&&ai>=0)?q.options[ai]:'';
-        var exp=q.explanation||{};if(typeof exp==='string')exp={concept:exp};
-        var gl=s.grade;
-        var sl=s.subj;
-        wrap.innerHTML='<details class="qcard" style="max-width:760px;margin:0 auto">'
-          +'<summary><span class="qnum">1</span><span style="flex:1"><span class="q-meta">'+esc(q.type||'標準題型')+'</span><br>'+esc(q.question)+'</span><span class="plus">+</span></summary>'
-          +'<div style="padding:0 24px 20px"><div class="q-opts">'+opts+'</div>'
-          +'<div class="qbody"><div class="qseg ok"><span class="st">&#10003; 正確觀念</span>'
-          +'<div class="q-ans-inline"><span class="q-ans-badge">'+esc(q.answer)+'</span><span class="q-ans-val">'+esc(av)+'</span></div>'
-          +(exp.concept?'<span class="sx">'+esc(exp.concept)+'</span>':'')
-          +'</div>'
-          +(exp.commonMistake?'<div class="qseg err"><span class="st">&#10007; 常見錯誤</span><span class="sx">'+esc(exp.commonMistake)+'</span></div>':'')
-          +(exp.memoryTip?'<div class="qseg tip"><span class="st">&#9733; 記憶提示</span><span class="sx">'+esc(exp.memoryTip)+'</span></div>':'')
-          +'</div></div></details>';
+        var qs = (j.ok && j.data && j.data.questions) || [];
+        if(!qs.length){ loadFallback(); return; }
+        renderQ(qs[0]);
       })
       .catch(function(){wrap.innerHTML='<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:24px 0">載入失敗，請稍後再試。</p>';});
+  }
+  /* 本週題目為空時（例如月初/月底批次交界的空窗期），退回顯示最近一批已發布的歷屆題目 */
+  function loadFallback(){
+    var wrap = document.getElementById('hp-qcard');
+    if(!wrap) return;
+    var p = 'page=1&limit=1&grade='+encodeURIComponent(s.grade)+'&subject='+encodeURIComponent(s.subj);
+    fetch(API+'/practice/archive?'+p)
+      .then(function(r){return r.json();})
+      .then(function(j){
+        var qs = (j.ok && j.data && j.data.questions) || [];
+        if(!qs.length){
+          wrap.innerHTML='<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:24px 0">此條件暫無題目，請換個選項試試。</p>';return;
+        }
+        renderQ(qs[0]);
+      })
+      .catch(function(){wrap.innerHTML='<p style="text-align:center;color:var(--ink-mute,#A593A0);padding:24px 0">載入失敗，請稍後再試。</p>';});
+  }
+  function renderQ(q){
+    var wrap = document.getElementById('hp-qcard');
+    if(!wrap) return;
+    var LBL=['A','B','C','D','E'];
+    var opts=(q.options||[]).map(function(o,i){
+      var l=LBL[i],ok=(l===q.answer);
+      return '<div class="q-opt'+(ok?' correct':'')+'"><span class="q-opt-lbl">'+l+'</span><span>'+esc(o)+'</span>'+(ok?'<span class="q-correct-tag">✓ 正解</span>':'')+'</div>';
+    }).join('');
+    var ai=LBL.indexOf(q.answer), av=(q.options&&ai>=0)?q.options[ai]:'';
+    var exp=q.explanation||{};if(typeof exp==='string')exp={concept:exp};
+    wrap.innerHTML='<details class="qcard" style="max-width:760px;margin:0 auto">'
+      +'<summary><span class="qnum">1</span><span style="flex:1"><span class="q-meta">'+esc(q.type||'標準題型')+'</span><br>'+esc(q.question)+'</span><span class="plus">+</span></summary>'
+      +'<div style="padding:0 24px 20px"><div class="q-opts">'+opts+'</div>'
+      +'<div class="qbody"><div class="qseg ok"><span class="st">&#10003; 正確觀念</span>'
+      +'<div class="q-ans-inline"><span class="q-ans-badge">'+esc(q.answer)+'</span><span class="q-ans-val">'+esc(av)+'</span></div>'
+      +(exp.concept?'<span class="sx">'+esc(exp.concept)+'</span>':'')
+      +'</div>'
+      +(exp.commonMistake?'<div class="qseg err"><span class="st">&#10007; 常見錯誤</span><span class="sx">'+esc(exp.commonMistake)+'</span></div>':'')
+      +(exp.memoryTip?'<div class="qseg tip"><span class="st">&#9733; 記憶提示</span><span class="sx">'+esc(exp.memoryTip)+'</span></div>':'')
+      +'</div></div></details>';
   }
   function bind(cls, key){
     document.querySelectorAll('.'+cls).forEach(function(b){
