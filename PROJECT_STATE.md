@@ -1,13 +1,35 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-07-01（FOUC 修正、SEO 補強、題庫本週空窗期 fallback、JS 快取版本號機制）  
-**分支**：dev（自動部署至 minaedu.tw）  
-**Mobile PageSpeed**：Performance **95** ✅、Accessibility **100** ✅、Best Practices 100、SEO 100  
-**QA 健康分數**：93 / 100 ✅（6月25日 /qa 全面審計，修正 CSP GA4）
+**最後更新**：2026-07-01（關於我們補照片、部署架構釐清為 Railway、CLS 0.197 部分修正）  
+**分支**：dev（自動部署至 minaedu.tw，實際平台是 **Railway**（Railpack + Caddy），不是 Cloudflare Pages，見下方技術備忘）  
+**Mobile PageSpeed**：Performance **83–88**（今日多次量測波動，⚠️ 從 95 掉下來，CLS 0.197~0.216 未完全解決，見下方缺螺絲）、Accessibility 100、Best Practices 100、SEO 100  
+**QA 健康分數**：93 / 100 ✅（6月25日 /qa 全面審計，修正 CSP GA4，此分數尚未反映今日 PageSpeed 變化）
 
 ---
 
-## ✅ 已完成（2026-07-01 最新）
+## ✅ 已完成（2026-07-01 續，本次 session）
+
+### 關於我們頁面補照片（commit `e5b5873`）
+- 「Our Story」區塊的「教室／環境照片（待提供）」佔位框，換成真實店面外觀照片
+- `frontend/assets/images/space/店面.jpg`（1448×1086，4:3）
+
+### 部署架構釐清：Railway，不是 Cloudflare Pages（重要，改了認知）
+- 嘗試把 `/news-single.html?slug=xxx` 改成乾淨網址 `/news/xxx`，過程中發現 PROJECT_STATE.md 長期記錯部署平台
+- **實際架構**：Railway（Railpack 建置，用 Caddy 當靜態檔案伺服器），`minaedu.tw` 沒有登記在 Railway 的 domain 清單裡 → 代表 **Cloudflare 在前面擋著轉發到 Railway**，header 設定（CSP等）跟任何網址重寫規則都是在 **Cloudflare 那層設定**，跟這個 git repo 完全無關
+- `frontend/_headers`、`frontend/_redirects` 這兩個檔案（Cloudflare Pages/Netlify 慣例）對 Railway 來說**是死的，不會被讀取**——官方文件確認 Railpack 不支援這兩個檔案
+- 乾淨網址嘗試因此失敗（`_redirects` 沒作用，`/news/xxx` 被 Cloudflare 既有規則 308 導到 `/news-single` 且掉失 slug），已完整 `git revert` 撤銷（commit `3c3c8ba`、`0b50db0`），確認線上恢復正常
+- 過程中意外用 `railway domain`（不帶參數）誤建了一個多餘網域，已刪除清乾淨，不影響 minaedu.tw
+
+### CLS 0.197 → 找到根因，部分修正（commit `1ef5900`）
+- 發現：PageSpeed Performance 95→84，CLS 從 0 惡化成 0.197，`<section class="hero">` 被標為 layout shift 元凶
+- 根因：稍早（6/25 之前）加的 critical CSS 只複製了 `styles.css` 裡 `.hero-sub` / `.page-hero .ph-sub` 的第一條規則，漏了後面第二條 cascade override（line-height、max-width 不同）→ 首次繪製跟 styles.css 載入後的排版不一致 → reflow
+- 已修正 9 個頁面 critical CSS，補齊遺漏的第二條規則，確認已部署
+- **⚠️ 但重測 PageSpeed 兩次，CLS 仍是 0.216，沒有明顯改善**——用瀏覽器直接量測（`performance.getEntriesByType('layout-shift')`）在正常網速下完全沒偵測到位移，代表這個 CLS 只在 PageSpeed 模擬的手機慢速網路/CPU 節流下才會重現，工具權限不夠（CDP 節流 API 被 browse 的安全清單擋掉）沒辦法在本機複現驗證
+- 這個修正本身是對的、該做，但**還沒證實它是 CLS 唯一或主要成因**，留待下次追
+
+---
+
+## ✅ 已完成（2026-07-01）
 
 ### 首頁 FOUC 修正（commit `dd3309b`）
 - 根因：`styles.css` 用 non-blocking preload 載入，瀏覽器先畫未套樣式的 HTML 再套 CSS，進站瞬間閃一下純文字版面
@@ -124,11 +146,12 @@
 
 ## 🔧 缺螺絲（下次可以做，未強制）
 
+- **CLS 0.197~0.216 尚未證實解決**：已修正 critical CSS 遺漏的 cascade override（真的是個 bug，該修），但重測 PageSpeed 分數沒有改善。可能原因：Lighthouse 手機節流模擬本身變異度大（本次量測 CPU 模擬能力在 662~922 間跳動）、或 Cloudflare edge cache 節點間不同步、或還有沒抓到的第三個成因。下次先去 **Google Search Console → Core Web Vitals** 看真實使用者數據（比單次 Lighthouse 快照可靠），而不是一直重跑 PageSpeed
 - **Bing Webmaster Tools 提交 sitemap**：GSC + GBP 已完成，Bing/Yahoo TW 這塊還沒補（5分鐘可完成，零成本）
 - **Google 評論催收**：試聽後/續班時請家長留 Google 評論，累積到有意義數量（建議10+）後可把 `aggregateRating` schema 加回首頁 JSON-LD（現在故意沒加，因為不能虛構評分）
-- **`news-single.html?slug=xxx` 網址格式**：跟速度無關，SEO 風險已用動態 canonical 補掉，只是不夠漂亮。若要改成 `/news/xxx` 需要動 Cloudflare Pages `_redirects` 路由設定（正式環境部署設定），屬於架構層變動，先不做
-- **首頁「最新消息預覽」區塊**：目前首頁只有 nav/footer 連到 news.html，沒有文章預覽卡片，內部連結權重較弱。要加的話是新增首頁版面區塊，需要先問過再動
-- **JS 版本號機制是新建立的慣例（2026-07-01 起）**：以後改 `site.js` / `practice.js` / `news.js` / `booking.js` / `faq.js` / `components/mina-widget.js` 任何一支，切記同步 bump 該頁面 `<script src>` 的 `?v=` 版本號，否則 Cloudflare 4小時快取會讓使用者卡在舊版
+- **`news-single.html?slug=xxx` 網址格式**：跟速度無關，SEO 風險已用動態 canonical 補掉，只是不夠漂亮。**已嘗試改成 `/news/xxx` 但失敗並撤銷**（見上方「部署架構釐清」），因為部署平台是 Railway 不是 Cloudflare Pages，`_redirects` 沒用。要做的話得改 Cloudflare dashboard 的 Transform/Redirect Rules，或 Railway 自訂 Caddyfile，需要先弄清楚 Cloudflare 那層現有規則長怎樣（需要你有 Cloudflare dashboard 存取權限）
+- **首頁「最新消息預覽」區塊**：目前首頁只有 nav/footer 連到 news.html，沒有文章預覽卡片，內部連結權重較弱。要加的話是新增首頁版面區塊，需要先問過再動（今日已問過，你選擇不做）
+- **JS 版本號機制是新建立的慣例（2026-07-01 起）**：以後改 `site.js` / `practice.js` / `news.js` / `booking.js` / `faq.js` / `components/mina-widget.js` 任何一支，切記同步 bump 該頁面 `<script src>` 的 `?v=` 版本號，否則快取會讓使用者卡在舊版
 
 ---
 
@@ -161,11 +184,14 @@
 
 | 項目 | 值 |
 |------|-----|
-| 前端部署 | Cloudflare Pages，自動從 `dev` branch 部署 → `minaedu.tw` |
-| 後端部署 | `cd workers && npx wrangler deploy`（手動）→ `api.minaedu.tw` |
+| 前端部署 | **Railway**（Railpack 建置 + Caddy 靜態伺服器），`RAILPACK_SPA_OUTPUT_DIR=frontend`，自動從 `dev` branch 部署，`minaedu.tw` 沒登記在 Railway domain 清單裡 → Cloudflare 在前面轉發（見上方「部署架構釐清」）⚠️ 之前這裡誤寫 Cloudflare Pages，2026-07-01 已更正 |
+| 前端專案 | Railway workspace `hua19911027-code's Projects`，project `vivacious-education`，service `mina-website-edu`（同 project 下還有 `n8n`、`mina-community-edu`、`Postgres`） |
+| Railway CLI | `railway login --browserless`（WSL 沒有 GUI，用 device-code 流程，在自己電腦瀏覽器登入），`railway logs --build` 查建置log、`railway domain list`（⚠️ `railway domain` 不帶參數會**建立**新網域，不是列出，查詢一定要加 `list`） |
+| header/redirect 設定位置 | 在 **Cloudflare dashboard**（Transform Rules / Redirect Rules），不在這個 repo 裡；`frontend/_headers`、`frontend/_redirects` 對 Railway 無效 |
+| 後端部署 | `cd workers && npx wrangler deploy`（手動）→ `api.minaedu.tw`（Workers，跟前端是不同平台） |
 | Cloudflare Tunnel | Tunnel ID: `dd5ef701`（mina-tunnel-v2），token 模式，service: `cloudflared-mina.service` |
 | n8n | `http://localhost:5678`，公開: `https://n8n.minaedu.tw` ✅ |
 | n8n | `http://localhost:5678`，JWT key 在 memory `reference_n8n_api.md` |
 | n8n flows | A1~D2 命名，詳見 memory/reference_n8n_api.md |
-| PageSpeed URL | `https://pagespeed.web.dev/?url=https://mina-website-edu.pages.dev` |
+| PageSpeed URL | `https://pagespeed.web.dev/?url=https://minaedu.tw`（舊的 `mina-website-edu.pages.dev` 網址已失效，2026-07-01 更正） |
 | 規格文件層級 | V1.0 → V1.1 → V2.0 → V2.0 修訂摘要（後版優先） |
