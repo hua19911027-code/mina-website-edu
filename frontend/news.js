@@ -23,6 +23,70 @@
     return str.length > max ? str.slice(0, max) + '…' : str;
   }
 
+  function stripHtml(str) {
+    if (!str) return '';
+    return str.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function setMeta(id, content) {
+    var el = document.getElementById(id);
+    if (el) el.setAttribute('content', content);
+  }
+
+  /* ── Per-article SEO: canonical, OG tags, Article + Breadcrumb JSON-LD ── */
+  function updateArticleSEO(article, slug) {
+    var url = 'https://minaedu.tw/news-single.html?slug=' + encodeURIComponent(slug);
+    var desc = truncate(stripHtml(article.excerpt || article.content || ''), 120);
+    var image = article.coverImage || 'https://minaedu.tw/assets/og-cover.jpg';
+
+    var canonical = document.getElementById('canonical-link');
+    if (canonical) canonical.setAttribute('href', url);
+    setMeta('meta-description', desc);
+    setMeta('og-title', article.title + ' | 卓越國際文理');
+    setMeta('og-description', desc);
+    setMeta('og-url', url);
+    setMeta('og-image', image);
+
+    var ld = document.createElement('script');
+    ld.type = 'application/ld+json';
+    ld.id = 'article-jsonld';
+    ld.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'NewsArticle',
+      'headline': article.title,
+      'description': desc,
+      'image': [image],
+      'datePublished': article.publishedAt,
+      'dateModified': article.updatedAt || article.publishedAt,
+      'author': { '@type': 'Organization', 'name': '臺中市私立卓越國際文理短期補習班' },
+      'publisher': {
+        '@type': 'Organization',
+        'name': '臺中市私立卓越國際文理短期補習班',
+        'logo': { '@type': 'ImageObject', 'url': 'https://minaedu.tw/assets/og-cover.jpg' }
+      },
+      'mainEntityOfPage': { '@type': 'WebPage', '@id': url }
+    });
+    var old = document.getElementById('article-jsonld');
+    if (old) old.remove();
+    document.head.appendChild(ld);
+
+    var bc = document.createElement('script');
+    bc.type = 'application/ld+json';
+    bc.id = 'breadcrumb-jsonld';
+    bc.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      'itemListElement': [
+        { '@type': 'ListItem', 'position': 1, 'name': '首頁', 'item': 'https://minaedu.tw/' },
+        { '@type': 'ListItem', 'position': 2, 'name': '最新消息', 'item': 'https://minaedu.tw/news.html' },
+        { '@type': 'ListItem', 'position': 3, 'name': article.title, 'item': url }
+      ]
+    });
+    var oldBc = document.getElementById('breadcrumb-jsonld');
+    if (oldBc) oldBc.remove();
+    document.head.appendChild(bc);
+  }
+
   var CAT_CLASS = { '公告': 'c-notice', '活動': 'c-event', '特別課程': 'c-course', '文章': 'c-article' };
   var CAT_EMOJI = { '公告': '📢', '活動': '☀️', '特別課程': '🔤', '文章': '📖' };
 
@@ -259,6 +323,7 @@
         if (skeleton) skeleton.style.display = 'none';
         if (body) body.style.display = 'block';
         document.title = data.data.title + ' | 卓越國際文理';
+        updateArticleSEO(data.data, slug);
       })
       .catch(function () {
         if (skeleton) skeleton.style.display = 'none';
