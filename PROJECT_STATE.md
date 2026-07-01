@@ -1,13 +1,39 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-06-25（QA 全面通過 93/100，CSP GA4 修正）  
+**最後更新**：2026-07-01（FOUC 修正、SEO 補強、題庫本週空窗期 fallback、JS 快取版本號機制）  
 **分支**：dev（自動部署至 minaedu.tw）  
 **Mobile PageSpeed**：Performance **95** ✅、Accessibility **100** ✅、Best Practices 100、SEO 100  
 **QA 健康分數**：93 / 100 ✅（6月25日 /qa 全面審計，修正 CSP GA4）
 
 ---
 
-## ✅ 已完成（2026-06-25 最新）
+## ✅ 已完成（2026-07-01 最新）
+
+### 首頁 FOUC 修正（commit `dd3309b`）
+- 根因：`styles.css` 用 non-blocking preload 載入，瀏覽器先畫未套樣式的 HTML 再套 CSS，進站瞬間閃一下純文字版面
+- 修法：9 個頁面 `<head>` 加 inline critical CSS（nav + hero/page-hero 關鍵樣式），首次繪製就是正確樣式，`styles.css` 仍維持 non-blocking 不影響效能分數
+
+### SEO / Google 收錄補強（commit `d30e325`）
+- `sitemap.xml`：14 篇最新消息文章原本完全沒有索引路徑（news.html 用 JS 動態產連結），已串 API 補進 sitemap
+- `news-single.html` + `news.js`：文章載入後動態設定 canonical / og:title / og:description / og:image，並注入 `NewsArticle` + `BreadcrumbList` JSON-LD（原本每篇文章分享出去都顯示同一組通用標題）
+- 首頁 JSON-LD：`image` 從 placehold.co 佔位圖網址改成真實 og-cover.jpg，新增 `sameAs`（LINE/FB/IG/Threads）、`logo`，`@type` 補上 `LocalBusiness`
+- 7 個子頁加入 `BreadcrumbList` JSON-LD，對應既有視覺麵包屑
+- `llms.txt` 內容原本描述另一間「數學補習班」，跟本站徐薇英文×偉智數學不符，已改寫
+- Google Search Console 驗證、Google Business Profile 認領 → 使用者已自行完成
+
+### 題庫「本週題目」空窗期 fallback（commit `6e6155f`）
+- 根因：`/api/v1/practice` 用滾動 7 天窗口篩選本週題目，月批次交界（6/23 已發布批次 → 7/03 下一批）之間有空窗，7/01 當天窗口內完全沒有任何批次，導致首頁小工具與 practice.html 都顯示「目前沒有符合條件的題目」
+- 修法：`index.html`、`practice.js` 本週題目為空時自動 fallback 到 `/practice/archive`，顯示最近一批已發布題目，附「本週新題準備中，先看看最近一批」提示；下次批次日期一到自動恢復正常，不用人工介入
+- 另外：7 月已生成的 137 筆題目 Notion「是否發布」全數勾選（透過 Notion MCP 逐筆更新，SQL COUNT 驗證 137/137 成功）
+
+### JS 快取版本號機制（commit `50c6df7`、`937fca1`）
+- 踩坑：改了 `practice.js` 內容但忘記 bump `practice.html` 裡 `?v=` 版本號，Cloudflare 4小時快取讓已抓過舊版的瀏覽器/edge 持續跑舊程式碼，導致「首頁有 fallback 但 practice.html 沒有」
+- 已修正版本號 → `?v=20260701`，並補上全站慣例：`site.js`、`components/mina-widget.js`、`booking.js`、`faq.js`、`news.js` 原本完全沒有版本號機制，9 個頁面 20 處 `<script src>` 統一補上 `?v=` query string
+- **重要**：以後改任何一支 `.js`，記得同步 bump 該頁面上對應的版本號，否則會重演這次的問題
+
+---
+
+## ✅ 已完成（2026-06-25）
 
 ### QA 全面審計（6月25日完成）
 - 9 個頁面全部通過，API 4 個端點全部正常
@@ -92,7 +118,17 @@
 
 ## 🔄 進行中
 
-（目前無進行中項目，題庫修正 2026-06-15 結案）
+（目前無進行中項目，2026-07-01 本輪 FOUC / SEO / 題庫空窗期 / JS 快取修正已全部 commit + push）
+
+---
+
+## 🔧 缺螺絲（下次可以做，未強制）
+
+- **Bing Webmaster Tools 提交 sitemap**：GSC + GBP 已完成，Bing/Yahoo TW 這塊還沒補（5分鐘可完成，零成本）
+- **Google 評論催收**：試聽後/續班時請家長留 Google 評論，累積到有意義數量（建議10+）後可把 `aggregateRating` schema 加回首頁 JSON-LD（現在故意沒加，因為不能虛構評分）
+- **`news-single.html?slug=xxx` 網址格式**：跟速度無關，SEO 風險已用動態 canonical 補掉，只是不夠漂亮。若要改成 `/news/xxx` 需要動 Cloudflare Pages `_redirects` 路由設定（正式環境部署設定），屬於架構層變動，先不做
+- **首頁「最新消息預覽」區塊**：目前首頁只有 nav/footer 連到 news.html，沒有文章預覽卡片，內部連結權重較弱。要加的話是新增首頁版面區塊，需要先問過再動
+- **JS 版本號機制是新建立的慣例（2026-07-01 起）**：以後改 `site.js` / `practice.js` / `news.js` / `booking.js` / `faq.js` / `components/mina-widget.js` 任何一支，切記同步 bump 該頁面 `<script src>` 的 `?v=` 版本號，否則 Cloudflare 4小時快取會讓使用者卡在舊版
 
 ---
 
