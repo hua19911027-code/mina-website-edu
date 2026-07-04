@@ -1,13 +1,33 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-07-01（關於我們補照片、部署架構釐清為 Railway、CLS 0.197 部分修正）  
+**最後更新**：2026-07-04（Google 評論 schema、CLS 確認已解決、`/news/xxx` 乾淨網址上線）  
 **分支**：dev（自動部署至 minaedu.tw，實際平台是 **Railway**（Railpack + Caddy），不是 Cloudflare Pages，見下方技術備忘）  
-**Mobile PageSpeed**：Performance **83–88**（今日多次量測波動，⚠️ 從 95 掉下來，CLS 0.197~0.216 未完全解決，見下方缺螺絲）、Accessibility 100、Best Practices 100、SEO 100  
-**QA 健康分數**：93 / 100 ✅（6月25日 /qa 全面審計，修正 CSP GA4，此分數尚未反映今日 PageSpeed 變化）
+**Mobile PageSpeed**：Performance **91**、CLS **0**（2026-07-04 用 PageSpeed API 連測3次確認穩定，CrUX 無真實數據可查——流量不足，Search Console 應該也顯示同樣結果。之前 0.197~0.216 確認是 Lighthouse 手機節流模擬的量測抖動，非常態）、Accessibility 100、Best Practices 100、SEO 100  
+**QA 健康分數**：93 / 100 ✅（6月25日 /qa 全面審計，修正 CSP GA4，此分數尚未反映今日變化）
 
 ---
 
-## ✅ 已完成（2026-07-01 續，本次 session）
+## ✅ 已完成（2026-07-04，本次 session）
+
+### CLS 確認已解決（非新修正，是驗證之前的修正有效）
+- 用 Google PageSpeed API（使用者提供 API key）連續查 3 次 minaedu.tw mobile，CLS 穩定為 0，效能分數 91
+- CrUX 真實數據完全沒有（流量不足），Search Console Core Web Vitals 大概率顯示「資料不足」
+- 結論：6/25 之前修正的 critical CSS cascade override（commit `1ef5900`）是有效的，之前重測分數沒改善是 Lighthouse 手機節流模擬變異度造成的假訊號
+
+### 首頁 JSON-LD 補 aggregateRating（commit `29b8b29`）
+- Google Maps 商家頁確認：4.8 星、22 則評論
+- 補進 `index.html` JSON-LD `aggregateRating`
+
+### `/news/xxx` 乾淨網址上線（commit `29b8b29`→`ffb51af`，含一次 Cloudflare 規則）
+- **Cloudflare Transform Rule**（Rewrite）：`http.request.uri.path wildcard "/news/*"` → 內部改寫路徑到 `/news-single`、query 帶 `slug=`（Free 方案不支援 regex `matches`，改用 `wildcard` + `wildcard_replace()`）
+- **`news.js`**（commit `69af49a`）：`initSinglePage()` 原本只認 `location.search` 的 `?slug=`，抓不到就 `location.replace('news.html')`——新增 `location.pathname` 解析 fallback（`/news/:slug` 格式）
+- **`news-single.html`**（commit `ffb51af`）：加 `<base href="/">`——原本 nav/logo/CSS/JS 全部用相對路徑，瀏覽器在 `/news/xxx` 這種網址下會把 `news/` 誤判成目錄，資源全部 404（MIME type 被瀏覽器擋掉，script 完全沒執行）
+- **驗證**：3 篇不同文章的乾淨網址 + 舊格式 `news-single.html?slug=xxx` + 假 slug（優雅顯示 404 區塊，非新問題）+ `/news.html` 列表頁 + 首頁，全部無 console error、內容正確
+- ⚠️ **canonical/og:url 尚未更新**：`news.js` 的 `updateArticleSEO()` 目前仍固定產生 `news-single.html?slug=` 格式的 canonical，沒有改成新的 `/news/:slug`——兩種網址格式現在都能用，但 SEO 角度建議之後統一導向乾淨網址當 canonical，避免重複內容疑慮（未強制，下次可做）
+
+---
+
+## ✅ 已完成（2026-07-01 續）
 
 ### 關於我們頁面補照片（commit `e5b5873`）
 - 「Our Story」區塊的「教室／環境照片（待提供）」佔位框，換成真實店面外觀照片
