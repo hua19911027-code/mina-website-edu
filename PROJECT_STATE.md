@@ -23,7 +23,8 @@
 - **`news.js`**（commit `69af49a`）：`initSinglePage()` 原本只認 `location.search` 的 `?slug=`，抓不到就 `location.replace('news.html')`——新增 `location.pathname` 解析 fallback（`/news/:slug` 格式）
 - **`news-single.html`**（commit `ffb51af`）：加 `<base href="/">`——原本 nav/logo/CSS/JS 全部用相對路徑，瀏覽器在 `/news/xxx` 這種網址下會把 `news/` 誤判成目錄，資源全部 404（MIME type 被瀏覽器擋掉，script 完全沒執行）
 - **驗證**：3 篇不同文章的乾淨網址 + 舊格式 `news-single.html?slug=xxx` + 假 slug（優雅顯示 404 區塊，非新問題）+ `/news.html` 列表頁 + 首頁，全部無 console error、內容正確
-- ⚠️ **canonical/og:url 尚未更新**：`news.js` 的 `updateArticleSEO()` 目前仍固定產生 `news-single.html?slug=` 格式的 canonical，沒有改成新的 `/news/:slug`——兩種網址格式現在都能用，但 SEO 角度建議之後統一導向乾淨網址當 canonical，避免重複內容疑慮（未強制，下次可做）
+- **canonical/og:url 已統一（commit `e0c4f7f`）**：`updateArticleSEO()` 改成永遠產生 `/news/:slug` 格式，不管訪客從舊格式還是新格式進來，canonical 都指向同一個乾淨網址，避免重複內容疑慮。已驗證兩種進入方式皆正確。
+- 相關文章卡片／列表頁連結目前仍連到舊格式（`news-single.html?slug=`）——不影響正確性（canonical 已統一），純粹是還沒順手改成新格式連結，之後可做
 
 ---
 
