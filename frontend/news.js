@@ -256,6 +256,10 @@
   /* ── Single article page ── */
   function initSinglePage() {
     var slug = new URLSearchParams(window.location.search).get('slug');
+    if (!slug) {
+      var m = window.location.pathname.match(/^\/news\/([^\/]+)\/?$/);
+      if (m) slug = decodeURIComponent(m[1]);
+    }
     if (!slug) { window.location.replace('news.html'); return; }
     initShareButtons();
     loadArticle(slug);
