@@ -35,7 +35,7 @@
 
   /* ── Per-article SEO: canonical, OG tags, Article + Breadcrumb JSON-LD ── */
   function updateArticleSEO(article, slug) {
-    var url = 'https://minaedu.tw/news-single.html?slug=' + encodeURIComponent(slug);
+    var url = 'https://minaedu.tw/news/' + encodeURIComponent(slug);
     var desc = truncate(stripHtml(article.excerpt || article.content || ''), 120);
     var image = article.coverImage || 'https://minaedu.tw/assets/og-cover.jpg';
 
