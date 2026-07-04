@@ -93,7 +93,7 @@
   /* ── Article Card Factory — matches .ncard prototype structure ── */
   function buildCard(article) {
     var a = document.createElement('a');
-    a.href = 'news-single.html?slug=' + encodeURIComponent(article.slug);
+    a.href = '/news/' + encodeURIComponent(article.slug);
     a.className = 'ncard reveal';
 
     var catCls = CAT_CLASS[article.category] || '';
