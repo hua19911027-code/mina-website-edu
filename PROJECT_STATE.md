@@ -1,13 +1,25 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-07-04（Google 評論 schema、CLS 確認已解決、`/news/xxx` 乾淨網址上線）  
+**最後更新**：2026-07-07（115學年度出版社設定更新）  
 **分支**：dev（自動部署至 minaedu.tw，實際平台是 **Railway**（Railpack + Caddy），不是 Cloudflare Pages，見下方技術備忘）  
 **Mobile PageSpeed**：Performance **91**、CLS **0**（2026-07-04 用 PageSpeed API 連測3次確認穩定，CrUX 無真實數據可查——流量不足，Search Console 應該也顯示同樣結果。之前 0.197~0.216 確認是 Lighthouse 手機節流模擬的量測抖動，非常態）、Accessibility 100、Best Practices 100、SEO 100  
 **QA 健康分數**：93 / 100 ✅（6月25日 /qa 全面審計，修正 CSP GA4，此分數尚未反映今日變化）
 
 ---
 
-## ✅ 已完成（2026-07-04，本次 session）
+## ✅ 已完成（2026-07-07，本次 session）
+
+### 115 學年度出版社設定更新（n8n workflow，非 repo commit）
+- 使用者提供旭光國小 115 學年度教科書選用表，8/1 起新學年生效
+- **重要發現**：規格文件（`Mina_題庫系統_封板規格_V2.0.md` 第12節）描述的「Admin Panel 上傳教科書照片 → AI Vision 分析 → 寫入 Notion『出題規範』DB → 出題時讀取」機制**沒有真的接上**——那個 DB 有寫入但沒有東西讀取。實際出題邏輯是 n8n workflow `AI-自動出題（每月15日）`（ID `IpxBWR3Nbg2z798v`）「建立出題任務清單」code 節點裡**寫死**的 JS 出版社對照物件
+- 已透過 n8n API 直接更新該節點，換成 115 學年度版本（數學：小一翰林/小二康軒/小三康軒/小四康軒/小五康軒/小六康軒；英文：小三何嘉仁SuperFun/小四康軒WW/小五康軒WW/小六何嘉仁SuperFun，小一小二英文沿用康軒WW）
+- **時間壓力已排除**：此 workflow 7/15 09:00 會出「8月份」的題（115學年度第一批），已在期限前改完並驗證 workflow 仍是 active 狀態
+- 詳細新舊對照與決策脈絡記錄在 `memory/decisions.md`
+- **缺螺絲**：明年（116學年度）一樣要手動改這個 code 節點；Admin Panel 出版社上傳功能目前是斷頭路，要接上需額外開發（讀取出題規範DB、改 prompt 組裝邏輯），這次先跳過
+
+---
+
+## ✅ 已完成（2026-07-04）
 
 ### CLS 確認已解決（非新修正，是驗證之前的修正有效）
 - 用 Google PageSpeed API（使用者提供 API key）連續查 3 次 minaedu.tw mobile，CLS 穩定為 0，效能分數 91
@@ -24,7 +36,7 @@
 - **`news-single.html`**（commit `ffb51af`）：加 `<base href="/">`——原本 nav/logo/CSS/JS 全部用相對路徑，瀏覽器在 `/news/xxx` 這種網址下會把 `news/` 誤判成目錄，資源全部 404（MIME type 被瀏覽器擋掉，script 完全沒執行）
 - **驗證**：3 篇不同文章的乾淨網址 + 舊格式 `news-single.html?slug=xxx` + 假 slug（優雅顯示 404 區塊，非新問題）+ `/news.html` 列表頁 + 首頁，全部無 console error、內容正確
 - **canonical/og:url 已統一（commit `e0c4f7f`）**：`updateArticleSEO()` 改成永遠產生 `/news/:slug` 格式，不管訪客從舊格式還是新格式進來，canonical 都指向同一個乾淨網址，避免重複內容疑慮。已驗證兩種進入方式皆正確。
-- 相關文章卡片／列表頁連結目前仍連到舊格式（`news-single.html?slug=`）——不影響正確性（canonical 已統一），純粹是還沒順手改成新格式連結，之後可做
+- **文章卡片連結統一改乾淨網址（commit `1b78065`）**：`news.html` 列表頁、`news-single.html` 相關文章卡片，連結格式從 `news-single.html?slug=` 改成 `/news/:slug`，全站內部連結格式一致
 
 ---
 
