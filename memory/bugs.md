@@ -53,3 +53,12 @@
 **如何避免（給未來寫文章的人）：**
 - 影片、圖片內文請直接寫在 Notion 頁面「內文」區塊裡（用 Notion 原生影片/圖片區塊插入），不要只寫在「內容摘要」屬性——那個欄位只用於列表卡片摘要與 SEO description，不會顯示在文章內頁。
 - 「活動照片」屬性只放圖片檔案；影片請用頁面內文的影片區塊插入。
+
+**後續（同日）：改放頁面內文區塊後影片仍無法播放，影響文章：**
+`2026-summer-camp-scallion-pancake`、`2026-childrens-day-happy-learning`、`2026-bug-awakening-super-sentai-part1`、`2026-bug-awakening-super-sentai-part2`
+
+**真正根本原因：** `frontend/_headers` 的 CSP 沒有設定 `media-src`，瀏覽器會 fallback 用 `default-src 'self'`，導致所有跨網域（Notion 的 S3 檔案網址 `prod-files-secure.s3.us-west-2.amazonaws.com`）的 `<video>` 一律被瀏覽器靜默擋下（不會顯示任何錯誤訊息，只是播不出來）。`img-src` 當初有明確開 `https:`，所以圖片一直沒事，但沒人幫 `media-src` 開一樣的權限。直接 curl 該簽名網址回應 200 + `video/mp4`，證實檔案本身沒壞，純粹是 CSP 擋下。
+
+**解法：** `frontend/_headers` CSP 新增 `media-src 'self' https:;`（比照 `img-src` 的作法）。
+
+**如何避免：** 之後如果 CSP 要新增可外部載入的資源類型（字型、影片、iframe...），要記得同時確認對應的 `*-src` 指令有開，不能只靠 `default-src` 兜底——沒明確設定的資源類型全部會退回 `default-src 'self'`，跨網域資源會被靜默擋下且不易察覺。
