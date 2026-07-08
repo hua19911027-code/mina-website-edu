@@ -153,6 +153,13 @@ function blockToHtml(block: any): string {
       return `<figure><img src="${url}" alt="${caption || '圖片'}" loading="lazy"/>${caption ? `<figcaption>${caption}</figcaption>` : ''}</figure>`;
     }
 
+    case 'video': {
+      const url = (data.type === 'external' ? data.external?.url : data.file?.url) as string | undefined;
+      if (!url) return '';
+      const caption = richTextToHtml(data.caption ?? []);
+      return `<figure><video src="${url}" controls preload="metadata"></video>${caption ? `<figcaption>${caption}</figcaption>` : ''}</figure>`;
+    }
+
     case 'toggle':
       return `<p>${richTextToHtml(data.rich_text)}</p>`;
 
@@ -174,7 +181,6 @@ function blockToHtml(block: any): string {
     case 'table_of_contents':
     case 'equation':
     case 'pdf':
-    case 'video':
     case 'audio':
     case 'file':
     case 'link_to_page':

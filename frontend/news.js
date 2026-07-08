@@ -10,6 +10,11 @@
   var hasMore = false;
 
   /* ── Helpers ── */
+  function isVideoUrl(url) {
+    var path = (url || '').split('?')[0];
+    return /\.(mp4|mov|webm|m4v|avi)$/i.test(path);
+  }
+
   function formatDate(iso) {
     if (!iso) return '';
     var d = new Date(iso);
@@ -26,6 +31,21 @@
   function stripHtml(str) {
     if (!str) return '';
     return str.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function textToParagraphs(str) {
+    return (str || '')
+      .split(/\n+/)
+      .map(function (line) { return line.trim(); })
+      .filter(Boolean)
+      .map(function (line) { return '<p>' + escapeHtml(line) + '</p>'; })
+      .join('');
   }
 
   function setMeta(id, content) {
@@ -371,7 +391,7 @@
     var body = document.getElementById('article-body');
     if (skeleton) skeleton.style.display = 'none';
     if (body) { body.style.display = 'block'; body.classList.add('in'); }
-    if (contentEl) contentEl.innerHTML = article.content || '';
+    if (contentEl) contentEl.innerHTML = article.content || textToParagraphs(article.excerpt);
 
     /* Carousel — show whenever photos are present, regardless of category */
     if (article.photos && article.photos.length >= 1) {
@@ -401,11 +421,20 @@
     items.forEach(function (url, i) {
       var slide = document.createElement('div');
       slide.className = 'carousel-slide' + (i === 0 ? ' on' : '');
-      var img = document.createElement('img');
-      img.src = url;
-      img.alt = articleTitle + ' 活動照片 ' + (i + 1);
-      img.loading = 'lazy';
-      slide.appendChild(img);
+      if (isVideoUrl(url)) {
+        var video = document.createElement('video');
+        video.src = url;
+        video.controls = true;
+        video.preload = 'metadata';
+        video.setAttribute('aria-label', articleTitle + ' 活動影片 ' + (i + 1));
+        slide.appendChild(video);
+      } else {
+        var img = document.createElement('img');
+        img.src = url;
+        img.alt = articleTitle + ' 活動照片 ' + (i + 1);
+        img.loading = 'lazy';
+        slide.appendChild(img);
+      }
       track.appendChild(slide);
 
       if (items.length > 1 && items.length <= 10 && dotsEl) {

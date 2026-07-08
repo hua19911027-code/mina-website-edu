@@ -586,7 +586,7 @@ a.camp-link:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,0
 .carousel-track{position:relative;aspect-ratio:4/3;}
 .carousel-slide{position:absolute;inset:0;opacity:0;transition:opacity .3s ease;display:flex;align-items:center;justify-content:center;}
 .carousel-slide.on{opacity:1;}
-.carousel-slide img{width:100%;height:100%;object-fit:cover;}
+.carousel-slide img,.carousel-slide video{width:100%;height:100%;object-fit:cover;}
 .carousel-slide .ph-slide{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;font-weight:700;font-size:15px;}
 .carousel-slide .ph-slide .pi{font-size:54px;}
 .carousel-slide:nth-child(4n+1) .ph-slide{background:linear-gradient(150deg,#FF9A3D,#EE7700);}
