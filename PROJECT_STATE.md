@@ -1,9 +1,30 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-07-07（115學年度出版社設定更新）  
-**分支**：dev（自動部署至 minaedu.tw，實際平台是 **Railway**（Railpack + Caddy），不是 Cloudflare Pages，見下方技術備忘）  
+**最後更新**：2026-07-12（部署平台確認更正：是 Cloudflare Pages，不是 Railway）  
+**分支**：dev（自動部署至 minaedu.tw，**實際平台是 Cloudflare Pages**，見下方技術備忘——2026-07-01 那次「更正為 Railway」的結論是錯的，2026-07-12 用 `wrangler pages project list` 拿到權威證據推翻）  
 **Mobile PageSpeed**：Performance **91**、CLS **0**（2026-07-04 用 PageSpeed API 連測3次確認穩定，CrUX 無真實數據可查——流量不足，Search Console 應該也顯示同樣結果。之前 0.197~0.216 確認是 Lighthouse 手機節流模擬的量測抖動，非常態）、Accessibility 100、Best Practices 100、SEO 100  
 **QA 健康分數**：93 / 100 ✅（6月25日 /qa 全面審計，修正 CSP GA4，此分數尚未反映今日變化）
+
+---
+
+## ✅ 已完成（2026-07-12）
+
+### 部署架構二次釐清：是 Cloudflare Pages，2026-07-01 那次更正是錯的
+- **`npx wrangler pages project list` 權威證據**：Cloudflare Pages 專案 `mina-website-edu` 的 Project Domains 欄位就是 `mina-website-edu.pages.dev, minaedu.tw, www.minaedu.tw`——自訂網域直接綁定在 Pages 專案上，不是 Cloudflare 轉發到別的地方。同時 `railway status` 查到 Railway 上的 `mina-website-edu` 服務是 **Failed**（trial 到期，跟 `mina-community-edu` 那次同一個帳號層級的停機事故），但網站完全正常運作——證明 Railway 那個服務根本不在流量路徑上，是沒人在用的殘留服務
+- **`frontend/_headers` 對 Cloudflare Pages 是有效的**：直接 curl 正式站，CSP header 字串跟 repo 裡 `_headers` 檔案內容逐字相同——2026-07-01 判斷「_headers 是死的」也是錯的
+- **好用的 wrangler 指令**：`npx wrangler pages deployment list --project-name=mina-website-edu`（查部署歷史/build 狀態，含對應 git commit hash）、`npx wrangler pages deploy frontend --project-name=mina-website-edu --branch=dev --commit-dirty=true`（繞過 GitHub 整合直接部署，本次遇到一次 GitHub 觸發的 build Failure，用這個指令幾秒內繞過去生效，不用等重新觸發或查失敗原因）
+- Wrangler 已有可用的 OAuth session（`npx wrangler whoami`，帳號 hua19911027@gmail.com，scope 含 `pages (write)`）——之後任何 Cloudflare Pages/Workers 操作都可以直接用 wrangler CLI，不需要進 Cloudflare 儀表板（儀表板本身有機器人偵測會擋自動化瀏覽器）
+
+### 社群連結修正（FB/IG/Threads + 新增 YT/TikTok）
+- 6 個頁面（index/news/news-single/about/faq/booking）的社群列統一補上 YouTube、TikTok 圖示，沿用既有 `.soc` 樣式；首頁 JSON-LD `sameAs` 同步更新
+- FB/IG/Threads 帳號依 manko 指示修正三輪，最終定案：FB `profile.php?id=61558577002869`、IG `instagram.com/minaedu.tw/`、Threads `@minaedu.tw`；YouTube 最終改用頻道 ID 網址 `youtube.com/channel/UCYRS9Q-6a4bJQ3dee-FV9Pw`（原本用頻道名稱網址）
+
+### 首頁題庫練習小工具三個問題修復
+- **選項預設不顯示**：首頁 `hp-qcard` 小工具把選項（`.q-opts`）放在 `<details>` 展開內容裡，要點開才看得到；`practice.js` 的 `appendCard()` 是把選項放在 `<summary>` 裡本來就會顯示，只有詳解才需要點開。已改成跟 `practice.js` 結構一致
+- **卡片尺寸/數字位置跟題庫練習頁不一樣**：首頁本地複製的 CSS 少了 `.qcard summary{align-items:flex-start!important;}`、`.q-sum-body`、`.q-title` 三條規則，`.q-opts` 的 margin 也對不上，導致排版跟 `practice.js` 算出來的不一致。已補齊三條規則、統一 margin，`renderQ()` 的 HTML 也改用同樣的 class
+- **⚠️ 這次修復差點被靜默吃掉**：第一次修完卡片尺寸的那個 commit（`954e15b`）push 後，Cloudflare Pages 的 GitHub 自動 build **失敗**（`npx wrangler pages deployment list` 查到 Status: Failure），導致正式站一直停在上一版，manko 反映「修完還是小的」其實是真的沒部署上去，不是修法錯誤。用 `npx wrangler pages deploy frontend --project-name=mina-website-edu --branch=dev --commit-dirty=true` 直接繞過去部署成功，重新推的下一個 commit（`6391e3a`）GitHub 自動 build 又恢復正常（推測是單次暫時性問題，非持續故障）——**以後改完前端如果 manko 反映「沒生效」，先查 `wrangler pages deployment list` 有沒有 Failure，不要預設是程式碼問題**
+- **題型標籤（觀念拆解/錯題診斷/標準題型）字太小**：`.q-meta` 從 12px/500 改成 14px/700，`practice.js` 跟首頁本地複製同步調整
+- 全部修復皆用 `/browse` 離線注入假資料渲染桌面版（1280px）+ 手機版（390px）跟 `practice.html` 真實 `appendCard()` 輸出並排比對驗證，確認像素級一致後才 push
 
 ---
 
@@ -46,12 +67,8 @@
 - 「Our Story」區塊的「教室／環境照片（待提供）」佔位框，換成真實店面外觀照片
 - `frontend/assets/images/space/店面.jpg`（1448×1086，4:3）
 
-### 部署架構釐清：Railway，不是 Cloudflare Pages（重要，改了認知）
-- 嘗試把 `/news-single.html?slug=xxx` 改成乾淨網址 `/news/xxx`，過程中發現 PROJECT_STATE.md 長期記錯部署平台
-- **實際架構**：Railway（Railpack 建置，用 Caddy 當靜態檔案伺服器），`minaedu.tw` 沒有登記在 Railway 的 domain 清單裡 → 代表 **Cloudflare 在前面擋著轉發到 Railway**，header 設定（CSP等）跟任何網址重寫規則都是在 **Cloudflare 那層設定**，跟這個 git repo 完全無關
-- `frontend/_headers`、`frontend/_redirects` 這兩個檔案（Cloudflare Pages/Netlify 慣例）對 Railway 來說**是死的，不會被讀取**——官方文件確認 Railpack 不支援這兩個檔案
-- 乾淨網址嘗試因此失敗（`_redirects` 沒作用，`/news/xxx` 被 Cloudflare 既有規則 308 導到 `/news-single` 且掉失 slug），已完整 `git revert` 撤銷（commit `3c3c8ba`、`0b50db0`），確認線上恢復正常
-- 過程中意外用 `railway domain`（不帶參數）誤建了一個多餘網域，已刪除清乾淨，不影響 minaedu.tw
+### 舊「部署架構釐清」結論已知有誤，見 2026-07-12 最新更正
+2026-07-01 這裡原本判斷是 Railway，理由是「`railway domain list` 沒看到 minaedu.tw」——這個推論本身有漏洞，只證明「Railway 不知道這個網域」，不能反推「所以是 Cloudflare 轉發到 Railway」。**2026-07-12 用權威證據推翻，正確結論是 Cloudflare Pages，完整記錄見本文件最上方「✅ 已完成（2026-07-12）」區塊**，以下原文保留僅供歷史對照：嘗試把 `/news-single.html?slug=xxx` 改成乾淨網址 `/news/xxx`，過程中發現 PROJECT_STATE.md 長期記錯部署平台。~~實際架構：Railway（Railpack 建置，用 Caddy 當靜態檔案伺服器），`minaedu.tw` 沒有登記在 Railway 的 domain 清單裡 → 代表 Cloudflare 在前面擋著轉發到 Railway，header 設定（CSP等）跟任何網址重寫規則都是在 Cloudflare 那層設定，跟這個 git repo 完全無關。`frontend/_headers`、`frontend/_redirects` 這兩個檔案（Cloudflare Pages/Netlify 慣例）對 Railway 來說是死的，不會被讀取——官方文件確認 Railpack 不支援這兩個檔案。~~ 乾淨網址嘗試因此失敗（`_redirects` 沒作用，`/news/xxx` 被 Cloudflare 既有規則 308 導到 `/news-single` 且掉失 slug），已完整 `git revert` 撤銷（commit `3c3c8ba`、`0b50db0`），確認線上恢復正常。過程中意外用 `railway domain`（不帶參數）誤建了一個多餘網域，已刪除清乾淨，不影響 minaedu.tw
 
 ### CLS 0.197 → 找到根因，部分修正（commit `1ef5900`）
 - 發現：PageSpeed Performance 95→84，CLS 從 0 惡化成 0.197，`<section class="hero">` 被標為 layout shift 元凶
@@ -217,7 +234,7 @@
 
 | 項目 | 值 |
 |------|-----|
-| 前端部署 | **Railway**（Railpack 建置 + Caddy 靜態伺服器），`RAILPACK_SPA_OUTPUT_DIR=frontend`，自動從 `dev` branch 部署，`minaedu.tw` 沒登記在 Railway domain 清單裡 → Cloudflare 在前面轉發（見上方「部署架構釐清」）⚠️ 之前這裡誤寫 Cloudflare Pages，2026-07-01 已更正 |
+| 前端部署 | **Cloudflare Pages**（專案 `mina-website-edu`，自訂網域 `minaedu.tw`/`www.minaedu.tw` 直接綁定），自動從 `dev` branch 部署，`frontend/` 目錄整包當靜態內容（無 build 步驟）。管理指令：`npx wrangler pages deployment list --project-name=mina-website-edu`（查歷史/build 狀態）、`npx wrangler pages deploy frontend --project-name=mina-website-edu --branch=dev --commit-dirty=true`（繞過 GitHub 整合直接部署，build 失敗時的備援）。Railway 上同名的 `mina-website-edu` 服務是沒人在用的殘留品，2026-07-12 確認狀態 Failed 但完全不影響網站，**不要浪費時間去查 Railway 那邊**。⚠️ 2026-07-01 曾誤更正成 Railway，2026-07-12 用 `wrangler pages project list` 權威證據推翻，見上方「部署架構二次釐清」 |
 | 前端專案 | Railway workspace `hua19911027-code's Projects`，project `vivacious-education`，service `mina-website-edu`（同 project 下還有 `n8n`、`mina-community-edu`、`Postgres`） |
 | Railway CLI | `railway login --browserless`（WSL 沒有 GUI，用 device-code 流程，在自己電腦瀏覽器登入），`railway logs --build` 查建置log、`railway domain list`（⚠️ `railway domain` 不帶參數會**建立**新網域，不是列出，查詢一定要加 `list`） |
 | header/redirect 設定位置 | 在 **Cloudflare dashboard**（Transform Rules / Redirect Rules），不在這個 repo 裡；`frontend/_headers`、`frontend/_redirects` 對 Railway 無效 |
