@@ -138,8 +138,11 @@ h1.hero-h .hl{background:var(--yellow);color:var(--ink);padding:0 10px;border-ra
 .hp-btn.active{background:var(--pink,#E8007D);color:#fff;border-color:var(--pink,#E8007D);}
 .hp-btn:hover:not(.active){border-color:var(--pink,#E8007D);color:var(--pink,#E8007D);}
 /* q-opt (needed since practice.js not loaded here) */
+.qcard summary{align-items:flex-start!important;}
+.q-sum-body{flex:1;display:flex;flex-direction:column;gap:4px;}
 .q-meta{font-size:12px;color:var(--pink,#E8007D);font-weight:500;}
-.q-opts{display:flex;flex-direction:column;gap:5px;margin:12px 0 4px;}
+.q-title{font-size:16px;font-weight:700;margin:4px 0 8px;}
+.q-opts{display:flex;flex-direction:column;gap:5px;margin-top:4px;}
 .q-opt{display:flex;align-items:center;gap:10px;padding:7px 14px;border-radius:10px;border:1.5px solid var(--pink-soft,#FFE3F1);background:var(--bg-2,#FFF6FB);font-size:14px;}
 .q-opt-lbl{font-weight:700;min-width:18px;color:#bbb;}
 .q-correct-tag{display:none;}
@@ -416,7 +419,7 @@ h1.hero-h .hl{background:var(--yellow);color:var(--ink);padding:0 10px;border-ra
     var ai=LBL.indexOf(q.answer), av=(q.options&&ai>=0)?q.options[ai]:'';
     var exp=q.explanation||{};if(typeof exp==='string')exp={concept:exp};
     wrap.innerHTML='<details class="qcard" style="max-width:760px;margin:0 auto">'
-      +'<summary><span class="qnum">1</span><div style="flex:1"><span class="q-meta">'+esc(q.type||'標準題型')+'</span><br>'+esc(q.question)+'<div class="q-opts">'+opts+'</div></div><span class="plus">+</span></summary>'
+      +'<summary><span class="qnum">1</span><div class="q-sum-body"><span class="q-meta">'+esc(q.type||'標準題型')+'</span><span class="q-title">'+esc(q.question)+'</span><div class="q-opts">'+opts+'</div></div><span class="plus">+</span></summary>'
       +'<div style="padding:0 24px 20px">'
       +'<div class="qbody"><div class="qseg ok"><span class="st">&#10003; 正確觀念</span>'
       +'<div class="q-ans-inline"><span class="q-ans-badge">'+esc(q.answer)+'</span><span class="q-ans-val">'+esc(av)+'</span></div>'
