@@ -287,7 +287,7 @@ h1.hero-h .hl{background:var(--yellow);color:var(--ink);padding:0 10px;border-ra
             <button class="hp-btn hp-subj" data-subj="數學">數學</button>
           </div>
         </div>
-        <div class="qcards" id="hp-qcard"></div>
+        <div id="hp-qcard"></div>
         <p class="practice-note">看更多請到 <b><a href="practice.html" style="color:var(--pink);border-bottom:2px solid var(--pink);">完整題庫練習 →</a></b></p>
       </div>
     </div>
@@ -418,7 +418,7 @@ h1.hero-h .hl{background:var(--yellow);color:var(--ink);padding:0 10px;border-ra
     }).join('');
     var ai=LBL.indexOf(q.answer), av=(q.options&&ai>=0)?q.options[ai]:'';
     var exp=q.explanation||{};if(typeof exp==='string')exp={concept:exp};
-    wrap.innerHTML='<details class="qcard" style="max-width:760px;margin:0 auto">'
+    wrap.innerHTML='<details class="qcard">'
       +'<summary><span class="qnum">1</span><div class="q-sum-body"><span class="q-meta">'+esc(q.type||'標準題型')+'</span><span class="q-title">'+esc(q.question)+'</span><div class="q-opts">'+opts+'</div></div><span class="plus">+</span></summary>'
       +'<div style="padding:0 24px 20px">'
       +'<div class="qbody"><div class="qseg ok"><span class="st">&#10003; 正確觀念</span>'
