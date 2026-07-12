@@ -416,8 +416,8 @@ h1.hero-h .hl{background:var(--yellow);color:var(--ink);padding:0 10px;border-ra
     var ai=LBL.indexOf(q.answer), av=(q.options&&ai>=0)?q.options[ai]:'';
     var exp=q.explanation||{};if(typeof exp==='string')exp={concept:exp};
     wrap.innerHTML='<details class="qcard" style="max-width:760px;margin:0 auto">'
-      +'<summary><span class="qnum">1</span><span style="flex:1"><span class="q-meta">'+esc(q.type||'標準題型')+'</span><br>'+esc(q.question)+'</span><span class="plus">+</span></summary>'
-      +'<div style="padding:0 24px 20px"><div class="q-opts">'+opts+'</div>'
+      +'<summary><span class="qnum">1</span><div style="flex:1"><span class="q-meta">'+esc(q.type||'標準題型')+'</span><br>'+esc(q.question)+'<div class="q-opts">'+opts+'</div></div><span class="plus">+</span></summary>'
+      +'<div style="padding:0 24px 20px">'
       +'<div class="qbody"><div class="qseg ok"><span class="st">&#10003; 正確觀念</span>'
       +'<div class="q-ans-inline"><span class="q-ans-badge">'+esc(q.answer)+'</span><span class="q-ans-val">'+esc(av)+'</span></div>'
       +(exp.concept?'<span class="sx">'+esc(exp.concept)+'</span>':'')
