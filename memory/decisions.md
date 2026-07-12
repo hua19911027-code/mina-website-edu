@@ -1,5 +1,17 @@
 # 技術決策紀錄
 
+## 2026-07-12 — 記錄：「乾淨網址」/news/:slug 的轉址規則不在這個 repo 裡
+
+**背景：** 調查桌面 PWA 打開最新消息內頁解崩的 bug（見 `memory/bugs.md` 同日條目）時發現，`/news/:slug` 這種乾淨網址能正確顯示 `news-single.html` 的內容，靠的是一條 **Cloudflare 儀表板端的 Transform/Redirect Rule**（commit `69af49a` message 提到「搭配 Cloudflare rewrite」），這條規則本身完全沒有寫進這個 repo 的任何檔案，只存在 Cloudflare 帳號設定裡。
+
+**決策：** 暫不把規則內容抄寫進 repo（沒有實際存取 Cloudflare 儀表板核對確切規則內容，不確定就不亂寫，避免文件跟現況兜不起來）。先記錄「這個依賴存在」這件事，讓下一次有人查這一區塊的 bug 時，知道要同時去 Cloudflare 儀表板核對，而不是只看程式碼就以為看到全貌。
+
+**待辦（manko 有空進 Cloudflare 儀表板時）：** 把 `/news/:slug` 對應的實際 Transform Rule（比對條件、rewrite 目標）截圖或抄錄下來，補進這份文件，讓這條規則不再是「只有 Cloudflare 帳號知道」的隱性依賴。
+
+**Why：** `news-single.html` 是這個 repo 目前變動最頻繁的檔案（一個月內改了 5 次以上，含一次 revert），任何依賴 dashboard 設定卻沒有記錄下來的部分，都會讓未來的除錯變成憑空猜測，跟這次調查耗掉的時間一樣。
+
+---
+
 ## 2026-07-07 — 出版社設定更新為 115 學年度（旭光國小）
 
 **決策：** 直接修改 n8n workflow `AI-自動出題（每月15日）`（ID `IpxBWR3Nbg2z798v`）「建立出題任務清單」code 節點裡寫死的出版社對照物件，改成 115 學年度版本，不走 Admin Panel 上傳 AI 分析那條路。
