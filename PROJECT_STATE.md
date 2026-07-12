@@ -24,7 +24,9 @@
 - **卡片尺寸/數字位置跟題庫練習頁不一樣**：首頁本地複製的 CSS 少了 `.qcard summary{align-items:flex-start!important;}`、`.q-sum-body`、`.q-title` 三條規則，`.q-opts` 的 margin 也對不上，導致排版跟 `practice.js` 算出來的不一致。已補齊三條規則、統一 margin，`renderQ()` 的 HTML 也改用同樣的 class
 - **⚠️ 這次修復差點被靜默吃掉**：第一次修完卡片尺寸的那個 commit（`954e15b`）push 後，Cloudflare Pages 的 GitHub 自動 build **失敗**（`npx wrangler pages deployment list` 查到 Status: Failure），導致正式站一直停在上一版，manko 反映「修完還是小的」其實是真的沒部署上去，不是修法錯誤。用 `npx wrangler pages deploy frontend --project-name=mina-website-edu --branch=dev --commit-dirty=true` 直接繞過去部署成功，重新推的下一個 commit（`6391e3a`）GitHub 自動 build 又恢復正常（推測是單次暫時性問題，非持續故障）——**以後改完前端如果 manko 反映「沒生效」，先查 `wrangler pages deployment list` 有沒有 Failure，不要預設是程式碼問題**
 - **題型標籤（觀念拆解/錯題診斷/標準題型）字太小**：`.q-meta` 從 12px/500 改成 14px/700，`practice.js` 跟首頁本地複製同步調整
-- 全部修復皆用 `/browse` 離線注入假資料渲染桌面版（1280px）+ 手機版（390px）跟 `practice.html` 真實 `appendCard()` 輸出並排比對驗證，確認像素級一致後才 push
+- **卡片整體寬度跟題庫練習頁差很多（第四個、也是最後才抓到的問題）**：離線假資料測試完全沒抓到這個，因為前三項修完後用 `/browse` 直接對比「真實上線」的首頁跟 `practice.html`（不是離線假資料）才看出寬度差一大截。**根因**：`practice.html` 的卡片容器是 `<div id="qcards"></div>`，完全沒有 class；首頁小工具的容器多寫了 `class="qcards" id="hp-qcard"`，被 `styles.css` 的 `.qcards{max-width:760px}` 這條 class 規則限制住，`practice.html` 沒有這個 class 所以不受限，直接撐滿 `.wrap` 寬度（~1076px）。`renderQ()` 注入的 `<details class="qcard" style="max-width:760px;margin:0 auto">` 也有同款多餘的 inline 寬度限制。兩處都拿掉後，寬度才真正一致
+- **重要教訓**：離線假資料渲染測試（複製 `frontend/` 到暫存目錄本地開）沒辦法抓到「容器 class 造成的寬度差異」這類問題，因為兩邊測試環境剛好都套用了同一份 `styles.css`，光看渲染結果容易忽略 class 差異本身。**之後這類「A 頁面 vs B 頁面外觀應該一致」的驗證，要直接對比正式站兩個頁面的真實渲染結果，不能只靠離線注入假資料**
+- 全部修復皆用 `/browse` 驗證：前三項先離線注入假資料渲染桌面版（1280px）+ 手機版（390px）跟 `practice.html` 真實 `appendCard()` 輸出並排比對；第四項（寬度）改用正式站真實資料直接比對兩個頁面才抓到，修完同樣用正式站真實比對確認一致
 
 ---
 
