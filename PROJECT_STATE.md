@@ -1,9 +1,20 @@
 # PROJECT_STATE.md — Mina 網站專案
 
-**最後更新**：2026-07-12（部署平台確認更正：是 Cloudflare Pages，不是 Railway）  
+**最後更新**：2026-07-13（修正 GSC「頁面會重新導向」：canonical/sitemap 改無副檔名網址）  
 **分支**：dev（自動部署至 minaedu.tw，**實際平台是 Cloudflare Pages**，見下方技術備忘——2026-07-01 那次「更正為 Railway」的結論是錯的，2026-07-12 用 `wrangler pages project list` 拿到權威證據推翻）  
 **Mobile PageSpeed**：Performance **91**、CLS **0**（2026-07-04 用 PageSpeed API 連測3次確認穩定，CrUX 無真實數據可查——流量不足，Search Console 應該也顯示同樣結果。之前 0.197~0.216 確認是 Lighthouse 手機節流模擬的量測抖動，非常態）、Accessibility 100、Best Practices 100、SEO 100  
 **QA 健康分數**：93 / 100 ✅（6月25日 /qa 全面審計，修正 CSP GA4，此分數尚未反映今日變化）
+
+---
+
+## ✅ 已完成（2026-07-13）
+
+### 修正 GSC「頁面會重新導向」未編入索引問題（commit `1669dbc`）
+- 起因：使用者收到 2026-07-04 GSC 通知信「新原因造成網頁無法編入索引：頁面會重新導向、找不到網頁(404)」
+- **根因確認（curl 實測正式站）**：Cloudflare Pages 平台對所有 `.html` 結尾網址一律 308 重導向到無副檔名版本（例：`/about.html` → `/about`），這是平台內建行為、非本次改動造成，應該從一開始部署就存在。但各頁 `<link rel="canonical">` 與 `sitemap.xml` 卻宣告 `.html` 版本才是正式網址——canonical 宣告的網址 = 會被重導向掉的網址，自我矛盾，這正是 GSC「頁面會重新導向」的典型成因。sitemap.xml 20 筆網址（6 主頁面 + 14 篇文章）全部符合此模式
+- **修法**：6 個頁面（about/courses/booking/faq/news/practice）canonical tag + news-single.html 靜態預設 canonical + sitemap.xml 全部 20 筆網址，改成 Cloudflare 實際服務的無副檔名版本（`/about`、`/news/:slug` 等）。範圍只動 canonical tag 與 sitemap.xml，未動內部導覽連結（`href="xxx.html"`）與 og:url，因為那些仍能正常運作（多一次 308 但不影響功能），非這次要解決的矛盾
+- 已用 `wrangler pages deployment list` + curl 正式站雙重驗證部署成功、canonical/sitemap 皆已生效
+- **「找不到網頁 (404)」未完全查明**：比對時間線，7/01 21:16~21:26 之間曾短暫上線又撤銷 `/news/xxx` 舊嘗試，不排除 Google bot 當時爬到又消失，但無法從 repo 端 100% 確認，**下次待辦**：使用者需自行開 GSC 索引報表查看實際受影響網址清單，確認 404 是否已隨 7/04 正式版乾淨網址上線而自然消失，或仍有其他成因
 
 ---
 
