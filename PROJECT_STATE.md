@@ -14,7 +14,12 @@
 - **根因確認（curl 實測正式站）**：Cloudflare Pages 平台對所有 `.html` 結尾網址一律 308 重導向到無副檔名版本（例：`/about.html` → `/about`），這是平台內建行為、非本次改動造成，應該從一開始部署就存在。但各頁 `<link rel="canonical">` 與 `sitemap.xml` 卻宣告 `.html` 版本才是正式網址——canonical 宣告的網址 = 會被重導向掉的網址，自我矛盾，這正是 GSC「頁面會重新導向」的典型成因。sitemap.xml 20 筆網址（6 主頁面 + 14 篇文章）全部符合此模式
 - **修法**：6 個頁面（about/courses/booking/faq/news/practice）canonical tag + news-single.html 靜態預設 canonical + sitemap.xml 全部 20 筆網址，改成 Cloudflare 實際服務的無副檔名版本（`/about`、`/news/:slug` 等）。範圍只動 canonical tag 與 sitemap.xml，未動內部導覽連結（`href="xxx.html"`）與 og:url，因為那些仍能正常運作（多一次 308 但不影響功能），非這次要解決的矛盾
 - 已用 `wrangler pages deployment list` + curl 正式站雙重驗證部署成功、canonical/sitemap 皆已生效
-- **「找不到網頁 (404)」未完全查明**：比對時間線，7/01 21:16~21:26 之間曾短暫上線又撤銷 `/news/xxx` 舊嘗試，不排除 Google bot 當時爬到又消失，但無法從 repo 端 100% 確認，**下次待辦**：使用者需自行開 GSC 索引報表查看實際受影響網址清單，確認 404 是否已隨 7/04 正式版乾淨網址上線而自然消失，或仍有其他成因
+- **使用者提供 GSC 實際受影響網址清單後，二次修復（commit `7b43d41`）**：
+  - 「頁面會重新導向」2 筆：`https://minaedu.tw/index.html`（真實 bug，同上述根因）、`http://minaedu.tw/`（HTTP→HTTPS 安全性重導向，**正常行為非 bug**，不用修）
+  - 「找不到網頁 (404)」1 筆：`https://api.minaedu.tw/`（後端 API 根目錄本來就沒有頁面，只有 `/api/v1/...` 路由，**正常行為非 bug**，Google 只是發現這個子網域存在並嘗試爬取，不需修正）
+  - `index.html` 被爬到的原因：全站 9 個頁面 nav/footer/breadcrumb 內部連結全部寫死 `.html`（含連回首頁的 `href="index.html"`），一路檢查發現全站共 203 處都是這個模式。已全部改成無副檔名網址（含 `courses.html#camps` 這類帶錨點的連結），用 `/browse` 離線渲染 `index.html` 驗證連結結構正常、無 console error 才 commit
+  - **推送小插曲**：這次 `git push` 卡住逾時（可能是 credential helper 或連線問題），但用 `git ls-remote origin` 確認其實已經推上去了；額外用 `wrangler pages deploy` 補一次部署確保保險（結果顯示 76 個檔案都已存在，證明 GitHub 自動部署已經成功接手），已用 curl 正式站驗證 `/about` 等連結已是無副檔名格式
+  - 至此，信裡回報的 3 個網址（2 重新導向 + 1 個 404）都已查明：1 個是真 bug 已修，2 個是平台正常行為不需處理
 
 ---
 
