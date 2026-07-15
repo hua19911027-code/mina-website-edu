@@ -418,9 +418,12 @@
     track.innerHTML = '';
     if (dotsEl) dotsEl.innerHTML = '';
 
+    var reel = document.createElement('div');
+    reel.className = 'carousel-reel';
+
     items.forEach(function (url, i) {
       var slide = document.createElement('div');
-      slide.className = 'carousel-slide' + (i === 0 ? ' on' : '');
+      slide.className = 'carousel-slide';
       if (isVideoUrl(url)) {
         var video = document.createElement('video');
         video.src = url;
@@ -435,7 +438,7 @@
         img.loading = 'lazy';
         slide.appendChild(img);
       }
-      track.appendChild(slide);
+      reel.appendChild(slide);
 
       if (items.length > 1 && items.length <= 10 && dotsEl) {
         var dot = document.createElement('button');
@@ -446,6 +449,8 @@
       }
     });
 
+    track.appendChild(reel);
+
     if (items.length === 1) {
       if (prevBtn) prevBtn.style.display = 'none';
       if (nextBtn) nextBtn.style.display = 'none';
@@ -454,15 +459,13 @@
       return;
     }
 
-    var slides = track.querySelectorAll('.carousel-slide');
     var dots = dotsEl ? dotsEl.querySelectorAll('.dot') : [];
 
     function goTo(n) {
-      slides[current].classList.remove('on');
       if (dots[current]) dots[current].classList.remove('on');
       current = (n + items.length) % items.length;
-      slides[current].classList.add('on');
       if (dots[current]) dots[current].classList.add('on');
+      reel.style.transform = 'translateX(-' + (current * 100) + '%)';
       if (counter) counter.textContent = (current + 1) + ' / ' + items.length;
     }
 

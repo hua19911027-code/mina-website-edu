@@ -583,9 +583,9 @@ a.camp-link:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,0
 
 /* ---- photo carousel (活動照片) ---- */
 .photo-carousel{position:relative;margin:0 0 36px;border-radius:var(--r-lg);overflow:hidden;border:2px solid var(--pink-soft);background:var(--bg-2);}
-.carousel-track{position:relative;aspect-ratio:4/3;}
-.carousel-slide{position:absolute;inset:0;opacity:0;transition:opacity .3s ease;display:flex;align-items:center;justify-content:center;}
-.carousel-slide.on{opacity:1;}
+.carousel-track{position:relative;aspect-ratio:4/5;overflow:hidden;}
+.carousel-reel{display:flex;width:100%;height:100%;transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.carousel-slide{position:relative;flex:0 0 100%;width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
 .carousel-slide img,.carousel-slide video{width:100%;height:100%;object-fit:cover;}
 .carousel-slide .ph-slide{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;font-weight:700;font-size:15px;}
 .carousel-slide .ph-slide .pi{font-size:54px;}
