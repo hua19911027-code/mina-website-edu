@@ -444,7 +444,7 @@
         var dot = document.createElement('button');
         dot.className = 'dot' + (i === 0 ? ' on' : '');
         dot.setAttribute('aria-label', '第 ' + (i + 1) + ' 張');
-        (function (idx) { dot.addEventListener('click', function () { goTo(idx); }); }(i));
+        (function (idx) { dot.addEventListener('click', function () { userGoTo(idx); }); }(i));
         dotsEl.appendChild(dot);
       }
     });
@@ -460,6 +460,7 @@
     }
 
     var dots = dotsEl ? dotsEl.querySelectorAll('.dot') : [];
+    var autoplayTimer = null;
 
     function goTo(n) {
       if (dots[current]) dots[current].classList.remove('on');
@@ -469,20 +470,37 @@
       if (counter) counter.textContent = (current + 1) + ' / ' + items.length;
     }
 
-    if (prevBtn) prevBtn.addEventListener('click', function () { goTo(current - 1); });
-    if (nextBtn) nextBtn.addEventListener('click', function () { goTo(current + 1); });
+    function stopAutoplay() {
+      if (autoplayTimer) { clearInterval(autoplayTimer); autoplayTimer = null; }
+    }
+
+    function startAutoplay() {
+      stopAutoplay();
+      autoplayTimer = setInterval(function () { goTo(current + 1); }, 4500);
+    }
+
+    function userGoTo(n) { goTo(n); startAutoplay(); }
+
+    if (prevBtn) prevBtn.addEventListener('click', function () { userGoTo(current - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { userGoTo(current + 1); });
 
     var startX = 0;
     track.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; }, { passive: true });
     track.addEventListener('touchend', function (e) {
       var diff = startX - e.changedTouches[0].clientX;
-      if (Math.abs(diff) > 40) goTo(diff > 0 ? current + 1 : current - 1);
+      if (Math.abs(diff) > 40) userGoTo(diff > 0 ? current + 1 : current - 1);
     });
 
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowLeft') goTo(current - 1);
-      if (e.key === 'ArrowRight') goTo(current + 1);
+      if (e.key === 'ArrowLeft') userGoTo(current - 1);
+      if (e.key === 'ArrowRight') userGoTo(current + 1);
     });
+
+    carousel.addEventListener('mouseenter', stopAutoplay);
+    carousel.addEventListener('mouseleave', startAutoplay);
+    carousel.addEventListener('touchstart', stopAutoplay, { passive: true });
+
+    startAutoplay();
 
     if (counter) counter.textContent = '1 / ' + items.length;
   }
