@@ -136,7 +136,9 @@ header.nav{position:sticky;top:0;z-index:120;background:var(--pink);border-botto
         <div class="split-media">
           <div class="photo-carousel">
             <div class="carousel-track">
-              <div class="carousel-slide on"><img src="assets/images/space/店面.jpg" alt="卓越國際文理補習班（徐薇英文旭光分校）店面外觀" loading="lazy"></div>
+              <div class="carousel-reel">
+                <div class="carousel-slide"><img src="assets/images/space/店面.jpg" alt="卓越國際文理補習班（徐薇英文旭光分校）店面外觀" loading="lazy"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -196,14 +198,17 @@ header.nav{position:sticky;top:0;z-index:120;background:var(--pink);border-botto
         <div class="split-media">
           <div class="photo-carousel env-carousel" role="region" aria-label="教室環境照片">
             <div class="carousel-track">
-              <div class="carousel-slide on"><img src="https://res.cloudinary.com/pooh/image/upload/v1781748840/space-1.jpg" alt="前台接待區" loading="lazy"></div>
-              <div class="carousel-slide"><img src="https://res.cloudinary.com/pooh/image/upload/v1781748839/space-2.jpg" alt="安親大教室" loading="lazy"></div>
-              <div class="carousel-slide"><img src="https://res.cloudinary.com/pooh/image/upload/v1781748840/space-3.jpg" alt="數學小班教室" loading="lazy"></div>
-              <div class="carousel-slide"><img src="https://res.cloudinary.com/pooh/image/upload/v1781748840/space-4.jpg" alt="英文小班教室" loading="lazy"></div>
+              <div class="carousel-reel">
+                <div class="carousel-slide"><img src="https://res.cloudinary.com/pooh/image/upload/v1781748840/space-1.jpg" alt="前台接待區" loading="lazy"></div>
+                <div class="carousel-slide"><img src="https://res.cloudinary.com/pooh/image/upload/v1781748839/space-2.jpg" alt="安親大教室" loading="lazy"></div>
+                <div class="carousel-slide"><img src="https://res.cloudinary.com/pooh/image/upload/v1781748840/space-3.jpg" alt="數學小班教室" loading="lazy"></div>
+                <div class="carousel-slide"><img src="https://res.cloudinary.com/pooh/image/upload/v1781748840/space-4.jpg" alt="英文小班教室" loading="lazy"></div>
+              </div>
             </div>
             <button class="carousel-prev" aria-label="上一張">‹</button>
             <button class="carousel-next" aria-label="下一張">›</button>
             <div class="carousel-dots"></div>
+            <div class="carousel-counter"></div>
           </div>
         </div>
         <div class="split-text">
@@ -292,28 +297,48 @@ header.nav{position:sticky;top:0;z-index:120;background:var(--pink);border-botto
 (function(){
   var car = document.querySelector('.env-carousel');
   if(!car) return;
+  var reel = car.querySelector('.carousel-reel');
   var slides = car.querySelectorAll('.carousel-slide');
   var dotsEl = car.querySelector('.carousel-dots');
+  var counter = car.querySelector('.carousel-counter');
   var cur = 0;
+  var timer = null;
+
   slides.forEach(function(_,i){
     var d = document.createElement('button');
     d.className = 'dot' + (i===0?' on':'');
     d.setAttribute('aria-label', '第'+(i+1)+'張');
-    d.onclick = function(){ go(i); };
+    d.onclick = function(){ userGo(i); };
     dotsEl.appendChild(d);
   });
+
   function go(n){
-    slides[cur].classList.remove('on');
     dotsEl.children[cur].classList.remove('on');
     cur = (n + slides.length) % slides.length;
-    slides[cur].classList.add('on');
     dotsEl.children[cur].classList.add('on');
+    reel.style.transform = 'translateX(-' + (cur * 100) + '%)';
+    if (counter) counter.textContent = (cur + 1) + ' / ' + slides.length;
   }
-  car.querySelector('.carousel-prev').onclick = function(){ go(cur-1); };
-  car.querySelector('.carousel-next').onclick = function(){ go(cur+1); };
-  var t = setInterval(function(){ go(cur+1); }, 4000);
-  car.addEventListener('mouseenter', function(){ clearInterval(t); });
-  car.addEventListener('mouseleave', function(){ t = setInterval(function(){ go(cur+1); }, 4000); });
+  function stopAutoplay(){ if(timer){ clearInterval(timer); timer=null; } }
+  function startAutoplay(){ stopAutoplay(); timer = setInterval(function(){ go(cur+1); }, 4500); }
+  function userGo(n){ go(n); startAutoplay(); }
+
+  car.querySelector('.carousel-prev').onclick = function(){ userGo(cur-1); };
+  car.querySelector('.carousel-next').onclick = function(){ userGo(cur+1); };
+
+  var startX = 0;
+  reel.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; }, { passive:true });
+  reel.addEventListener('touchend', function(e){
+    var diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) userGo(diff > 0 ? cur+1 : cur-1);
+  });
+
+  car.addEventListener('mouseenter', stopAutoplay);
+  car.addEventListener('mouseleave', startAutoplay);
+  car.addEventListener('touchstart', stopAutoplay, { passive:true });
+
+  counter && (counter.textContent = '1 / ' + slides.length);
+  startAutoplay();
 })();
 </script>
 <script src="site.js?v=20260701" defer></script>
