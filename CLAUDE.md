@@ -59,6 +59,14 @@ cd workers && npm run deploy:staging
 
 **Cloudflare Pages 對 `.html` 結尾網址一律 308 重導向到無副檔名版本**(如 `/about.html` → `/about`),這是平台內建行為。所以 `frontend/*.html` 內部連結(nav/footer/breadcrumb)、`canonical` tag、`sitemap.xml` 一律用無副檔名網址,不要寫 `.html` 副檔名,否則會造成 SEO 重複網址/重新導向問題。
 
+## Health Stack
+
+- typecheck: cd workers && npx tsc --noEmit
+- lint: 未設定(無 eslint/biome)
+- test: 未設定(無 test script)
+- deadcode: 未設定(無 knip)
+- shell: 未設定(無 .sh 腳本)
+
 ## 本專案特殊規則
 
 - .env 永遠不進 Git;不要修改 .gitignore、不要修改 .env 實際值、不要修改正式環境設定
