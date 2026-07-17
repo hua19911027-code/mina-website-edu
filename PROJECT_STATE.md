@@ -2,13 +2,14 @@
 
 > 更早的歷史記錄見 `PROJECT_STATE-archive.md`；架構細節見 `CLAUDE.md`。
 
-## 狀態（更新：2026-07-14）
+## 狀態（更新：2026-07-17）
 
 已完成：
 - GSC「頁面會重新導向」修復：canonical tag + sitemap.xml 改無副檔名網址（commit `1669dbc`）；全站 9 頁 203 處內部導覽連結（nav/footer/breadcrumb）同步改無副檔名（commit `7b43d41`）。根因是 Cloudflare Pages 對 `.html` 結尾網址一律 308 重導向，但 canonical/連結卻宣告 `.html` 版本，自我矛盾
 - GSC 回報的另外 2 筆（`http://minaedu.tw/` HTTP→HTTPS、`api.minaedu.tw/` 404）確認是平台正常行為，非 bug，不需修正
 - `/doctor` 環境健檢：關閉 3 個從未使用/近一個月未用的外掛（andrej-karpathy-skills、compound-engineering、vercel-plugin）與 1 個 MCP 連線（notebooklm-mcp）；清掉 `.claude/settings.local.json` 裡意外內嵌真實密鑰的 3 條規則（CF_TOKEN×2、GKEY，該檔案本來就沒進 git，未外流）
-- `CLAUDE.md` 補上 Commands / Architecture 章節（`/init`），精簡跟全域規則重複的行為守則段落，順手修正過時錯誤資訊（誤寫「push 後 Vercel 自動部署」，已改對）
+- `CLAUDE.md` 補上 Commands / Architecture 章節（`/init`）與 Health Stack 章節，精簡跟全域規則重複的行為守則段落，順手修正過時錯誤資訊（誤寫「push 後 Vercel 自動部署」，已改對）
+- FB 網域驗證：`.html` 上傳法被 Cloudflare Pages 平台的 .html→無副檔名 308 重導向擋下（`_redirects` 自我改寫規則實測無效，會退回 SPA fallback 回傳首頁內容），改用 `frontend/functions/` 下的 Pages Function 直接攔截該路徑回應驗證碼，已部署並用 curl 實測確認 200 + 正確內容（commit `3e1b813`、`532bd47`）。這是本專案第一次用到 Pages Functions，之後若還有平台驗證檔案需求可比照此 pattern
 
 下一步：
 - 到 Cloudflare / Google Cloud 主控台重新產生 CF_TOKEN、GKEY 這兩把金鑰（doctor 健檢時發現明碼內嵌在本地設定檔的規則字串裡，字串已清但金鑰本身沒失效）
