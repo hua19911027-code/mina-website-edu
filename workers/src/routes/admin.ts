@@ -260,7 +260,22 @@ route.post('/exam-review/generate', async (c) => {
   };
   await c.env.KV_SETTINGS.put('exam_review_state', JSON.stringify(state));
 
-  return c.json({ ok: true, data: { examName, notionParentUrl, generatedAt: state.generatedAt } });
+  /* 5. 各年級科目實際題數（可能因題庫不足而低於 QUESTIONS_PER_PAPER），供通知訊息使用 */
+  const paperCounts: Record<string, Record<string, number>> = {};
+  let totalQuestions = 0;
+  for (const grade of GRADES) {
+    paperCounts[grade] = {};
+    for (const subject of EXAM_SUBJECTS) {
+      const n = papers[grade][subject].length;
+      paperCounts[grade][subject] = n;
+      totalQuestions += n;
+    }
+  }
+
+  return c.json({
+    ok: true,
+    data: { examName, notionParentUrl, generatedAt: state.generatedAt, paperCounts, totalQuestions, questionsPerPaper: QUESTIONS_PER_PAPER },
+  });
 });
 
 /* DELETE /cache                — 清除所有快取
