@@ -1,3 +1,5 @@
+import { renderQCard, TYPE_ORDER } from './components/qcard-template.js?v=20260810'
+
 ;(function () {
   'use strict'
 
@@ -141,46 +143,9 @@
     var container = getContainer(containerId)
     if (!container) return
 
-    var optHtml = ['A','B','C','D'].map(function(lbl, i) {
-      var ok = (lbl === q.answer)
-      return '<div class="q-opt' + (ok ? ' correct' : '') + '">'
-        + '<span class="q-opt-lbl">' + lbl + '</span>'
-        + '<span>' + esc(q.options[i] != null ? q.options[i] : '') + '</span>'
-        + (ok ? '<span class="q-correct-tag">&#10003; 正解</span>' : '')
-        + '</div>'
-    }).join('')
-
-    var exp = q.explanation || {}
-    /* find correct option value for the answer reveal row */
-    var LABELS = ['A','B','C','D']
-    var answerIdx = LABELS.indexOf(String(q.answer || '').toUpperCase())
-    var answerVal = answerIdx >= 0 && q.options ? q.options[answerIdx] : ''
-    var answerLbl = answerIdx >= 0 ? LABELS[answerIdx] : String(q.answer || '')
-
     var card = document.createElement('details')
     card.className = 'qcard'
-    card.innerHTML =
-      '<summary>'
-        + '<span class="qnum">' + n + '</span>'
-        + '<div class="q-sum-body">'
-          + '<span class="q-meta">' + esc({'標準題型':'標準題型','觀念':'觀念拆解','錯題':'錯題診斷'}[q.type] || q.type || '標準題型') + '</span>'
-          + '<span class="q-title">' + esc(q.question) + '</span>'
-          + '<div class="q-opts">' + optHtml + '</div>'
-        + '</div>'
-        + '<span class="plus">+</span>'
-      + '</summary>'
-      + '<div class="qbody">'
-        + '<div class="qseg ok">'
-          + '<span class="st">&#10003; 正確觀念</span>'
-          + '<div class="q-ans-inline">'
-            + '<span class="q-ans-badge">' + esc(answerLbl) + '</span>'
-            + '<span class="q-ans-val">' + esc(answerVal) + '</span>'
-          + '</div>'
-          + (exp.concept ? '<span class="sx">' + esc(exp.concept) + '</span>' : '')
-        + '</div>'
-        + '<div class="qseg err"><span class="st">&#10007; 常見錯誤</span><span class="sx">' + esc(exp.commonMistake || '') + '</span></div>'
-        + '<div class="qseg tip"><span class="st">&#9733; 記憶提示</span><span class="sx">' + esc(exp.memoryTip || '') + '</span></div>'
-      + '</div>'
+    card.innerHTML = renderQCard(q, n)
 
     container.appendChild(card)
   }
@@ -230,7 +195,6 @@
           fetchCurrentWeekFallback(f)
           return
         }
-        var TYPE_ORDER = { '標準題型': 0, '觀念': 1, '錯題': 2 }
         qs.sort(function(a, b) {
           var ao = TYPE_ORDER[a.type] != null ? TYPE_ORDER[a.type] : 99
           var bo = TYPE_ORDER[b.type] != null ? TYPE_ORDER[b.type] : 99
@@ -693,10 +657,32 @@
 
   function init() {
     if (initialized) return
-    if (!getContainer()) return
+    var container = getContainer()
+    if (!container) return
     initialized = true
     ensureStyles()
     bindAll()
+
+    /* data-ssr-count 由 functions/practice.js 寫入：
+     * > 0 代表 SSR 已成功渲染題目卡片到 #qcards，此時跳過 clearList()
+     * 與重新 fetch，直接沿用既有內容，避免「內容出現→清空→骨架→重繪」的閃爍。
+     * 無此屬性或為 0（SSR 降級/passthrough）則照現行流程走 fetchQuestions()。
+     * 使用者之後切換年級/科目一律呼叫 fetchQuestions()（此屬性已被移除，
+     * 且那條路徑本來就不檢查這個屬性），行為不變。 */
+    var ssrCount = parseInt(container.getAttribute('data-ssr-count') || '0', 10)
+    if (ssrCount > 0) {
+      var ssrHasMore = container.getAttribute('data-ssr-hasmore') === 'true'
+      container.removeAttribute('data-ssr-count')
+      container.removeAttribute('data-ssr-hasmore')
+      loaded = ssrCount
+      page = 1
+      /* 比照現行 fetchQuestions() 成功分支的按鈕邏輯（第213-218行）：
+       * SSR 情境下 loaded 必然遠小於 MAX(36)，不需要處理 archiveCta。 */
+      var moreBtn = document.getElementById('load-more-btn') || document.querySelector('[data-load-more]')
+      if (moreBtn) moreBtn.style.display = ssrHasMore ? '' : 'none'
+      return
+    }
+
     fetchQuestions(false)
   }
 
