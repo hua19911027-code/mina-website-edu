@@ -2,26 +2,25 @@
 
 > 更早的歷史記錄見 `PROJECT_STATE-archive.md`；架構細節見 `CLAUDE.md`。
 
-## 狀態（更新：2026-07-27）
+## 狀態（更新：2026-08-10）
 
 已完成：
-- 題庫 n8n 自動化連環 bug 全部查明修正（透過 n8n API 直接改 workflow，非本 repo git 歷史）：
-  - A2-週六發布封存：`計算目標日期`節點用 UTC 算日期，跟台灣時區排程日期差一天，導致「今日發布」query 每週必為 0；改用 `Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei'})` 修正
-  - A1-每月15日出題：AI prompt 樣板裡混入一個未轉義的真實換行字元（新增禁圖規則時手滑），造成整批 JSON.parse 失敗、8月題目 0 生成；已修正轉義，並強化禁圖規則措辭（明確禁止「如圖」「如下圖」等字眼）
-  - A1「是否發布」checkbox 建立時改預設打勾（`checkboxValue: true`），新題直接發布，有問題使用者自行取消勾選；舊有 171 題 8月批次不受影響，仍為未勾，需人工審核挑除看圖題
-  - A1/A2/A3/A4/C1/E2/B1 七個會發通知的 workflow，訊息全部改「詳細版」：各年級科目題數明細、來源 workflow 名稱、時間戳；並用【官網題庫】【官網預約】【社群】等標籤區分不同子系統，避免混淆是誰發的訊息
-  - D2/D3/D4/D5、E1、Social Studio 排程/同步觸發：確認本來就不發通知訊息，未動
-- `workers/src/routes/admin.ts` 的 `/exam-review/generate` 加回傳 `paperCounts`/`totalQuestions`（各年級科目實際生題數），修正 B1 通知訊息原本寫死「英數各年級共12份」看不出題庫不足的問題（commit `f8a0920`，**尚未 deploy**）
-- GSC「頁面會重新導向」修復：canonical tag + sitemap.xml 改無副檔名網址（commit `1669dbc`）；全站 9 頁 203 處內部導覽連結（nav/footer/breadcrumb）同步改無副檔名（commit `7b43d41`）
-- FB 網域驗證：改用 `frontend/functions/` 下的 Pages Function 直接攔截該路徑回應驗證碼，已部署（commit `3e1b813`、`532bd47`）
+- **最新消息 SEO 修復（PHASE 1–5，`seo-ssr-preview` 分支開發驗證後合併至 dev，已在正式站驗證通過）**：
+  - `frontend/functions/news/[slug].js`：Cloudflare Pages Function 做文章頁 SSR（伺服器端填入 title/content/meta/og/JSON-LD BlogPosting，並切換 skeleton/body/404 可見性），用 `onRequest` 涵蓋 GET/HEAD，靜態外殼改抓無副檔名路徑並手動跟隨重導向（避開 `.html→無副檔名` 308 導致外殼取得失敗的坑）
+  - `frontend/functions/sitemap.xml.js`：動態產生 sitemap，依 API `hasMore` 分頁抓全部文章（**API `total` 欄位有 bug，回傳 `limit+1`，全站程式碼禁止使用該欄位判斷分頁**）
+  - `frontend/404.html`：新增真 404 頁（`noindex`，套用既有 header/footer），取代原本亂打網址回首頁還 200 的行為
+  - `robots.txt` 排除 `/news-single`(.html)（SSR 用空殼模板不應被獨立收錄）；`llms.txt` 六個連結移除 `.html`；`news-single.html` 清除三篇寫死假文章（`#related-list` 改空容器供 `news.js` 注入）、修正 og:url
+  - **根因排查**：Cloudflare 該網域的「URL 改寫規則」`/news/* → /news-single` 在邊緣層攔截了所有請求，Function 完全沒機會執行（h1 一直是 skeleton 佔位符、404 分支也回 200）；已由使用者在 Dashboard 停用該規則，問題排除，非程式碼問題
+- `workers/src/routes/admin.ts` 的 paperCounts 修正已部署（2026-08-10，Version ID `763e0019-b1ec-4c39-9283-bc65c79acc81`）
 
 下一步：
-- `cd workers && npx wrangler deploy` 部署 `admin.ts` 的 paperCounts 修正（B1 訊息 deploy 前會顯示退回版文案，不會壞，但沒有真實數字）
 - 人工進 Notion 審 8 月那 171 題：挑掉看圖題，其餘勾「是否發布」
-- 到 Cloudflare / Google Cloud 主控台重新產生 CF_TOKEN、GKEY 這兩把金鑰（doctor 健檢時發現明碼內嵌在本地設定檔的規則字串裡，字串已清但金鑰本身沒失效）
-- Bing Webmaster Tools 提交 sitemap（5 分鐘、零成本，一直沒排進去）
+- 到 Cloudflare / Google Cloud 主控台重新產生 CF_TOKEN、GKEY（金鑰本身沒失效，待重新產生）
+- Bing Webmaster Tools 提交 sitemap
+- Google Search Console 重新提交新版動態 sitemap（新增 29 篇文章單獨 URL，之前這些頁面對爬蟲是空白的）
 
 缺螺絲：
+- `practice.html` 題庫頁靜態化未做（`news.js`/`practice.js` 同款「內容靠 JS fetch 注入」問題，practice 這支工程量較大，另行規劃）
 - CLS 0.197~0.216 舊案尚未證實根本解決（見 archive「2026-07-01」段），下次應查 Search Console Core Web Vitals 真實數據，不要只重跑 PageSpeed
 - 116 學年度（明年）出版社設定一樣要手動改 n8n code 節點（`IpxBWR3Nbg2z798v`），Admin Panel 出版社上傳功能目前是斷頭路
-- gstack 技能框架 vendored 安裝造成技能清單膨脹（node_modules 文件被當技能列出），doctor 健檢發現但無法直接修，需透過 gstack 自己的 vendoring 遷移流程處理
+- gstack 技能框架 vendored 安裝造成技能清單膨脹，doctor 健檢發現但無法直接修

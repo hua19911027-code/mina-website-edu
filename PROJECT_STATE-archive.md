@@ -12,6 +12,21 @@
 
 ---
 
+## ✅ 已完成（2026-07-27，2026-08-10 從主檔案移入歸檔）
+
+### 題庫 n8n 自動化連環 bug 全部查明修正（透過 n8n API 直接改 workflow，非本 repo git 歷史）
+- A2-週六發布封存：`計算目標日期`節點用 UTC 算日期，跟台灣時區排程日期差一天，導致「今日發布」query 每週必為 0；改用 `Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei'})` 修正
+- A1-每月15日出題：AI prompt 樣板裡混入一個未轉義的真實換行字元（新增禁圖規則時手滑），造成整批 JSON.parse 失敗、8月題目 0 生成；已修正轉義，並強化禁圖規則措辭（明確禁止「如圖」「如下圖」等字眼）
+- A1「是否發布」checkbox 建立時改預設打勾（`checkboxValue: true`），新題直接發布，有問題使用者自行取消勾選；舊有 171 題 8月批次不受影響，仍為未勾，需人工審核挑除看圖題
+- A1/A2/A3/A4/C1/E2/B1 七個會發通知的 workflow，訊息全部改「詳細版」：各年級科目題數明細、來源 workflow 名稱、時間戳；並用【官網題庫】【官網預約】【社群】等標籤區分不同子系統，避免混淆是誰發的訊息
+- D2/D3/D4/D5、E1、Social Studio 排程/同步觸發：確認本來就不發通知訊息，未動
+- `workers/src/routes/admin.ts` 的 `/exam-review/generate` 加回傳 `paperCounts`/`totalQuestions`（commit `f8a0920`，2026-08-10 已 deploy，Version ID `763e0019-b1ec-4c39-9283-bc65c79acc81`）
+
+### FB 網域驗證（commit `3e1b813`、`532bd47`）
+- 改用 `frontend/functions/` 下的 Pages Function 直接攔截該路徑回應驗證碼，已部署
+
+---
+
 ## ✅ 已完成（2026-07-13）
 
 ### 修正 GSC「頁面會重新導向」未編入索引問題（commit `1669dbc`）
