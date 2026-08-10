@@ -3,18 +3,17 @@
  * 路徑：frontend/functions/news/[slug].js
  * 對應網址：https://minaedu.tw/news/{slug}
  *
- * 版本：V2（修正 V1 取得靜態外殼時拿到空 body 的問題）
+ * 版本：V3
  *
- * V1 問題：
- *   env.ASSETS.fetch("/news-single.html") 疑似觸發 Pages 的
- *   「.html → 無副檔名」308 重導向，回應 body 為空，
- *   導致 HTMLRewriter 在空字串上轉換，產生「狀態碼正確、內容全空」的頁面。
- *
- * V2 對策：
- *   1. 優先嘗試無副檔名路徑，失敗才退回 .html
- *   2. 手動跟隨 3xx 重導向（最多 3 次）
- *   3. 外殼取得失敗時回 500 並附診斷訊息，絕不安靜地回傳空頁面
- *   4. 加上 x-mina-shell / x-mina-render 回應標頭，方便驗證與除錯
+ * 版本歷程：
+ *   V1 — 初版。問題：env.ASSETS.fetch("/news-single.html") 疑似觸發
+ *        「.html → 無副檔名」308 重導向，body 為空，產生空白頁。
+ *   V2 — 改為優先取無副檔名路徑 + 手動跟隨 3xx。SSR 成功。
+ *        殘留問題：只匯出 onRequestGet，HEAD 請求不經過 Function，
+ *        導致 curl -I 測到的是靜態資源層的回應（狀態碼與標頭皆非本 Function 產生）。
+ *   V3 — 改為 onRequest（涵蓋 GET 與 HEAD）；
+ *        setDisplay() 改為先移除既有 display 宣告再設定，避免
+ *        style 屬性殘留 "display:none;display:block;" 這類脆弱寫法。
  */
 
 const API_BASE = "https://api.minaedu.tw/api/v1";
@@ -37,11 +36,19 @@ function formatDate(iso) {
   return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())}`;
 }
 
-/** 保留既有 inline style，附加新規則（後者覆寫前者） */
-function appendStyle(el, extra) {
+/**
+ * 設定 inline style 的 display 值。
+ * 先移除既有的 display 宣告再寫入，避免同一屬性重複出現。
+ * 其餘 style 宣告（如 max-width、margin）完整保留。
+ */
+function setDisplay(el, value) {
   const current = el.getAttribute("style") || "";
-  const sep = current.trim() === "" || current.trim().endsWith(";") ? "" : ";";
-  el.setAttribute("style", `${current}${sep}${extra}`);
+  const kept = current
+    .split(";")
+    .map((s) => s.trim())
+    .filter((s) => s && !/^display\s*:/i.test(s));
+  kept.push(`display:${value}`);
+  el.setAttribute("style", kept.join(";") + ";");
 }
 
 /** 補上 class（避免重複） */
@@ -53,7 +60,7 @@ function addClass(el, name) {
 
 /**
  * 取得靜態外殼 HTML。
- * 依序嘗試候選路徑，並手動跟隨重導向。
+ * 依序嘗試候選路徑，並手動跟隨重導向（env.ASSETS.fetch 不會自動跟隨）。
  * @returns {Promise<{html: string, path: string} | null>}
  */
 async function loadShell(env, request) {
@@ -61,17 +68,20 @@ async function loadShell(env, request) {
     let url = new URL(candidate, request.url);
 
     try {
-      // 使用乾淨的 GET 請求，不沿用原始 request 的標頭，
-      // 避免額外標頭影響資源伺服器的行為。
-      let res = await env.ASSETS.fetch(new Request(url.toString(), { method: "GET" }));
+      // 使用乾淨的 GET 請求，不沿用原始 request 的標頭與方法。
+      // 特別重要：原始請求可能是 HEAD，直接沿用會拿不到 body。
+      let res = await env.ASSETS.fetch(
+        new Request(url.toString(), { method: "GET" })
+      );
 
-      // 手動跟隨 3xx（env.ASSETS.fetch 不會自動跟隨）
       for (let hop = 0; hop < 3; hop++) {
         if (res.status < 300 || res.status >= 400) break;
         const loc = res.headers.get("location");
         if (!loc) break;
         url = new URL(loc, url);
-        res = await env.ASSETS.fetch(new Request(url.toString(), { method: "GET" }));
+        res = await env.ASSETS.fetch(
+          new Request(url.toString(), { method: "GET" })
+        );
       }
 
       if (!res.ok) continue;
@@ -97,37 +107,51 @@ async function loadShell(env, request) {
  * news.js 成功時：skeleton→none、body→block、body 加 .in
  * news.js 失敗時：skeleton→none、404→block
  *
- * 一律以 inline style 覆寫，與 news.js 相同機制。
+ * 以 inline style 覆寫，與 news.js 相同機制。
  * .in 為必要 —— .reveal 使用 opacity:0，缺少 .in 時內容雖 display:block
  * 仍為全透明，等同不可見。
  * ────────────────────────────────────────────────────────── */
 
 const HIDE_SKELETON = {
-  element: (el) => appendStyle(el, "display:none;"),
+  element: (el) => setDisplay(el, "none"),
 };
 
 const SHOW_BODY = {
   element(el) {
-    appendStyle(el, "display:block;");
+    setDisplay(el, "block");
     addClass(el, "in");
   },
 };
 
 const SHOW_NOT_FOUND = {
-  element: (el) => appendStyle(el, "display:block;"),
+  element: (el) => setDisplay(el, "block"),
 };
 
-/* ── 主處理 ─────────────────────────────────────────────── */
+/* ── 主處理 ─────────────────────────────────────────────────
+ * 使用 onRequest 而非 onRequestGet：
+ * 需同時涵蓋 HEAD 請求。爬蟲、監控工具與 curl -I 皆會發送 HEAD，
+ * 若只處理 GET，HEAD 會掉到靜態資源層，回傳與本 Function 無關的
+ * 狀態碼與標頭，造成誤判。
+ * Workers runtime 會自動為 HEAD 回應移除 body。
+ * ────────────────────────────────────────────────────────── */
 
-export async function onRequestGet(context) {
+export async function onRequest(context) {
   const { params, env, request } = context;
+
+  // 僅處理讀取類方法
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    return new Response("Method Not Allowed", {
+      status: 405,
+      headers: { allow: "GET, HEAD" },
+    });
+  }
+
   const slug = params.slug;
 
   /* 步驟 1：取得靜態外殼 */
   const shell = await loadShell(env, request);
 
   if (!shell) {
-    // 明確失敗，不安靜回傳空頁面
     return new Response(
       "Shell template unavailable. Tried: " + SHELL_CANDIDATES.join(", "),
       {
