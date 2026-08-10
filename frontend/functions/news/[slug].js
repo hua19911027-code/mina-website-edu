@@ -58,6 +58,15 @@ function addClass(el, name) {
   el.setAttribute("class", current ? `${current} ${name}` : name);
 }
 
+/** HTML 屬性值跳脫 */
+function attrEsc(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 /**
  * 取得靜態外殼 HTML。
  * 依序嘗試候選路徑，並手動跟隨重導向（env.ASSETS.fetch 不會自動跟隨）。
@@ -289,6 +298,17 @@ export async function onRequest(context) {
     })
     .on("#article-content", {
       element: (el) => el.setInnerContent(contentHtml, { html: true }),
+    })
+    .on("#article-cover", {
+      element(el) {
+        if (!coverImage) return; // 無封面圖時維持原本的 emoji 佔位符
+        el.setInnerContent(
+          `<img src="${attrEsc(coverImage)}" alt="${attrEsc(title)}" ` +
+            `style="width:100%;height:100%;object-fit:cover;display:block;" ` +
+            `fetchpriority="high" decoding="async">`,
+          { html: true }
+        );
+      },
     })
 
     /* body — 可見性切換 */
