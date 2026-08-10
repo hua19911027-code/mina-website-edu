@@ -334,6 +334,7 @@
     var skeleton = document.getElementById('article-skeleton');
     var body = document.getElementById('article-body');
     var notFound = document.getElementById('article-404');
+    var alreadyRendered = !!(body && body.style.display === 'block');
 
     fetch(API_BASE + '/api/v1/news/' + encodeURIComponent(slug))
       .then(function (r) { return r.json(); })
@@ -350,6 +351,11 @@
         updateArticleSEO(data.data, slug);
       })
       .catch(function () {
+        // #article-body 的 inline display 由 SSR function 設定：
+        // 僅「正常渲染」路徑會設為 block，降級與 404 路徑維持 none。
+        // 此處 fetch 失敗代表網路/CORS 問題而非文章不存在，
+        // 不應覆蓋 SSR 已渲染的內容。
+        if (alreadyRendered) return;
         if (skeleton) skeleton.style.display = 'none';
         if (notFound) notFound.style.display = 'block';
       });

@@ -21,6 +21,7 @@
 
 缺螺絲：
 - `practice.html` 題庫頁靜態化未做（`news.js`/`practice.js` 同款「內容靠 JS fetch 注入」問題，practice 這支工程量較大，另行規劃）
+- `news.js` `loadArticle()` 已修正「fetch失敗覆蓋SSR內容」問題（2026-08-10），但剩一個邊界情況未處理：SSR 降級（`[slug].js` 內 API 異常回原樣外殼）+ 瀏覽器端 fetch 也失敗時，仍會顯示「找不到這篇文章」（因為此時 `#article-body` 不是 SSR 設的 `display:block`，判斷不出「已有內容」）。徹底修正需新增獨立的「載入失敗」UI 狀態區塊，屬新增功能，另行規劃
 - CLS 0.197~0.216 舊案尚未證實根本解決（見 archive「2026-07-01」段），下次應查 Search Console Core Web Vitals 真實數據，不要只重跑 PageSpeed
 - 116 學年度（明年）出版社設定一樣要手動改 n8n code 節點（`IpxBWR3Nbg2z798v`），Admin Panel 出版社上傳功能目前是斷頭路
 - gstack 技能框架 vendored 安裝造成技能清單膨脹，doctor 健檢發現但無法直接修
