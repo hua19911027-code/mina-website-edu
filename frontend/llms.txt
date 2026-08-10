@@ -4,12 +4,12 @@
 
 ## 服務
 
-- [課程介紹](https://minaedu.tw/courses.html) — 英文（徐薇英文 UP學）、數學（偉智數學 WISE）、安親、夏令營、冬令營、正音課程說明
-- [題庫練習](https://minaedu.tw/practice.html) — 依年級與科目分類的免費題庫，附正確觀念、常見錯誤、記憶提示
-- [最新消息](https://minaedu.tw/news.html) — 最新課程公告、活動照片與學習文章
-- [預約試聽](https://minaedu.tw/booking.html) — 免費試聽課程預約表單
-- [常見問題](https://minaedu.tw/faq.html) — 家長與學生常見問題
-- [關於我們](https://minaedu.tw/about.html) — 教學理念與師資介紹
+- [課程介紹](https://minaedu.tw/courses) — 英文（徐薇英文 UP學）、數學（偉智數學 WISE）、安親、夏令營、冬令營、正音課程說明
+- [題庫練習](https://minaedu.tw/practice) — 依年級與科目分類的免費題庫，附正確觀念、常見錯誤、記憶提示
+- [最新消息](https://minaedu.tw/news) — 最新課程公告、活動照片與學習文章
+- [預約試聽](https://minaedu.tw/booking) — 免費試聽課程預約表單
+- [常見問題](https://minaedu.tw/faq) — 家長與學生常見問題
+- [關於我們](https://minaedu.tw/about) — 教學理念與師資介紹
 
 ## 聯絡
 

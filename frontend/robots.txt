@@ -4,4 +4,7 @@ Disallow: /booking-success.html
 
 Disallow: /admin/
 
+Disallow: /news-single
+Disallow: /news-single.html
+
 Sitemap: https://minaedu.tw/sitemap.xml
