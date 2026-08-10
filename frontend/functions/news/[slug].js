@@ -3,16 +3,29 @@
  * 路徑：frontend/functions/news/[slug].js
  * 對應網址：https://minaedu.tw/news/{slug}
  *
- * 設計原則：
- * 1. 沿用既有的 news-single.html 靜態外殼，不另做模板
- * 2. 用 HTMLRewriter 填入內容並切換可見性，重現「news.js 執行完畢」的狀態
- * 3. news.js 完全不需修改，瀏覽器端仍會正常運作（重複設定同樣的值，無副作用）
- * 4. API 異常時退回原樣外殼，行為與修改前相同，不讓頁面壞掉
+ * 版本：V2（修正 V1 取得靜態外殼時拿到空 body 的問題）
+ *
+ * V1 問題：
+ *   env.ASSETS.fetch("/news-single.html") 疑似觸發 Pages 的
+ *   「.html → 無副檔名」308 重導向，回應 body 為空，
+ *   導致 HTMLRewriter 在空字串上轉換，產生「狀態碼正確、內容全空」的頁面。
+ *
+ * V2 對策：
+ *   1. 優先嘗試無副檔名路徑，失敗才退回 .html
+ *   2. 手動跟隨 3xx 重導向（最多 3 次）
+ *   3. 外殼取得失敗時回 500 並附診斷訊息，絕不安靜地回傳空頁面
+ *   4. 加上 x-mina-shell / x-mina-render 回應標頭，方便驗證與除錯
  */
 
 const API_BASE = "https://api.minaedu.tw/api/v1";
 const SITE = "https://minaedu.tw";
 const BRAND = "臺中市私立卓越國際文理短期補習班";
+
+/** 外殼候選路徑，依序嘗試 */
+const SHELL_CANDIDATES = ["/news-single", "/news-single.html"];
+
+/** 外殼內容最小長度，低於此值視為抓取失敗 */
+const SHELL_MIN_LENGTH = 500;
 
 /* ── 工具函式 ───────────────────────────────────────────── */
 
@@ -27,19 +40,56 @@ function formatDate(iso) {
 /** 保留既有 inline style，附加新規則（後者覆寫前者） */
 function appendStyle(el, extra) {
   const current = el.getAttribute("style") || "";
-  const sep = current.trim().endsWith(";") || current === "" ? "" : ";";
+  const sep = current.trim() === "" || current.trim().endsWith(";") ? "" : ";";
   el.setAttribute("style", `${current}${sep}${extra}`);
 }
 
 /** 補上 class（避免重複） */
 function addClass(el, name) {
   const current = el.getAttribute("class") || "";
-  if (current.split(/\s+/).includes(name)) return;
+  if (current.split(/\s+/).filter(Boolean).includes(name)) return;
   el.setAttribute("class", current ? `${current} ${name}` : name);
 }
 
+/**
+ * 取得靜態外殼 HTML。
+ * 依序嘗試候選路徑，並手動跟隨重導向。
+ * @returns {Promise<{html: string, path: string} | null>}
+ */
+async function loadShell(env, request) {
+  for (const candidate of SHELL_CANDIDATES) {
+    let url = new URL(candidate, request.url);
+
+    try {
+      // 使用乾淨的 GET 請求，不沿用原始 request 的標頭，
+      // 避免額外標頭影響資源伺服器的行為。
+      let res = await env.ASSETS.fetch(new Request(url.toString(), { method: "GET" }));
+
+      // 手動跟隨 3xx（env.ASSETS.fetch 不會自動跟隨）
+      for (let hop = 0; hop < 3; hop++) {
+        if (res.status < 300 || res.status >= 400) break;
+        const loc = res.headers.get("location");
+        if (!loc) break;
+        url = new URL(loc, url);
+        res = await env.ASSETS.fetch(new Request(url.toString(), { method: "GET" }));
+      }
+
+      if (!res.ok) continue;
+
+      const html = await res.text();
+      if (html && html.length >= SHELL_MIN_LENGTH) {
+        return { html, path: url.pathname };
+      }
+    } catch (e) {
+      // 換下一個候選路徑
+    }
+  }
+
+  return null;
+}
+
 /* ── 可見性切換 ─────────────────────────────────────────────
- * news-single.html 的預設狀態：
+ * news-single.html 預設狀態：
  *   #article-skeleton  可見（style="max-width:780px;margin:0 auto;"）
  *   #article-body      隱藏（style="display:none;"）
  *   #article-404       隱藏（style="display:none;"）
@@ -47,9 +97,9 @@ function addClass(el, name) {
  * news.js 成功時：skeleton→none、body→block、body 加 .in
  * news.js 失敗時：skeleton→none、404→block
  *
- * 一律使用 inline style 覆寫，與 news.js 相同機制，不自創 class。
- * .in 是必要的 —— .reveal 用 opacity:0 做動畫，缺少 .in 時內容
- * 雖然 display:block 但仍為全透明，爬蟲與使用者都看不到。
+ * 一律以 inline style 覆寫，與 news.js 相同機制。
+ * .in 為必要 —— .reveal 使用 opacity:0，缺少 .in 時內容雖 display:block
+ * 仍為全透明，等同不可見。
  * ────────────────────────────────────────────────────────── */
 
 const HIDE_SKELETON = {
@@ -73,17 +123,31 @@ export async function onRequestGet(context) {
   const { params, env, request } = context;
   const slug = params.slug;
 
-  // 取得靜態外殼
-  const shellUrl = new URL("/news-single.html", request.url);
-  const shellRes = await env.ASSETS.fetch(new Request(shellUrl, request));
-  const shellHtml = await shellRes.text();
+  /* 步驟 1：取得靜態外殼 */
+  const shell = await loadShell(env, request);
 
+  if (!shell) {
+    // 明確失敗，不安靜回傳空頁面
+    return new Response(
+      "Shell template unavailable. Tried: " + SHELL_CANDIDATES.join(", "),
+      {
+        status: 500,
+        headers: {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "no-store",
+          "x-mina-render": "shell-load-failed",
+        },
+      }
+    );
+  }
+
+  const shellHtml = shell.html;
   const makeShellResponse = () =>
     new Response(shellHtml, {
       headers: { "content-type": "text/html; charset=utf-8" },
     });
 
-  // 取得文章資料
+  /* 步驟 2：取得文章資料 */
   let article = null;
   let apiFailed = false;
 
@@ -101,18 +165,20 @@ export async function onRequestGet(context) {
     apiFailed = true;
   }
 
-  /* ── 路徑 A：API 異常 → 回原樣外殼，交給 JS 接手 ── */
+  /* 路徑 A：API 異常 → 回原樣外殼，交給前端 JS 接手 */
   if (apiFailed) {
     return new Response(shellHtml, {
       status: 200,
       headers: {
         "content-type": "text/html; charset=utf-8",
         "cache-control": "no-store",
+        "x-mina-shell": shell.path,
+        "x-mina-render": "api-failed-passthrough",
       },
     });
   }
 
-  /* ── 路徑 B：文章不存在 → 真 404 ── */
+  /* 路徑 B：文章不存在 → 真 404 */
   if (!article) {
     const html = await new HTMLRewriter()
       .on("title", {
@@ -124,7 +190,7 @@ export async function onRequestGet(context) {
       })
       .on("#article-skeleton", HIDE_SKELETON)
       .on("#article-404", SHOW_NOT_FOUND)
-      // #article-body 維持預設的 display:none，不動
+      // #article-body 維持預設 display:none
       .transform(makeShellResponse())
       .text();
 
@@ -133,11 +199,13 @@ export async function onRequestGet(context) {
       headers: {
         "content-type": "text/html; charset=utf-8",
         "cache-control": "public, max-age=0, s-maxage=60",
+        "x-mina-shell": shell.path,
+        "x-mina-render": "not-found",
       },
     });
   }
 
-  /* ── 路徑 C：正常渲染 ── */
+  /* 路徑 C：正常渲染 */
 
   const title = article.title ?? "";
   const excerpt = article.excerpt ?? "";
@@ -202,7 +270,7 @@ export async function onRequestGet(context) {
     /* body — 可見性切換 */
     .on("#article-skeleton", HIDE_SKELETON)
     .on("#article-body", SHOW_BODY)
-    // #article-404 維持預設的 display:none，不動
+    // #article-404 維持預設 display:none
 
     .transform(makeShellResponse())
     .text();
@@ -212,6 +280,8 @@ export async function onRequestGet(context) {
     headers: {
       "content-type": "text/html; charset=utf-8",
       "cache-control": "public, max-age=0, s-maxage=300",
+      "x-mina-shell": shell.path,
+      "x-mina-render": "ssr",
     },
   });
 }
