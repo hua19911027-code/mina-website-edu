@@ -12,6 +12,19 @@
 
 ---
 
+## ✅ 已完成（2026-08-10，2026-08-11 從主檔案移入歸檔）
+
+**最新消息 SEO 修復（PHASE 1–5，`seo-ssr-preview` 分支開發驗證後合併至 dev，已在正式站驗證通過）**：
+- `frontend/functions/news/[slug].js`：Cloudflare Pages Function 做文章頁 SSR（伺服器端填入 title/content/meta/og/JSON-LD BlogPosting，並切換 skeleton/body/404 可見性），用 `onRequest` 涵蓋 GET/HEAD，靜態外殼改抓無副檔名路徑並手動跟隨重導向（避開 `.html→無副檔名` 308 導致外殼取得失敗的坑）
+- `frontend/functions/sitemap.xml.js`：動態產生 sitemap，依 API `hasMore` 分頁抓全部文章（**API `total` 欄位有 bug，回傳 `limit+1`，全站程式碼禁止使用該欄位判斷分頁**）
+- `frontend/404.html`：新增真 404 頁（`noindex`，套用既有 header/footer），取代原本亂打網址回首頁還 200 的行為
+- `robots.txt` 排除 `/news-single`(.html)（SSR 用空殼模板不應被獨立收錄）；`llms.txt` 六個連結移除 `.html`；`news-single.html` 清除三篇寫死假文章（`#related-list` 改空容器供 `news.js` 注入）、修正 og:url
+- **根因排查**：Cloudflare 該網域的「URL 改寫規則」`/news/* → /news-single` 在邊緣層攔截了所有請求，Function 完全沒機會執行（h1 一直是 skeleton 佔位符、404 分支也回 200）；已由使用者在 Dashboard 停用該規則，問題排除，非程式碼問題
+
+`workers/src/routes/admin.ts` 的 paperCounts 修正已部署（2026-08-10，Version ID `763e0019-b1ec-4c39-9283-bc65c79acc81`）
+
+---
+
 ## ✅ 已完成（2026-07-27，2026-08-10 從主檔案移入歸檔）
 
 ### 題庫 n8n 自動化連環 bug 全部查明修正（透過 n8n API 直接改 workflow，非本 repo git 歷史）
