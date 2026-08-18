@@ -68,7 +68,7 @@ export interface Article {
 
 export interface ArticleList {
   articles: Article[];
-  total: number;
+  atLeast: number;
   page: number;
   limit: number;
   hasMore: boolean;
@@ -111,7 +111,7 @@ export interface PracticeQuestion {
 
 export interface PracticeList {
   questions: PracticeQuestion[];
-  total: number;
+  atLeast: number;
   page: number;
   limit: number;
   hasMore: boolean;

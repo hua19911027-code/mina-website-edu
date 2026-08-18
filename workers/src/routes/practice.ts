@@ -162,7 +162,7 @@ route.get('/', async (c) => {
     const slice = filtered.slice(start, start + PAGE_SIZE);
     const result: PracticeList = {
       questions: slice,
-      total: filtered.length,
+      atLeast: filtered.length,
       page,
       limit: PAGE_SIZE,
       hasMore: start + PAGE_SIZE < filtered.length,
@@ -195,7 +195,7 @@ route.get('/', async (c) => {
 
     const data: PracticeList = {
       questions: slice,
-      total: all.length,
+      atLeast: all.length,
       page,
       limit: PAGE_SIZE,
       hasMore,
@@ -239,7 +239,7 @@ route.get('/archive', async (c) => {
       ok: true,
       data: {
         questions: slice,
-        total: Math.min(filtered.length, ARCHIVE_HARD_LIMIT),
+        atLeast: Math.min(filtered.length, ARCHIVE_HARD_LIMIT),
         page,
         limit: PAGE_SIZE,
         hasMore: !reachedLimit && start + PAGE_SIZE < limited.length,
@@ -270,7 +270,7 @@ route.get('/archive', async (c) => {
 
     const data: PracticeList & { reachedLimit: boolean } = {
       questions: slice,
-      total: all.length,
+      atLeast: all.length,
       page,
       limit: PAGE_SIZE,
       hasMore: !reachedLimit && start + PAGE_SIZE < all.length,

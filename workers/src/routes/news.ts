@@ -43,17 +43,17 @@ route.get('/', async (c) => {
     if (category) {
       articles = articles.filter((a) => a.category === category);
     }
-    const total = articles.length;
+    const atLeast = articles.length;
     const start = (page - 1) * limit;
     const slice = articles.slice(start, start + limit);
     return c.json<{ ok: true; data: ArticleList }>({
       ok: true,
       data: {
         articles: slice,
-        total,
+        atLeast,
         page,
         limit,
-        hasMore: start + limit < total,
+        hasMore: start + limit < atLeast,
       },
     });
   }
@@ -80,18 +80,18 @@ route.get('/', async (c) => {
     });
 
     const all = result.results.map(transformPage);
-    const total = all.length;
+    const atLeast = all.length;
     const start = (page - 1) * limit;
     const articles = all.slice(start, start + limit);
 
-    const payload = { ok: true, data: { articles, total, page, limit, hasMore: start + limit < total } };
+    const payload = { ok: true, data: { articles, atLeast, page, limit, hasMore: start + limit < atLeast } };
     c.executionCtx.waitUntil(c.env.KV_CACHE.put(cacheKey, JSON.stringify(payload), { expirationTtl: 900 }));
     return c.json<{ ok: true; data: ArticleList }>(payload as { ok: true; data: ArticleList });
   } catch (e) {
     console.error('News list error:', e);
     return c.json<{ ok: true; data: ArticleList }>({
       ok: true,
-      data: { articles: [], total: 0, page, limit, hasMore: false },
+      data: { articles: [], atLeast: 0, page, limit, hasMore: false },
     });
   }
 });
