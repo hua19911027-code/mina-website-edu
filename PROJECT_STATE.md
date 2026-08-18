@@ -5,6 +5,12 @@
 ## 狀態（更新：2026-08-18）
 
 已完成：
+- **新建 A5-每年9月30日封存舊學年題庫**（`H540ksT2ZiAPIeEK`，12節點，仿 A3/A4 風格，`errorWorkflow` 接 F2）：
+  - 依 `Mina_題庫系統_封板規格_V2.0.md` 工作流程4：cron `0 2 30 9 *`，計算「去年」學年度DB名稱（roc-1）、Notion `/v1/search` 比對精確標題找到目標DB、分頁抓取全部未封存題目（Code節點用 `this.helpers.httpRequestWithAuthentication` 迴圈處理 `has_more`/`next_cursor`）、逐題 PATCH `已封存=true`（不刪除，僅打勾）、完成後 LINE 通知
+  - **多加一層安全煞車**（規格沒要求，是額外判斷）：封存前比對目標DB id 是否等於目前網站正在讀取的 `notionPracticeDbId`，若相同就中止並改發警告通知，避免萬一比對邏輯出錯而誤封存正在使用中的題庫
+  - **已知落差**：114學年度題庫在 Notion 裡的實際標題是「Minaedu.tw 114學年度題庫（新版）」，不是新命名慣例的「114學年度題庫」（115開始才用乾淨命名），精確比對邏輯找不到它，第一次真正觸發（明年9/30封存115時應該沒問題，但若要現在測試/涵蓋114則會走到「找不到，警告」分支）——建議之後找時間把 114 的 DB 標題改成統一格式，或明確告知業務上是否需要涵蓋114
+  - **尚未實測**：n8n 這個容器內 CLI 執行跟已在跑的正式服務 port 衝突，公開API也沒有「立即執行」端點，沒辦法自動化測試。已用 `node --check` 驗證所有 Code 節點語法正確，其餘節點都是直接複製 A3/A4 已驗證過的 pattern，只有「分頁抓取待封存題目」這個節點用的 `this.helpers.httpRequestWithAuthentication` 是這個專案第一次用（其他都是獨立 HTTP Request 節點，不是在 Code 節點裡直接發請求）——**建議 Manko 在 n8n UI（localhost:5678）手動點一次「Execute workflow」測試**，預期會安全地走到「找不到DB」警告分支（不會動到任何真實資料）
+  - **目前 `active: false`**，是否啟用、是否要處理114命名落差，待 Manko 決定
 - **A4觸發確認 / A3排程視窗化 / PHASE B total欄位修正**（延續上輪 A3 冪等修復的收尾工作）：
   - **A4觸發確認**：直接查 n8n SQLite `workflow_statistics` 表（不受14天執行紀錄清除限制的持久化聚合統計），確認 A3 於 `2026-07-10 03:00`（台北時間）`production_success`、A4 於 `2026-08-01 03:00`（台北時間）`production_success`，兩者皆準時觸發成功。搭配正式站 `/api/v1/practice` 實測（撈到 2026-08 新題），確認題庫讀取路徑正常
   - **9/30 學年封存 workflow**：重新查現行全部 24 支 n8n workflow（含未啟用/已封存），確認**不存在**任何處理 9/30 學年封存的 workflow；舊 memory 記錄的 workflow ID（`ulkXidFkF4cf2wur`）已不存在於目前清單。是否需要重建屬業務決策，待 Manko 確認
@@ -28,7 +34,7 @@
 - （PHASE B 已部署，無未完成項）
 
 下一步：
-- 9/30 學年封存 workflow 是否還要做：業務面決策，若要做則比照 A3/A4 模式重建
+- A5 學年封存 workflow：Manko 手動測試一次（n8n UI 點 Execute workflow）+ 決定是否啟用 + 決定 114 命名落差怎麼處理
 - 人工進 Notion 審 8 月那 171 題：挑掉看圖題，其餘勾「是否發布」
 - 到 Cloudflare / Google Cloud 主控台重新產生 CF_TOKEN、GKEY
 - Bing Webmaster Tools 提交 sitemap；Google Search Console 重新提交新版動態 sitemap
