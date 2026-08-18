@@ -2,9 +2,14 @@
 
 > 更早的歷史記錄見 `PROJECT_STATE-archive.md`；架構細節見 `CLAUDE.md`。
 
-## 狀態（更新：2026-08-15）
+## 狀態（更新：2026-08-18）
 
 已完成：
+- **A4觸發確認 / A3排程視窗化 / PHASE B total欄位修正**（延續上輪 A3 冪等修復的收尾工作）：
+  - **A4觸發確認**：直接查 n8n SQLite `workflow_statistics` 表（不受14天執行紀錄清除限制的持久化聚合統計），確認 A3 於 `2026-07-10 03:00`（台北時間）`production_success`、A4 於 `2026-08-01 03:00`（台北時間）`production_success`，兩者皆準時觸發成功。搭配正式站 `/api/v1/practice` 實測（撈到 2026-08 新題），確認題庫讀取路徑正常
+  - **9/30 學年封存 workflow**：重新查現行全部 24 支 n8n workflow（含未啟用/已封存），確認**不存在**任何處理 9/30 學年封存的 workflow；舊 memory 記錄的 workflow ID（`ulkXidFkF4cf2wur`）已不存在於目前清單。是否需要重建屬業務決策，待 Manko 確認
+  - **A3 排程視窗化**：cron 由單日 `0 3 10 7 *` 改為視窗 `0 3 10-23 7 *`（每年 7/10~7/23 每日檢查一次），workflow 更名為「A3-每年7/10~23建新學年度題庫DB（冪等，逐日檢查）」。前提條件（冪等，重複執行不重複建立）已於上輪修復滿足，故此改動安全。備份：`~/n8n-local/workflow-backups/A3-20260818-090310-before-window-schedule.json`
+  - **PHASE B**：確認 n8n 24 支 workflow 均未呼叫 `/api/v1/practice`、`/api/v1/news` 公開端點（只呼叫 `/api/v1/admin/*` 系列），也未在任何 Code 節點讀取 `total` 欄位，前端亦確認未讀取（已 grep）。故將 `PracticeList`/`ArticleList` 的 `total` 欄位直接改名為 `atLeast`（誠實反映「本次查詢至少抓到這麼多筆」的語意，非資料庫真實總筆數），未保留過渡期別名。`workers/src/types.ts`、`routes/practice.ts`、`routes/news.ts` 已改，`tsc --noEmit` 通過，**尚未 `wrangler deploy`**
 - **n8n A3 workflow（每年7月10日建新學年度題庫DB）無聲失敗修復**：
   - 移除「建立新學年度DB」「更新KV出題DB」兩個節點的 `neverError:true`（原本 Notion/KV 失敗時 workflow 仍回報成功，可能寫入壞值）
   - 新增冪等前置判斷：查詢 Notion `/v1/search` 比對是否已存在同名同父頁面的資料庫，已存在則跳過建立、直接沿用既有 database id；新增「驗證DB建立結果」節點檢查回應含合法 UUID 格式的 id
@@ -20,13 +25,14 @@
 - 舊項目（最新消息 SEO 修復 PHASE 1–5、admin.ts paperCounts）已移至 `PROJECT_STATE-archive.md`
 
 未完成：
-- PHASE B（`workers/src/routes/news.ts`/`practice.ts` 的 `total` 欄位語意錯誤：實際是「已抓取筆數」被誤標成「總筆數」，非 Notion has_more 判斷錯誤）本輪暫緩未執行。前端/後端目前皆無人讀取此欄位（已 grep 確認），改動風險低，但 n8n workflow 是否依賴需 Manko 自行在 n8n 介面確認（本 repo 內查無 n8n 流程定義檔，無法用 grep 查）
+- PHASE B 程式碼已改完但**尚未部署到正式環境**（`cd workers && npx wrangler deploy`）——workers 不隨 git push 自動部署，需手動觸發，屬「動 prod」需 Manko 確認後才執行
 
 下一步：
+- 部署 PHASE B（`wrangler deploy`）——需 Manko 確認
+- 9/30 學年封存 workflow 是否還要做：業務面決策，若要做則比照 A3/A4 模式重建
 - 人工進 Notion 審 8 月那 171 題：挑掉看圖題，其餘勾「是否發布」
 - 到 Cloudflare / Google Cloud 主控台重新產生 CF_TOKEN、GKEY
 - Bing Webmaster Tools 提交 sitemap；Google Search Console 重新提交新版動態 sitemap
-- PHASE B：確認 n8n 是否依賴 `total` 欄位後再決定修法（移除，或改名 `atLeast` 並保留 `total` 過渡期）
 
 缺螺絲：
 - `/practice` SSR 僅涵蓋單頁預設篩選（小一/英文）的本週題目；歷屆題庫、考前複習、切換篩選後結果仍是 client-side fetch。分年級/科目多網址（如 `/practice/g1-en`）列入後續規劃，屆時可沿用 `qcard-template.js`、Function 骨架、SSR 偵測邏輯
@@ -35,5 +41,4 @@
 - CLS 0.197~0.216 舊案尚未證實根本解決（見 archive「2026-07-01」段），下次應查 Search Console Core Web Vitals 真實數據，不要只重跑 PageSpeed
 - 116 學年度（明年）出版社設定一樣要手動改 n8n code 節點（`IpxBWR3Nbg2z798v`），Admin Panel 出版社上傳功能目前是斷頭路
 - gstack 技能框架 vendored 安裝造成技能清單膨脹，doctor 健檢發現但無法直接修
-- A3 排程仍為單日觸發（`0 3 10 7 *`），視窗式排程（如改 `0 3 10-23 7 *` 避免機器未開機整年錯過）尚未套用——但前提條件（冪等，連續執行不重複建立）已於本輪滿足，之後排程本身要不要改是獨立決策
-- A4（8/1切換讀取DB）、9/30學年封存這兩個項目本輪只診斷未修：A4 是否曾自動觸發無法從執行紀錄確認；9/30 封存 workflow 在現行 n8n 找不到，規格文件已過時，需重新確認業務需求是否還要做
+- Notion KV 設定的 `notionPracticeDbId`（現值 `2502b420-9049-4621-a4b9-99a299a9b922`）用 Manko 自己的 Notion 帳號（陳芊樺）查不到這個資料庫（404），但用 n8n/Workers 的整合金鑰查詢正常出題——研判是這個資料庫當初由自動化直接用 API 建立、未正確掛在「Minaedu.tw」父頁面下或未分享給個人帳號，功能上無影響但建議找時間在 Notion UI 裡確認這個資料庫的位置、補上正確歸屬
