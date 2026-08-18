@@ -9,7 +9,7 @@
   - **A4觸發確認**：直接查 n8n SQLite `workflow_statistics` 表（不受14天執行紀錄清除限制的持久化聚合統計），確認 A3 於 `2026-07-10 03:00`（台北時間）`production_success`、A4 於 `2026-08-01 03:00`（台北時間）`production_success`，兩者皆準時觸發成功。搭配正式站 `/api/v1/practice` 實測（撈到 2026-08 新題），確認題庫讀取路徑正常
   - **9/30 學年封存 workflow**：重新查現行全部 24 支 n8n workflow（含未啟用/已封存），確認**不存在**任何處理 9/30 學年封存的 workflow；舊 memory 記錄的 workflow ID（`ulkXidFkF4cf2wur`）已不存在於目前清單。是否需要重建屬業務決策，待 Manko 確認
   - **A3 排程視窗化**：cron 由單日 `0 3 10 7 *` 改為視窗 `0 3 10-23 7 *`（每年 7/10~7/23 每日檢查一次），workflow 更名為「A3-每年7/10~23建新學年度題庫DB（冪等，逐日檢查）」。前提條件（冪等，重複執行不重複建立）已於上輪修復滿足，故此改動安全。備份：`~/n8n-local/workflow-backups/A3-20260818-090310-before-window-schedule.json`
-  - **PHASE B**：確認 n8n 24 支 workflow 均未呼叫 `/api/v1/practice`、`/api/v1/news` 公開端點（只呼叫 `/api/v1/admin/*` 系列），也未在任何 Code 節點讀取 `total` 欄位，前端亦確認未讀取（已 grep）。故將 `PracticeList`/`ArticleList` 的 `total` 欄位直接改名為 `atLeast`（誠實反映「本次查詢至少抓到這麼多筆」的語意，非資料庫真實總筆數），未保留過渡期別名。`workers/src/types.ts`、`routes/practice.ts`、`routes/news.ts` 已改，`tsc --noEmit` 通過，**尚未 `wrangler deploy`**
+  - **PHASE B**：確認 n8n 24 支 workflow 均未呼叫 `/api/v1/practice`、`/api/v1/news` 公開端點（只呼叫 `/api/v1/admin/*` 系列），也未在任何 Code 節點讀取 `total` 欄位，前端亦確認未讀取（已 grep）。故將 `PracticeList`/`ArticleList` 的 `total` 欄位直接改名為 `atLeast`（誠實反映「本次查詢至少抓到這麼多筆」的語意，非資料庫真實總筆數），未保留過渡期別名。`workers/src/types.ts`、`routes/practice.ts`、`routes/news.ts` 已改，`tsc --noEmit` 通過，**已 `wrangler deploy` 上正式站並實測 `/api/v1/practice`、`/api/v1/news` 回應皆已改用 `atLeast`**
 - **n8n A3 workflow（每年7月10日建新學年度題庫DB）無聲失敗修復**：
   - 移除「建立新學年度DB」「更新KV出題DB」兩個節點的 `neverError:true`（原本 Notion/KV 失敗時 workflow 仍回報成功，可能寫入壞值）
   - 新增冪等前置判斷：查詢 Notion `/v1/search` 比對是否已存在同名同父頁面的資料庫，已存在則跳過建立、直接沿用既有 database id；新增「驗證DB建立結果」節點檢查回應含合法 UUID 格式的 id
@@ -25,10 +25,9 @@
 - 舊項目（最新消息 SEO 修復 PHASE 1–5、admin.ts paperCounts）已移至 `PROJECT_STATE-archive.md`
 
 未完成：
-- PHASE B 程式碼已改完但**尚未部署到正式環境**（`cd workers && npx wrangler deploy`）——workers 不隨 git push 自動部署，需手動觸發，屬「動 prod」需 Manko 確認後才執行
+- （PHASE B 已部署，無未完成項）
 
 下一步：
-- 部署 PHASE B（`wrangler deploy`）——需 Manko 確認
 - 9/30 學年封存 workflow 是否還要做：業務面決策，若要做則比照 A3/A4 模式重建
 - 人工進 Notion 審 8 月那 171 題：挑掉看圖題，其餘勾「是否發布」
 - 到 Cloudflare / Google Cloud 主控台重新產生 CF_TOKEN、GKEY
