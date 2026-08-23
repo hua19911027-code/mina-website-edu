@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Threads OAuth Callback</title>
+</head>
+<body>
+<h1>Threads OAuth Callback</h1>
+<p>授權完成，請複製下面的 code 參數。</p>
+<pre id="code" style="word-break:break-all;white-space:pre-wrap;"></pre>
+<script>
+  var params = new URLSearchParams(window.location.search);
+  document.getElementById('code').textContent = params.get('code') || '(網址列沒有 code 參數)';
+</script>
+</body>
+</html>
