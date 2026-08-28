@@ -98,7 +98,7 @@
       '@type': 'BreadcrumbList',
       'itemListElement': [
         { '@type': 'ListItem', 'position': 1, 'name': '首頁', 'item': 'https://minaedu.tw/' },
-        { '@type': 'ListItem', 'position': 2, 'name': '最新消息', 'item': 'https://minaedu.tw/news.html' },
+        { '@type': 'ListItem', 'position': 2, 'name': '最新消息', 'item': 'https://minaedu.tw/news' },
         { '@type': 'ListItem', 'position': 3, 'name': article.title, 'item': url }
       ]
     });
