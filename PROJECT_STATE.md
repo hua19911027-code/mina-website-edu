@@ -2,9 +2,11 @@
 
 > 更早的歷史記錄見 `PROJECT_STATE-archive.md`；架構細節見 `CLAUDE.md`。
 
-## 狀態（更新：2026-08-18）
+## 狀態（更新：2026-08-28）
 
 已完成：
+- **修 courses.html 4 個死路連結**：`news-single.html?slug=...` 舊格式（.html 觸發 308 轉址 → 落在 robots.txt 擋掉的 `/news-single`）改成正確 `/news/{slug}`，`news.js` BreadcrumbList JSON-LD 的 `/news.html` 一併修正，見 memory/bugs.md 2026-08-28。起因是 Manko 回報 GSC 收錄卡住（14/42 已收錄，23 篇「已找到未建立索引」3 週未動），查證後 SSR/canonical/sitemap/robots.txt 本身都正常，這是查出的唯一真實技術 bug；收錄緩慢本身研判是年輕網域＋內容差異化不足的正常現象，非技術問題
+- **新增 `frontend/threads/callback.html`／`frontend/threads/privacy.html`**：供 mina-social-studio 專案換 Threads 長效 token 用的一次性 OAuth callback 頁＋Meta 要求的隱私政策頁。`callback.html` 已完成階段性任務可以刪；`privacy.html` 要留著（Meta 會持續驗證這個網址）
 - **新建 A5-每年9月30日封存舊學年題庫**（`H540ksT2ZiAPIeEK`，仿 A3/A4 風格，`errorWorkflow` 接 F2，`active: true`）：
   - 依 `Mina_題庫系統_封板規格_V2.0.md` 工作流程4：計算「去年」學年度DB名稱（roc-1）、Notion `/v1/search` 比對精確標題找到目標DB、逐題 PATCH `已封存=true`（不刪除，僅打勾）、完成後 LINE 通知
   - **多加一層安全煞車**（規格沒要求，是額外判斷）：封存前比對目標DB id 是否等於目前網站正在讀取的 `notionPracticeDbId`，若相同就中止並改發警告通知，避免萬一比對邏輯出錯而誤封存正在使用中的題庫

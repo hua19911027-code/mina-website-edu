@@ -80,3 +80,21 @@
 **如何避免同類 bug：** 任何頁面如果之後要改成「巢狀路徑」（例如 `/courses/:id`），第一步就要先加 `<base href="/">`，不要等上線後才補——`news-single.html` 這次的 16 分鐘破窗證明這個坑一碰就會踩到，其他 7 個頁面目前都還是單層路徑所以沒事，但只要哪天有人幫其中一個加上巢狀網址（常見於 SEO 改版），同一個坑會馬上重演。
 
 **如何避免：** 之後如果 CSP 要新增可外部載入的資源類型（字型、影片、iframe...），要記得同時確認對應的 `*-src` 指令有開，不能只靠 `default-src` 兜底——沒明確設定的資源類型全部會退回 `default-src 'self'`，跨網域資源會被靜默擋下且不易察覺。
+
+---
+
+## 2026-08-28 — GSC「已找到但未建立索引」28 篇 3 週未動；查到 courses.html 4 個連結死路
+
+**症狀：** Manko 回報 Google Search Console 網頁索引狀態卡住（已建立索引 14 / 未建立索引 28），已用「網址審查」逐一提交 news 文章網址近三週，數字沒增加。「涵蓋範圍」原因分類：已找到-未建立索引 23、頁面會重新導向 3、找不到網頁(404) 1、已檢索-未建立索引 1。
+
+**技術面查證（排除的可能性）：** 實測 `/news/{slug}` 真實回應——SSR 正常（`x-mina-render: ssr`）、`<title>`／canonical／JSON-LD 皆正確；`robots.txt` 沒有誤擋 `/news/*`；`sitemap.xml` 產出正常、35+ 篇文章網址皆在內；沒有誤加的 `noindex`。這條 SSR 管線本身沒有問題。
+
+**找到的真實 bug：** `frontend/courses.html` 有 4 個「最新消息」相關連結寫成舊格式 `href="news-single.html?slug=..."`（見 `65b1e...`/`1d528d5` 前的版本）——`.html` 副檔名先觸發 Cloudflare Pages 308 轉址，轉址落點 `/news-single?slug=...` 又剛好是 `robots.txt` 明確 `Disallow` 的路徑，等於從 `courses.html`（重要頁面）連過去的內部連結全部死路。同時 `news.js` 的 BreadcrumbList JSON-LD 也殘留一個 `https://minaedu.tw/news.html`（同一個 `.html` 根因，結構化資料裡的無效網址）。判斷這是 GSC「頁面會重新導向」3 筆的來源之一，也拉低這幾篇文章從內部連結拿到的權重信號。
+
+**修法：** `courses.html` 4 個連結改成正確的 `/news/{slug}`；`news.js` BreadcrumbList 的 `/news.html` 改成 `/news`；`news.js?v=` 快取版號同步 bump（20260810→20260828）。已 push `dev`、Cloudflare Pages 自動部署、`curl` 實測 `courses.html` 產出的連結已正確。
+
+**沒辦法排除、判斷是主因的部分：** 「已找到-未建立索引」23 篇 3 週沒有變化，這是 Google 官方文件裡明確定義的「Google 知道網址存在（多半來自 sitemap），但選擇不優先爬取／收錄」的狀態，不是可以用程式碼直接修的技術錯誤。網站 2026-06-03 才開站（本次查證日 08-28，約 12 週），加上這批「最新消息」文章屬同樣版型的活動花絮日記（相似度高、差異化低），研判是 Google 對年輕網域＋內容差異化不足的正常保守收錄行為，不是 bug。
+
+**相關決策：** 無
+
+**狀態：** `courses.html` 死路連結已修復並驗證；GSC 收錄緩慢本身無法靠這次修法直接解決，屬於需要時間 + 內容差異化 + 外部連結累積的漸進過程，建議列入下方追蹤觀察，不是待修 bug。
