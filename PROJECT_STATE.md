@@ -2,9 +2,10 @@
 
 > 更早的歷史記錄見 `PROJECT_STATE-archive.md`；架構細節見 `CLAUDE.md`。
 
-## 狀態（更新：2026-08-28）
+## 狀態（更新：2026-09-07）
 
 已完成：
+- **GSC「網頁索引狀態」新報回原因修復（robots.txt 封鎖 + 重新導向）**：起因 Manko 收到 GSC 通知信「新原因：遭到 robots.txt 封鎖」。查出根因是 `frontend/components/mina-widget.js`（全站7頁載入的聊天小工具）內建連結還在用舊格式：4條消息連結 `/news-single?slug=xxx`（撞上 `robots.txt` 的 `Disallow: /news-single`）、預約試聽 CTA `/booking.html#bookForm`（`.html` 觸發 Cloudflare Pages 308 轉址）。同時發現 about/booking/courses/faq/news/practice 六個頁面的 `og:url` meta 與 `BreadcrumbList` JSON-LD 自我參照都還留著 `.html`（canonical 之前修過但這兩處漏掉），也是轉址的來源——已全部改用無副檔名網址，同步 bump 7 頁面的 `mina-widget.js?v=` 版號。另確認「404」類的 `/threads/callback` 是刻意刪除的一次性頁面（見下方 8/28 項），非 bug，會隨 Google 重新爬取自然從索引移除；「已檢索/已找到-尚未建立索引」類延續 8/28 診斷結論（年輕網域+內容差異化不足，非技術問題）
 - **修 courses.html 4 個死路連結**：`news-single.html?slug=...` 舊格式（.html 觸發 308 轉址 → 落在 robots.txt 擋掉的 `/news-single`）改成正確 `/news/{slug}`，`news.js` BreadcrumbList JSON-LD 的 `/news.html` 一併修正，見 memory/bugs.md 2026-08-28。起因是 Manko 回報 GSC 收錄卡住（14/42 已收錄，23 篇「已找到未建立索引」3 週未動），查證後 SSR/canonical/sitemap/robots.txt 本身都正常，這是查出的唯一真實技術 bug；收錄緩慢本身研判是年輕網域＋內容差異化不足的正常現象，非技術問題
 - **新增 `frontend/threads/callback.html`／`frontend/threads/privacy.html`**：供 mina-social-studio 專案換 Threads 長效 token 用的一次性 OAuth callback 頁＋Meta 要求的隱私政策頁。`callback.html` 已完成階段性任務可以刪；`privacy.html` 要留著（Meta 會持續驗證這個網址）
 - **新建 A5-每年9月30日封存舊學年題庫**（`H540ksT2ZiAPIeEK`，仿 A3/A4 風格，`errorWorkflow` 接 F2，`active: true`）：
@@ -56,7 +57,6 @@
 缺螺絲：
 - `/practice` SSR 僅涵蓋單頁預設篩選（小一/英文）的本週題目；歷屆題庫、考前複習、切換篩選後結果仍是 client-side fetch。分年級/科目多網址（如 `/practice/g1-en`）列入後續規劃，屆時可沿用 `qcard-template.js`、Function 骨架、SSR 偵測邏輯
 - `news.js` SSR 降級（`[slug].js` 內 API 異常回原樣外殼）+ 瀏覽器端 fetch 也失敗時，仍會顯示「找不到這篇文章」，需新增獨立「載入失敗」UI 狀態區塊，屬新功能，另行規劃
-- `news-single.html`/`practice.html` 的 BreadcrumbList JSON-LD 內 `item` 仍含 `.html`（如 `.../news.html`、`.../practice.html`），與已修正的 canonical/og:url 不一致，屬遺漏點未修
 - CLS 0.197~0.216 舊案尚未證實根本解決（見 archive「2026-07-01」段），下次應查 Search Console Core Web Vitals 真實數據，不要只重跑 PageSpeed
 - 116 學年度（明年）出版社設定一樣要手動改 n8n code 節點（`IpxBWR3Nbg2z798v`），Admin Panel 出版社上傳功能目前是斷頭路
 - gstack 技能框架 vendored 安裝造成技能清單膨脹，doctor 健檢發現但無法直接修

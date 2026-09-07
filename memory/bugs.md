@@ -98,3 +98,19 @@
 **相關決策：** 無
 
 **狀態：** `courses.html` 死路連結已修復並驗證；GSC 收錄緩慢本身無法靠這次修法直接解決，屬於需要時間 + 內容差異化 + 外部連結累積的漸進過程，建議列入下方追蹤觀察，不是待修 bug。
+
+---
+
+## 2026-09-07 — GSC 通知「新原因：遭到 robots.txt 封鎖」；查到小工具與結構化資料殘留 `.html`
+
+**症狀：** Manko 收到 GSC 通知信，「網頁未編入索引的原因」新增「遭到 robots.txt 封鎖」10 個網址；同一份報表另有「頁面會重新導向」5、「找不到網頁(404)」2、「已檢索-未建立索引」3、「已找到-未建立索引」17。
+
+**找到的真實 bug（robots.txt 封鎖）：** `frontend/components/mina-widget.js`（全站聊天小工具設定物件，`about/booking/courses/faq/index/news/practice.html` 共 7 個頁面都會載入）內建 4 條「消息」連結還是 8/28 那輪修 `courses.html` 之前的舊格式 `https://minaedu.tw/news-single?slug=xxx`——`robots.txt` 明確 `Disallow: /news-single`，Google 爬到這個全站曝光的小工具連結就直接被擋。8/28 那輪只修了 `courses.html` 頁面本身的連結，沒查到小工具設定裡也有同樣的舊格式，這次補上。
+
+**找到的真實 bug（頁面會重新導向）：** 6 個頁面（about/booking/courses/faq/news/practice）的 `<meta property="og:url">` 與 `BreadcrumbList` JSON-LD 第二層 `item` 都還在用 `{page}.html` 自我參照——canonical tag 8/28 之前就修過，但 og:url 與 BreadcrumbList 這兩處當時漏掉（`practice.html` 的 BreadcrumbList `.html` 殘留其實已寫進 8/28 那次的 PROJECT_STATE「缺螺絲」清單，但沒發現其實 6 個頁面都有同樣問題，範圍比原本以為的大）。另外 `mina-widget.js` 的預約試聽 CTA 也是 `/booking.html#bookForm`，同一根因。`.html` 副檔名一律觸發 Cloudflare Pages 308 轉址，Google 記錄為「頁面會重新導向」。
+
+**排除的可能性（404 / 未建立索引）：** `/threads/callback` 404 是刻意刪除的一次性 OAuth callback 頁（見 2026-08-28 commit `912fb2b`），非 bug，Google 重新爬取後會自然從索引移除；「已檢索/已找到-未建立索引」延續上一輪（8/28）診斷結論——年輕網域＋內容差異化不足的正常保守收錄行為，非技術問題，這次沒有新發現推翻這個結論。
+
+**修法：** `mina-widget.js` 4 條消息連結、1 條預約 CTA 連結改為正確格式；6 個頁面的 `og:url`/`BreadcrumbList` 全部改用無副檔名網址；同步 bump 7 頁面 `mina-widget.js?v=` 快取版號（20260820→20260907→20260907b）。分兩個 commit push 到 dev（`40ce7c0` robots.txt 封鎖修正、`e8bb0f5` 重新導向修正）。
+
+**如何避免：** 之後任何「舊格式連結」修復都要同時搜尋 `frontend/components/*.js`（尤其 `mina-widget.js`，全站曝光度最高），不能只查頁面本身的 HTML；改網址格式時要一併搜尋 `og:url`、`BreadcrumbList`/`JSON-LD` 等 meta 層級的自我參照，不能只改 canonical。

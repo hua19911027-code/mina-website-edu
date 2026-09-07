@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-09-07
+
+### 修正（GSC 索引問題：robots.txt 封鎖 + 重新導向）
+- `components/mina-widget.js`：4 條消息連結 `/news-single?slug=xxx` → `/news/{slug}`（原網址被 `robots.txt` 的 `Disallow: /news-single` 擋下）
+- `components/mina-widget.js`：預約試聽 CTA `/booking.html#bookForm` → `/booking#bookForm`（`.html` 觸發 308 轉址）
+- `about.html`/`booking.html`/`courses.html`/`faq.html`/`news.html`/`practice.html`：`og:url` meta 與 `BreadcrumbList` JSON-LD 自我參照的 `.html` 改為無副檔名網址（canonical 先前已修正，這兩處是漏網之魚）
+- 同步 bump 7 個頁面的 `mina-widget.js?v=` 快取版號
+
 ## 2026-06-25
 
 ### 效能（PageSpeed 修正，目標 90+）
