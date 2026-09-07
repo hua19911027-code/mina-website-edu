@@ -115,7 +115,8 @@ route.get('/:slug', async (c) => {
   if (cached) return c.json(JSON.parse(cached));
 
   try {
-    /* Query by slug */
+    /* Query by slug. page_size:2 (not 1) so a duplicate slug can be detected
+     * instead of silently picking whichever page Notion happens to return first. */
     const result = await notion.queryDatabase(c.env.NOTION_API_KEY, c.env.NOTION_NEWS_DB_ID, {
       filter: {
         and: [
@@ -123,11 +124,16 @@ route.get('/:slug', async (c) => {
           { property: 'slug', rich_text: { equals: slug } },
         ],
       },
-      page_size: 1,
+      sorts: [{ property: '發布日期', direction: 'descending' }],
+      page_size: 2,
     });
 
     if (!result.results.length) {
       return c.json({ ok: false, error: { code: 'NOT_FOUND', message: 'Article not found' } }, 404);
+    }
+
+    if (result.results.length > 1) {
+      console.error(`Duplicate slug "${slug}": ${result.results.length} published articles match`);
     }
 
     const page = result.results[0];
