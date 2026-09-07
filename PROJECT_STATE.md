@@ -51,8 +51,6 @@
 - 小幫手歷屆題庫的真實題數修正已部署，建議實際在網站上測一次確認文案顯示正確（尤其是「未達36題」時的新分流文案）
 - 題庫練習頁「歷屆題庫/小幫手」目前上限是近90天、36題，超過這個範圍系統本身就查不到（小幫手在36題之後其實是導去約試聽的CTA，沒有更長的查詢機制）——如果業務上需要更長的保留期，屬新功能規劃，不是bug
 - 人工進 Notion 審 8 月那 171 題：挑掉看圖題，其餘勾「是否發布」
-- 到 Cloudflare / Google Cloud 主控台重新產生 CF_TOKEN、GKEY
-- Bing Webmaster Tools 提交 sitemap；Google Search Console 重新提交新版動態 sitemap
 
 缺螺絲：
 - `/practice` SSR 僅涵蓋單頁預設篩選（小一/英文）的本週題目；歷屆題庫、考前複習、切換篩選後結果仍是 client-side fetch。分年級/科目多網址（如 `/practice/g1-en`）列入後續規劃，屆時可沿用 `qcard-template.js`、Function 骨架、SSR 偵測邏輯
