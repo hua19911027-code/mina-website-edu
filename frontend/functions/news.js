@@ -5,7 +5,7 @@
  *
  * 目的：讓第一頁文章卡片（含 /news/{slug} 連結）直接出現在 HTML，
  * 搜尋引擎不需執行 JavaScript 就能發現每篇文章。
- * 範圍：僅 SSR「全部」分類第 1 頁；切換分類、載入更多維持 news.js 的 client-side fetch。
+ * 範圍：僅 SSR「全部」分類第 1 頁卡片，另在底部輸出所有文章的連結清單；切換分類、載入更多維持 news.js 的 client-side fetch。
  * 卡片結構必須與 news.js 的 buildCard() 一致。
  */
 
@@ -138,23 +138,28 @@ export async function onRequest(context) {
 
   const shellHtml = shell.html
 
-  let data = null
+  /* 單次最多 30 篇（API 上限），抓前兩頁涵蓋至多 60 篇，供「全部文章」連結清單使用 */
+  let articles = null
   try {
-    const apiRes = await fetch(`${API_BASE}/news?page=1&limit=${PAGE_SIZE}`, {
-      cf: { cacheTtl: 300, cacheEverything: true },
-    })
-    if (apiRes.ok) {
-      const json = await apiRes.json()
-      if (json.ok && json.data && Array.isArray(json.data.articles)) {
-        data = json.data
-      }
+    const pages = await Promise.all(
+      [1, 2].map(async (p) => {
+        const apiRes = await fetch(`${API_BASE}/news?page=${p}&limit=30`, {
+          cf: { cacheTtl: 300, cacheEverything: true },
+        })
+        if (!apiRes.ok) return null
+        const json = await apiRes.json()
+        return json.ok && json.data && Array.isArray(json.data.articles) ? json.data : null
+      })
+    )
+    if (pages[0]) {
+      articles = pages[0].articles.concat(pages[1] ? pages[1].articles : [])
     }
   } catch (e) {
-    // data 維持 null，走降級路徑
+    // articles 維持 null，走降級路徑
   }
 
   /* 降級路徑：API 異常或沒有文章 → 回原樣外殼，交給 news.js 接手 */
-  if (!data || !data.articles.length) {
+  if (!articles || !articles.length) {
     return new Response(shellHtml, {
       status: 200,
       headers: {
@@ -166,13 +171,28 @@ export async function onRequest(context) {
     })
   }
 
-  const cardsHtml = data.articles.map(renderCard).join('')
-  const hasMore = !!data.hasMore
+  const cards = articles.slice(0, PAGE_SIZE)
+  const cardsHtml = cards.map(renderCard).join('')
+  const hasMore = articles.length > PAGE_SIZE
+
+  /* 全部文章連結清單：搜尋引擎不會點「載入更多」，這裡把所有文章連結直接列在 HTML */
+  const allListHtml =
+    `<nav class="news-all" aria-label="全部文章" style="margin-top:48px;">` +
+    `<h2 style="font-size:1.1rem;margin-bottom:12px;">全部文章</h2>` +
+    `<ul style="list-style:none;padding:0;margin:0;display:grid;gap:8px;">` +
+    articles
+      .map(
+        (a) =>
+          `<li><a href="/news/${encodeURIComponent(a.slug)}">${esc(a.title)}</a>` +
+          ` <span style="opacity:.6;font-size:.85em;">${formatDate(a.publishedAt)}</span></li>`
+      )
+      .join('') +
+    `</ul></nav>`
 
   const html = await new HTMLRewriter()
     .on('#newsGrid', {
       element(el) {
-        el.setAttribute('data-ssr-count', String(data.articles.length))
+        el.setAttribute('data-ssr-count', String(cards.length))
         el.setAttribute('data-ssr-hasmore', hasMore ? 'true' : 'false')
         el.setInnerContent(cardsHtml, { html: true })
       },
@@ -180,6 +200,7 @@ export async function onRequest(context) {
     .on('#load-more-wrap', {
       element(el) {
         if (hasMore) el.setAttribute('style', 'text-align:center;margin-top:40px;display:block;')
+        el.after(allListHtml, { html: true })
       },
     })
     .transform(
