@@ -2,9 +2,15 @@
 
 > 更早的歷史記錄見 `PROJECT_STATE-archive.md`；架構細節見 `CLAUDE.md`。
 
-## 狀態（更新：2026-09-07）
+## 狀態（更新：2026-10-03）
 
 已完成：
+- **GSC「已找到-尚未建立索引」15 頁根因修復 + Bing 處理（2026-10-03）**：
+  - 根因：`/news` 的 `#newsGrid` 原為空、文章靠 JS 載入，原始 HTML 對文章的內部連結數為 0，Google 只能從 sitemap 得知文章。其餘 GSC 三類（robots 封鎖 11／重新導向 8／404 3）全是舊網址殘骸，來源已修，Manko 已全部按「驗證修正」
+  - 新增 `frontend/functions/news.js`：`/news` 第 1 頁 9 篇卡片 SSR，底部另輸出「全部文章」連結清單（35 篇）；`news.js` 偵測 `data-ssr-count` 跳過首次 fetch；`news.js?v=20261003`。API 異常降級回原外殼。已上線並於正式站驗證（`x-mina-render: ssr`、35 條連結）
+  - `news.html`／`practice.html` meta description 加長（Bing 建議；Bing 以英文字數為準，其餘主頁 48~58 字未動）
+  - IndexNow：金鑰檔 `frontend/9a642f49ab0c984d68910e85100536c3.txt`；已手動送出全站 42 頁（202）；新建 n8n workflow「Mina Social Studio - IndexNow 新文章自動通知 Bing」（`thR1yceDFEfVAGvQ`，每小時比對 sitemap，有新網址才送；首次執行只記錄不送；失敗接 F2；備份 `~/n8n-local/workflow-backups/IndexNow-*.json`）。已實測：預埋 41 筆 → 偵測 1 筆新網址 → 送出成功 → 第二次不重送
+  - Bing 現況：已收錄 37 頁、錯誤 0；反向連結不足屬外部因素，程式無法解決
 - **GSC「網頁索引狀態」新報回原因修復（robots.txt 封鎖 + 重新導向）**：起因 Manko 收到 GSC 通知信「新原因：遭到 robots.txt 封鎖」。查出根因是 `frontend/components/mina-widget.js`（全站7頁載入的聊天小工具）內建連結還在用舊格式：4條消息連結 `/news-single?slug=xxx`（撞上 `robots.txt` 的 `Disallow: /news-single`）、預約試聽 CTA `/booking.html#bookForm`（`.html` 觸發 Cloudflare Pages 308 轉址）。同時發現 about/booking/courses/faq/news/practice 六個頁面的 `og:url` meta 與 `BreadcrumbList` JSON-LD 自我參照都還留著 `.html`（canonical 之前修過但這兩處漏掉），也是轉址的來源——已全部改用無副檔名網址，同步 bump 7 頁面的 `mina-widget.js?v=` 版號。另確認「404」類的 `/threads/callback` 是刻意刪除的一次性頁面（見下方 8/28 項），非 bug，會隨 Google 重新爬取自然從索引移除；「已檢索/已找到-尚未建立索引」類延續 8/28 診斷結論（年輕網域+內容差異化不足，非技術問題）
 - **修 courses.html 4 個死路連結**：`news-single.html?slug=...` 舊格式（.html 觸發 308 轉址 → 落在 robots.txt 擋掉的 `/news-single`）改成正確 `/news/{slug}`，`news.js` BreadcrumbList JSON-LD 的 `/news.html` 一併修正，見 memory/bugs.md 2026-08-28。起因是 Manko 回報 GSC 收錄卡住（14/42 已收錄，23 篇「已找到未建立索引」3 週未動），查證後 SSR/canonical/sitemap/robots.txt 本身都正常，這是查出的唯一真實技術 bug；收錄緩慢本身研判是年輕網域＋內容差異化不足的正常現象，非技術問題
 - **新增 `frontend/threads/callback.html`／`frontend/threads/privacy.html`**：供 mina-social-studio 專案換 Threads 長效 token 用的一次性 OAuth callback 頁＋Meta 要求的隱私政策頁。`callback.html` 已完成階段性任務可以刪；`privacy.html` 要留著（Meta 會持續驗證這個網址）
@@ -47,6 +53,10 @@
 - （PHASE B 已部署，無未完成項）
 
 下一步：
+- 觀察 GSC 約 2 週：`/news` 重爬後「已找到」15 頁是否開始被爬／收錄；舊網址三類驗證結果
+- 首頁「最新消息」4 則仍是 JS 載入（未 SSR），若 15 頁仍無起色可考慮補做
+- 3 篇文章 meta 描述偏短（excellent-after-school-care／wisemath-thinking-learning／hsuwei-english-education-concept，49~55 字），描述來自 Notion excerpt 欄位，需 Manko 在 Notion 補長
+- 反向連結：Google 商家、Facebook、LINE 官方帳號等外部放網站連結（外部作業）
 - 觀察 A5 9/30~10/6 視窗內的後續每日重試，確認114的題目最終全數封存完（目前已封存100題，剩餘的靠隔天重試自動補）
 - 小幫手歷屆題庫的真實題數修正已部署，建議實際在網站上測一次確認文案顯示正確（尤其是「未達36題」時的新分流文案）
 - 題庫練習頁「歷屆題庫/小幫手」目前上限是近90天、36題，超過這個範圍系統本身就查不到（小幫手在36題之後其實是導去約試聽的CTA，沒有更長的查詢機制）——如果業務上需要更長的保留期，屬新功能規劃，不是bug
