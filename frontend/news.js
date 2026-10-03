@@ -304,6 +304,7 @@
   function loadRelated(currentSlug) {
     var wrap = document.getElementById('related-list');
     if (!wrap) return;
+    if (wrap.getAttribute('data-ssr-count')) return; /* 伺服器端已渲染 */
     fetch(API_BASE + '/api/v1/news?page=1&limit=4')
       .then(function (r) { return r.json(); })
       .then(function (data) {

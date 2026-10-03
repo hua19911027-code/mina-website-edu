@@ -8,6 +8,7 @@
 - bump `news.html`／`news-single.html` 的 `news.js?v=20261003`
 - 列表底部新增「全部文章」連結清單（輸出全部 35 篇連結，搜尋引擎不會點「載入更多」）
 - API 異常時降級回原樣外殼（行為同修改前）
+- 新增 `components/ncard-template.js`（卡片模板前後端共用，自 `functions/news.js` 抽出）；`functions/news/[slug].js` 將「你可能也想看」3 篇相關文章 SSR 進 `#related-list`（失敗則維持空容器交給 JS）；`news.js` 的 `loadRelated()` 偵測 `data-ssr-count` 跳過重抓；`news.js?v=20261003b`
 
 ## 2026-09-07
 

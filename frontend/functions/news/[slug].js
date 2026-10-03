@@ -16,6 +16,8 @@
  *        style 屬性殘留 "display:none;display:block;" 這類脆弱寫法。
  */
 
+import { renderCard } from "../../components/ncard-template.js";
+
 const API_BASE = "https://api.minaedu.tw/api/v1";
 const SITE = "https://minaedu.tw";
 const BRAND = "臺中市私立卓越國際文理短期補習班";
@@ -247,6 +249,26 @@ export async function onRequest(context) {
   const publishedAt = article.publishedAt ?? "";
   const coverImage = article.coverImage ?? "";
 
+  /* 「你可能也想看」：與 news.js loadRelated() 相同（最新 4 篇去掉自己、取 3 篇）。
+   * 失敗或沒有結果時不處理，維持空容器交給前端 JS。 */
+  let relatedHtml = "";
+  let relatedCount = 0;
+  try {
+    const relRes = await fetch(`${API_BASE}/news?page=1&limit=4`, {
+      cf: { cacheTtl: 300, cacheEverything: true },
+    });
+    if (relRes.ok) {
+      const relJson = await relRes.json();
+      const items = (relJson?.data?.articles ?? [])
+        .filter((a) => a.slug !== slug)
+        .slice(0, 3);
+      relatedCount = items.length;
+      relatedHtml = items.map(renderCard).join("");
+    }
+  } catch (e) {
+    // 維持空字串
+  }
+
   const pageTitle = `${title}｜${BRAND}`;
   const canonical = `${SITE}/news/${slug}`;
   const ogImage = coverImage || `${SITE}/assets/og-cover.jpg`;
@@ -308,6 +330,14 @@ export async function onRequest(context) {
             `fetchpriority="high" decoding="async">`,
           { html: true }
         );
+      },
+    })
+
+    .on("#related-list", {
+      element(el) {
+        if (!relatedCount) return;
+        el.setAttribute("data-ssr-count", String(relatedCount));
+        el.setInnerContent(relatedHtml, { html: true });
       },
     })
 
