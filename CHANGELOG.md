@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-10-03
+
+### 修正（GSC「已找到-尚未建立索引」：文章缺少靜態內部連結）
+- 新增 `functions/news.js`：`/news` 第 1 頁（全部分類，9 篇）文章卡片伺服器端渲染，`/news/{slug}` 連結直接進 HTML（原本 `#newsGrid` 為空、靠 JS 載入，Google 看不到內部連結）
+- `news.js`：偵測 `#newsGrid[data-ssr-count]` 時跳過首次 fetch；切換分類／載入更多維持原 client-side 流程
+- bump `news.html`／`news-single.html` 的 `news.js?v=20261003`
+- API 異常時降級回原樣外殼（行為同修改前）
+
 ## 2026-09-07
 
 ### 修正（GSC 索引問題：robots.txt 封鎖 + 重新導向）

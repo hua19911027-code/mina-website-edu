@@ -253,7 +253,22 @@
     var loadMoreBtn = document.getElementById('load-more-btn');
     if (!filterBar) return;
 
-    fetchNews(currentCategory, 1, false);
+    /* 伺服器端已渲染第 1 頁（全部分類）→ 跳過首次 fetch，避免閃爍 */
+    var ssrGrid = document.getElementById('newsGrid');
+    if (ssrGrid && ssrGrid.getAttribute('data-ssr-count')) {
+      hasMore = ssrGrid.getAttribute('data-ssr-hasmore') === 'true';
+      ssrGrid.querySelectorAll('.nc-cover img').forEach(function (img) {
+        img.addEventListener('error', function () {
+          this.style.display = 'none';
+          var ico = document.createElement('span');
+          ico.className = 'nc-ico';
+          ico.textContent = '📰';
+          this.parentNode.appendChild(ico);
+        });
+      });
+    } else {
+      fetchNews(currentCategory, 1, false);
+    }
 
     filterBar.addEventListener('click', function (e) {
       var btn = e.target.closest('.nfilter');
